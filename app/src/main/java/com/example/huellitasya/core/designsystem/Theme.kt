@@ -1,4 +1,4 @@
-package com.example.huellitasya.ui.theme
+package com.example.huellitasya.core.designsystem
 
 import android.app.Activity
 import android.os.Build

@@ -1,6 +1,11 @@
-package com.example.huellitasya.ui.theme
+package com.example.huellitasya.core.designsystem
 
 import androidx.compose.ui.graphics.Color
+
+val GreenPrimary = Color(0xFF588157)
+val GreenBackground = Color(0xFFC7EBC7)
+val GrayText = Color(0xFF8E8E93)
+val LightGrayText = Color(0xFFAEAEB2)
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
