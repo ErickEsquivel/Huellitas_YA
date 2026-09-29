@@ -17,7 +17,13 @@ sealed class Destinations {
     data object Home : Destinations()
 
     @Serializable
+    data object Calendar : Destinations()
+
+    @Serializable
     data object Profile : Destinations()
+
+    @Serializable
+    data object Menu : Destinations()
 
     @Serializable
     data class PetDetail(val petId: String) : Destinations()

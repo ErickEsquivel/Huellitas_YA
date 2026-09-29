@@ -1,37 +1,68 @@
 package com.example.huellitasya.core.navigation
 
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.huellitasya.features.auth.WelcomeScreen
+import com.example.huellitasya.features.home.HomeScreen
 
 @Composable
 fun AppNavGraph() {
     val navController = rememberNavController()
+    // Obtenemos el estado de la ruta actual para saber dónde estamos
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
 
-    NavHost(
-        navController = navController,
-        startDestination = Destinations.Welcome
-    ) {
-        composable<Destinations.Welcome> {
-            WelcomeScreen(onStartClick = { navController.navigate(Destinations.Login) })
+    // Condición para mostrar la barra de navegación (solo en las secciones principales)
+    val showBottomBar = currentDestination?.hasRoute<Destinations.Home>() == true ||
+            currentDestination?.hasRoute<Destinations.Calendar>() == true ||
+            currentDestination?.hasRoute<Destinations.Profile>() == true ||
+            currentDestination?.hasRoute<Destinations.Menu>() == true
+
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                HuellitasBottomBar(
+                    navController = navController,
+                    currentDestination = currentDestination
+                )
+            }
         }
-        composable<Destinations.Login> {
-            // LoginScreen(onNavigateToHome = { navController.navigate(Destinations.Home) })
-        }
-        composable<Destinations.Register> {
-            // RegisterScreen()
-        }
-        composable<Destinations.Home> {
-            // HomeScreen(onNavigateToPetDetail = { petId -> navController.navigate(Destinations.PetDetail(petId)) })
-        }
-        composable<Destinations.Profile> {
-            // ProfileScreen()
-        }
-        composable<Destinations.PetDetail> {
-            // val args = it.toRoute<Destinations.PetDetail>()
-            // PetDetailScreen(petId = args.petId)
+    ) { innerPadding ->
+        NavHost(
+            navController = navController,
+            startDestination = Destinations.Welcome,
+            modifier = Modifier.padding(innerPadding) // Evita que el contenido quede debajo de la barra
+        ) {
+            // -- Flujo Auth --
+            composable<Destinations.Welcome> {
+                WelcomeScreen(onStartClick = { navController.navigate(Destinations.Home) })
+            }
+            composable<Destinations.Login> {
+            }
+            composable<Destinations.Register> {
+            }
+
+            // -- Flujo Principal (Con Barra Inferior) --
+            composable<Destinations.Home> {
+                HomeScreen()
+            }
+            composable<Destinations.Calendar> {
+                // TODO: CalendarScreen()
+            }
+            composable<Destinations.Profile> {
+                // TODO: ProfileScreen()
+            }
+            composable<Destinations.Menu> {
+                // TODO: MenuScreen() o desplegable
+            }
         }
     }
 }
