@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.huellitasya.features.auth.WelcomeScreen
+import com.example.huellitasya.features.calendar.CalendarScreen
 import com.example.huellitasya.features.home.HomeScreen
 
 @Composable
@@ -55,7 +56,7 @@ fun AppNavGraph() {
                 HomeScreen()
             }
             composable<Destinations.Calendar> {
-                // TODO: CalendarScreen()
+                CalendarScreen()
             }
             composable<Destinations.Profile> {
                 // TODO: ProfileScreen()

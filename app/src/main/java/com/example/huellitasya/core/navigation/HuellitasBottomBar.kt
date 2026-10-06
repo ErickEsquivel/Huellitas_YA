@@ -63,7 +63,7 @@ fun HuellitasBottomBar(
                     Icon(
                         painter = painterResource(id = item.iconRes),
                         contentDescription = item.title,
-                        modifier = Modifier.size(28.dp) // Tamaño estándar, lo puedes ajustar
+                        modifier = Modifier.size(36.dp) // Aumentamos el tamaño de los íconos
                     )
                 },
                 // Desactivamos el texto para que solo se vean los iconos (como en tu Figma)
