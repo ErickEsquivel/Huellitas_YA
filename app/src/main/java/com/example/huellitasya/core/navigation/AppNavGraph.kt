@@ -14,6 +14,7 @@ import com.example.huellitasya.features.auth.WelcomeScreen
 import com.example.huellitasya.features.calendar.CalendarScreen
 import com.example.huellitasya.features.home.HomeScreen
 import com.example.huellitasya.features.profile.ProfileScreen
+import com.example.huellitasya.features.settings.SettingsScreen
 
 @Composable
 fun AppNavGraph() {
@@ -63,7 +64,14 @@ fun AppNavGraph() {
                 ProfileScreen()
             }
             composable<Destinations.Menu> {
-                // TODO: MenuScreen() o desplegable
+                SettingsScreen(
+                    onLogout = { 
+                        // Regresa al WelcomeScreen y limpia todo el historial de navegación
+                        navController.navigate(Destinations.Welcome) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
         }
     }
