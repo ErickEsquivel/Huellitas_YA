@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.huellitasya.features.auth.WelcomeScreen
 import com.example.huellitasya.features.calendar.CalendarScreen
 import com.example.huellitasya.features.home.HomeScreen
+import com.example.huellitasya.features.profile.ProfileScreen
 
 @Composable
 fun AppNavGraph() {
@@ -59,7 +60,7 @@ fun AppNavGraph() {
                 CalendarScreen()
             }
             composable<Destinations.Profile> {
-                // TODO: ProfileScreen()
+                ProfileScreen()
             }
             composable<Destinations.Menu> {
                 // TODO: MenuScreen() o desplegable
