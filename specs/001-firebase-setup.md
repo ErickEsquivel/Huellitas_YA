@@ -14,7 +14,8 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
    - Copiarlo en `app/google-services.json`.
    - Está en `.gitignore`: **nunca** se commitea. Se comparte por un canal privado del equipo.
    - Sin este archivo el build falla en la tarea `processDebugGoogleServices` con `File google-services.json is missing`.
-   - Si el archivo no incluye un cliente OAuth web (proveedor Google sin habilitar), no se genera `R.string.default_web_client_id` y la app no compila. Habilita Google (paso 3) y vuelve a descargarlo.
+   - Va en `app/`, no en la raíz del proyecto.
+   - Si el archivo no incluye un cliente OAuth web (`oauth_client` vacío porque Google no está habilitado o falta la SHA-1), no se genera `R.string.default_web_client_id`. La app compila y el login con correo funciona, pero "Continuar con Google" muestra un error y registra un aviso en Logcat (tag `GoogleSignIn`). Habilita Google (paso 3), registra la SHA-1 (paso 2) y vuelve a descargar el archivo.
 
 2. **Huellas SHA (necesarias para Google Sign-In)**
    - Ejecutar `./gradlew signingReport` (o `gradlew.bat signingReport` en Windows) y copiar SHA-1 y SHA-256 de la variante `debug`.

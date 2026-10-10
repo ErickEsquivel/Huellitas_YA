@@ -22,7 +22,8 @@ En Windows usar `gradlew.bat` (o `./gradlew` desde Git Bash).
 ./gradlew signingReport                                    # SHA-1/SHA-256 para registrar en Firebase
 ```
 
-- `app/google-services.json` **no** está en el repo (`.gitignore`). Sin él falla `processDebugGoogleServices`, y sin un cliente OAuth web no existe `R.string.default_web_client_id`. Los pasos están en `specs/001-firebase-setup.md`. Nunca lo commitees.
+- `app/google-services.json` (en `app/`, no en la raíz) **no** está en el repo (`.gitignore`). Sin él falla `processDebugGoogleServices`. Nunca lo commitees.
+- Si el archivo no trae un cliente OAuth web, no existe `R.string.default_web_client_id`. `MainActivity` lo busca por nombre con `getIdentifier`, así que la app compila y solo falla el login con Google. Los pasos de configuración están en `specs/001-firebase-setup.md`.
 - Si Android Studio está abierto, Windows puede bloquear `app/build` ("Unable to delete directory"). Cierra el IDE o redirige el build dir con un init script.
 - Las dependencias van en `gradle/libs.versions.toml` y se declaran en `app/build.gradle.kts`.
 
