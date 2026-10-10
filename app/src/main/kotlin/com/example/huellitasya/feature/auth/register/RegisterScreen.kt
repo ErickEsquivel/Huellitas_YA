@@ -95,6 +95,7 @@ internal fun RegisterScreen(
     snackbarHostState: SnackbarHostState,
     onAction: (RegisterAction) -> Unit,
     onBackClick: () -> Unit,
+    forceKeyboardLayout: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
     val showPassword = stringResource(R.string.auth_show_password)
@@ -109,6 +110,7 @@ internal fun RegisterScreen(
         ),
         subtitle = stringResource(R.string.auth_register_subtitle),
         onBackClick = onBackClick,
+        forceKeyboardLayout = forceKeyboardLayout,
         snackbarHostState = snackbarHostState,
         bottomButton = {
             HuellitasButton(
@@ -124,8 +126,9 @@ internal fun RegisterScreen(
                 modifier = Modifier.width(319.dp),
             )
         },
-    ) {
-        Spacer(modifier = Modifier.height(30.dp))
+    ) { isCompact ->
+        val fieldSpacing = if (isCompact) 4.dp else 8.dp
+        Spacer(modifier = Modifier.height(if (isCompact) 12.dp else 30.dp))
         HuellitasTextField(
             value = state.name,
             onValueChange = { onAction(RegisterAction.NameChanged(it)) },
@@ -133,12 +136,13 @@ internal fun RegisterScreen(
             status = state.nameFeedback.status,
             message = state.nameFeedback?.message?.asString(),
             enabled = !state.isLoading,
+            compact = isCompact,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Next,
             ),
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(fieldSpacing))
         HuellitasTextField(
             value = state.email,
             onValueChange = { onAction(RegisterAction.EmailChanged(it)) },
@@ -146,9 +150,10 @@ internal fun RegisterScreen(
             status = state.emailFeedback.status,
             message = state.emailFeedback?.message?.asString(),
             enabled = !state.isLoading,
+            compact = isCompact,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(fieldSpacing))
         HuellitasPasswordField(
             value = state.password,
             onValueChange = { onAction(RegisterAction.PasswordChanged(it)) },
@@ -158,8 +163,9 @@ internal fun RegisterScreen(
             status = state.passwordFeedback.status,
             message = state.passwordFeedback?.message?.asString(),
             enabled = !state.isLoading,
+            compact = isCompact,
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(fieldSpacing))
         HuellitasPasswordField(
             value = state.confirmPassword,
             onValueChange = { onAction(RegisterAction.ConfirmPasswordChanged(it)) },
@@ -169,6 +175,7 @@ internal fun RegisterScreen(
             status = state.confirmPasswordFeedback.status,
             message = state.confirmPasswordFeedback?.message?.asString(),
             enabled = !state.isLoading,
+            compact = isCompact,
             imeAction = ImeAction.Done,
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         )
@@ -178,7 +185,7 @@ internal fun RegisterScreen(
                 FieldMessage(text = message.asString(), status = feedback.status)
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(if (isCompact) 6.dp else 24.dp))
         TermsCheckbox(
             checked = state.termsAccepted,
             onCheckedChange = { onAction(RegisterAction.TermsChanged(it)) },
@@ -246,6 +253,33 @@ private fun RegisterScreenPreview() {
             snackbarHostState = SnackbarHostState(),
             onAction = {},
             onBackClick = {},
+        )
+    }
+}
+
+@Preview(name = "Teléfono compacto", showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun RegisterScreenCompactPreview() {
+    HuellitasYATheme {
+        RegisterScreen(
+            state = RegisterUiState(),
+            snackbarHostState = SnackbarHostState(),
+            onAction = {},
+            onBackClick = {},
+        )
+    }
+}
+
+@Preview(name = "Teclado abierto", showBackground = true, widthDp = 412, heightDp = 480)
+@Composable
+private fun RegisterScreenKeyboardPreview() {
+    HuellitasYATheme {
+        RegisterScreen(
+            state = RegisterUiState(name = "Santiago Cruz"),
+            snackbarHostState = SnackbarHostState(),
+            onAction = {},
+            onBackClick = {},
+            forceKeyboardLayout = true,
         )
     }
 }

@@ -57,6 +57,33 @@ Presentación (Figma "ERRORES LAYOUTS"):
 - El botón principal se ve gris (`ButtonIncomplete`) mientras falten datos y verde (`GreenAction`) cuando el formulario está completo. Sigue siendo pulsable en gris para mostrar los avisos.
 - Mientras hay una petición en curso, el botón muestra un indicador y no acepta otro clic.
 
+## Adaptación a pantalla y teclado
+
+Login, Registro y Recuperar contraseña comparten `AuthFormScaffold` y se ajustan sin scroll vertical:
+
+- **Cabecera flexible.** La foto y la insignia ocupan el espacio que sobra del alto disponible:
+  - en pantallas altas crecen hasta el tamaño de Figma;
+  - en pantallas bajas se encogen hasta un mínimo de 96 dp;
+  - la ola blanca inferior siempre queda visible, y la insignia se oculta si no cabe.
+- **Teclado.** El alto disponible excluye el teclado y sigue su animación. Al abrirse el teclado:
+  - la foto, la insignia y el subtítulo se ocultan con animación;
+  - la flecha volver pasa a negro;
+  - el botón principal queda justo encima del teclado.
+
+  Al cerrarlo, todo vuelve a aparecer.
+- **Modo compacto.** Se activa con el teclado abierto o con un alto disponible < 640 dp:
+  - campos de 44 dp con etiqueta de 14 sp;
+  - título de 20 sp (24 sp en Recuperar);
+  - espacios reducidos;
+  - margen inferior del botón de 12 dp.
+- **Barra de navegación del sistema.** Sin teclado, el botón queda por encima de ella (la app dibuja edge-to-edge).
+- **Respaldo.** Si el contenido no cabe ni así (p. ej. un teléfono de 640 dp de alto con el teclado abierto, o una fuente del sistema muy grande), el formulario se puede desplazar. Nunca se corta contenido.
+
+Verificado en un Vivo V2436 (384×857 dp, Android 16):
+- sin scroll en las tres pantallas, con y sin teclado;
+- con la pantalla simulada a 360×640 dp, sin scroll sin teclado.
+- En 360×640 dp **con** teclado, Login usa el respaldo.
+
 ## Errores remotos (`AuthError` → presentación)
 
 | Excepción Firebase | `AuthError` | Dónde | Mensaje |
@@ -131,6 +158,8 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 - [ ] Con sesión activa, al reabrir la app se entra a Home sin ver Presentación (el splash se mantiene mientras se resuelve la sesión).
 - [ ] "Cerrar sesión" en Configuración regresa a Presentación con el historial limpio.
 - [ ] Mientras una petición está en curso, el botón principal no se puede pulsar dos veces.
+- [x] Login, Registro y Recuperar no necesitan scroll, con o sin teclado, en pantallas de ≥ 800 dp de alto; sin teclado, tampoco desde 640 dp.
+- [x] Al abrir el teclado se ocultan con animación la foto, la insignia y el subtítulo, y el botón queda encima del teclado; al cerrarlo, reaparecen.
 
 ## Fuera de alcance
 
