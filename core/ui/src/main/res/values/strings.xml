@@ -1,0 +1,23 @@
+<resources>
+    <!-- Validación (spec 002, textos de Figma "ERRORES LAYOUTS") -->
+    <string name="error_missing_fields">Rellene todos los datos para continuar</string>
+    <string name="error_empty_name">Ingresa tu nombre</string>
+    <string name="error_name_too_short">El nombre debe tener al menos 2 caracteres</string>
+    <string name="error_empty_email">Ingresa tu correo</string>
+    <string name="error_invalid_email">Ingresa un correo válido</string>
+    <string name="error_empty_password">Ingresa tu contraseña</string>
+    <string name="error_password_too_short">Mínimo 8 caracteres</string>
+    <string name="error_password_uppercase">Debe incluir una letra mayúscula</string>
+    <string name="error_password_digit_or_symbol">Debe incluir un número o carácter especial</string>
+    <string name="error_passwords_do_not_match">Las contraseñas no coinciden</string>
+    <string name="error_terms_not_accepted">Acepta los Términos y Condiciones para continuar</string>
+
+    <!-- Errores remotos (spec 002) -->
+    <string name="error_invalid_credentials">Correo o contraseña incorrectos</string>
+    <string name="error_email_in_use">Este correo ya está registrado</string>
+    <string name="error_weak_password">La contraseña es demasiado débil</string>
+    <string name="error_network">Sin conexión. Revisa tu internet</string>
+    <string name="error_too_many_requests">Demasiados intentos. Intenta más tarde</string>
+    <string name="error_google_sign_in">No se pudo iniciar sesión con Google</string>
+    <string name="error_unknown">Ocurrió un error inesperado</string>
+</resources>
