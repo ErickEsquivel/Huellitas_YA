@@ -14,10 +14,10 @@ Las specs son la fuente de verdad de **qué** debe hacer cada feature antes de e
 
 | Spec | Estado |
 |------|--------|
-| [000 — Arquitectura](000-arquitectura.md) | Approved |
-| [001 — Firebase setup](001-firebase-setup.md) | Approved |
-| [002 — Autenticación](002-auth.md) | Approved |
-| [003 — Design system](003-design-system.md) | Approved |
+| [000 — Arquitectura](000-arquitectura.md) | Implemented |
+| [001 — Firebase setup](001-firebase-setup.md) | Implemented |
+| [002 — Autenticación](002-auth.md) | Implemented |
+| [003 — Design system](003-design-system.md) | Implemented |
 
 ## Plantilla
 

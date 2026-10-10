@@ -1,6 +1,6 @@
 # 001 — Firebase setup
 
-- **Estado:** Approved
+- **Estado:** Implemented
 - **Módulos:** :app, :core:data
 
 ## Objetivo
@@ -14,6 +14,7 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
    - Copiarlo en `app/google-services.json`.
    - Está en `.gitignore`: **nunca** se commitea. Se comparte por un canal privado del equipo.
    - Sin este archivo el build falla en la tarea `processDebugGoogleServices` con `File google-services.json is missing`.
+   - Si el archivo no incluye un cliente OAuth web (proveedor Google sin habilitar), no se genera `R.string.default_web_client_id` y `:app` no compila. Habilita Google (paso 3) y vuelve a descargarlo.
 
 2. **Huellas SHA (necesarias para Google Sign-In)**
    - Ejecutar `./gradlew signingReport` (o `gradlew.bat signingReport` en Windows) y copiar SHA-1 y SHA-256 de la variante `debug`.

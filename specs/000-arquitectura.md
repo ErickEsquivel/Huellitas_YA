@@ -1,6 +1,6 @@
 # 000 — Arquitectura
 
-- **Estado:** Approved
+- **Estado:** Implemented
 - **Módulos:** todos
 
 ## Objetivo
@@ -19,7 +19,8 @@ Definir una arquitectura MVVM multi-módulo que permita desarrollar features en 
                       módulos Hilt que las enlazan con las interfaces de :core:domain.
 :core:designsystem    Tema, tokens (color, tipografía, espaciado) y componentes Compose
                       sin lógica de negocio.
-:core:ui              Helpers de UI compartidos por features (UiText, ObserveAsEvents).
+:core:ui              Helpers de UI compartidos por features (UiText, FieldFeedback, ObserveAsEvents).
+:core:testing         Fakes de repositorios y MainDispatcherRule (solo testImplementation).
 :feature:<nombre>     Pantallas + ViewModels de una feature (auth, home, calendar,
                       profile, settings).
 build-logic/          Convention plugins de Gradle (configuración común de módulos).
@@ -59,17 +60,23 @@ Reglas:
 
 ## Navegación
 
-- Navigation Compose type-safe: cada feature declara sus rutas `@Serializable` en `navigation/XNavigation.kt` y expone:
-  - `fun NavGraphBuilder.xScreen(...)` (o `xGraph(...)` si es un grafo anidado).
-  - `fun NavController.navigateToX(navOptions)`.
-- `:app` ensambla los grafos en `HuellitasNavHost`.
-- Grafos raíz: `AuthGraph` (Welcome, Login, Register, ForgotPassword) y las pestañas principales (Home, Calendar, Profile, Settings) con barra inferior.
+- Navigation Compose type-safe. Cada feature declara sus destinos `@Serializable` (`XDestination`) en `navigation/XNavigation.kt` y expone `fun NavGraphBuilder.xScreen(...)`, o `xGraph(...)` si es un grafo anidado.
+- El sufijo `Destination` se usa para los objetos de ruta, porque `XRoute` es el nombre del composable stateful.
+- `:app` (`navigation/HuellitasApp.kt`) decide el NavHost según `SessionState`:
+  - `SignedOut` → NavHost de auth (`authGraph`).
+  - `SignedIn` → NavHost principal con barra inferior (`TopLevelDestination`).
+- Iniciar o cerrar sesión **no** navega: reemplaza el NavHost completo, y con él el historial.
 
 ## Inyección de dependencias
 
 - Hilt. `@HiltAndroidApp` en `HuellitasApplication`, `@AndroidEntryPoint` en `MainActivity`.
 - Use cases con `@Inject constructor` (sin anotaciones de Android: `javax.inject` funciona en módulos JVM).
 - Bindings `@Binds` / `@Provides` viven en `:core:data/di`.
+
+## Tests
+
+- Unit tests en la JVM para validadores, use cases y ViewModels, con los fakes de `:core:testing` (`FakeAuthRepository`, `FakeUserRepository`), `MainDispatcherRule` y Turbine para flows.
+- En tests de ViewModel, el `@ApplicationScope` de los use cases es el propio `TestScope` (`appScope = this`), para que `advanceUntilIdle()` ejecute ese trabajo.
 
 ## Convenciones de nombres
 
@@ -79,9 +86,9 @@ Reglas:
 
 ## Criterios de aceptación
 
-- [ ] El proyecto compila con los módulos listados y las reglas de dependencia se cumplen (ninguna feature declara `:core:data` ni otra feature).
-- [ ] Cada pantalla con lógica tiene ViewModel + Route + Screen stateless con `@Preview`.
-- [ ] Los módulos `:core:model`, `:core:common`, `:core:domain` compilan como JVM puro.
+- [x] El proyecto compila con los módulos listados y las reglas de dependencia se cumplen (ninguna feature declara `:core:data` ni otra feature).
+- [x] Cada pantalla con lógica tiene ViewModel + Route + Screen stateless con `@Preview`.
+- [x] Los módulos `:core:model`, `:core:common`, `:core:domain` compilan como JVM puro.
 
 ## Fuera de alcance
 
