@@ -1,57 +1,75 @@
 # 003 — Design system
 
-- **Estado:** Approved
+- **Estado:** Implemented
 - **Módulos:** :core:designsystem
+- **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-) (frame `ERRORES LAYOUTS` para los estados de campos)
 
 ## Objetivo
 
 Centralizar tokens visuales y componentes reutilizables para que las pantallas generadas desde Figma (vía MCP) se armen con piezas existentes en lugar de duplicar estilos.
 
-## Tokens
+## Tokens (`Color.kt`)
 
 | Token | Valor | Uso |
 |-------|-------|-----|
-| `GreenPrimary` | `#588157` | Botones principales, ícono de pestaña activa, acentos |
-| `GreenBackground` | `#C7EBC7` | Fondo curvo, íconos inactivos |
+| `GreenPrimary` | `#588157` | Botón "Comenzar", ícono de pestaña activa, bordes verdes |
+| `GreenAction` | `#57AF80` | Botones de acción de auth cuando el formulario está listo |
+| `GreenHighlight` | `#59AD57` | Acentos de título ("YA!", "!") |
+| `GreenBackground` | `#C7EBC7` | Fondo curvo, íconos inactivos, huella decorativa |
 | `GreenAccent` | `#8DC68F` | Botón flotante "+" |
+| `MintSurface` | `#E5F5ED` | Botón secundario suave ("Regístrate", al 50 %) |
+| `ButtonIncomplete` | `#676E68` | Botón principal mientras faltan datos |
 | `GrayText` | `#8E8E93` | Subtítulos |
 | `LightGrayText` | `#AEAEB2` | Texto secundario |
 | `SurfaceGray` | `#F2F2F2` | Tarjetas vacías / placeholders |
-| `BorderSubtle` | `#33000000` | Bordes de tarjetas y botones |
-| `ErrorRed` | `#D32F2F` | Errores de formulario |
+| `BorderSubtle` | `#33000000` | Bordes de campos, tarjetas y botones |
+| `LinkBlue` | `#0077FF` | Enlaces ("¿Se te olvidó la contraseña?", "Términos") |
+| `ErrorRed` | `#FF0000` | Campo con error (borde e ícono X) |
+| `WarningOrange` | `#80FF6A00` | Campo con advertencia (borde) |
 
 - Espaciados en `HuellitasSpacing` (`xs=4, sm=8, md=16, lg=24, xl=32, xxl=48` dp).
-- Tipografía: `Typography` de Material 3 en `Type.kt`; cuando se defina la fuente de Figma (Nunito) se configura ahí una sola vez.
-- `HuellitasYATheme` usa un esquema de color de marca fijo (sin dynamic color) para que `MaterialTheme.colorScheme` refleje los colores de Figma.
+- Tipografía: **Nunito** (Regular 400, Bold 700, ExtraBold 800) en `res/font`, con licencia SIL OFL 1.1. `Typography` aplica Nunito a todos los estilos, así que cualquier `Text` la hereda.
+- `HuellitasYATheme` usa un esquema de color de marca fijo (sin dynamic color), para que `MaterialTheme.colorScheme` refleje los colores de Figma.
 
 ## Catálogo de componentes (`core.designsystem.components`)
 
 | Componente | Descripción |
 |------------|-------------|
-| `HuellitasButton` | Botón principal verde redondeado. Soporta `enabled` y `isLoading`. |
-| `HuellitasTextButton` | Enlace de texto (p. ej. "¿Olvidaste tu contraseña?"). |
-| `GoogleSignInButton` | Botón con borde "Continuar con Google". |
-| `HuellitasTextField` | Campo con label, placeholder, mensaje de error y `KeyboardOptions`. |
+| `HuellitasButton` | Botón principal redondeado. Soporta `containerColor`, `enabled` e `isLoading`. |
+| `HuellitasOptionButton` | Botón de 319×46 con ícono a la izquierda y texto alineado a 87 dp ("Continuar con correo", "Regístrate"). |
+| `GoogleOptionButton` | Variante blanca con borde verde y logo de Google. |
+| `HuellitasTextButton` | Enlace de texto. |
+| `HuellitasTextField` | Etiqueta arriba + caja de 48 dp + `FieldStatus` (`Default`/`Warning`/`Error`) + mensaje opcional. |
 | `HuellitasPasswordField` | `HuellitasTextField` con mostrar/ocultar contraseña. |
-| `CurvedBackground` | Fondo con ola verde (parámetro `fraction` de altura). |
+| `FieldMessage` | Ícono (alerta o X) + mensaje bajo un campo o un formulario. |
+| `CurvedBackground` | Fondo con ola verde. |
 | `ScreenHeader` | Título + subtítulo opcional + campana de notificaciones. |
 | `LoadingOverlay` | Capa semitransparente con indicador de progreso. |
 | `AddPlaceholderCard` | Tarjeta gris con ícono "+" (agregar mascota/evento). |
 
+En `:core:ui`, `FieldFeedback(status, message: UiText?)` es lo que los ViewModels asignan a cada campo. Los mapeos `ValidationError.toFieldFeedback()` y `AuthError.toFieldFeedback()` aplican las reglas de la spec 002.
+
+## Assets de Figma
+
+- Se descargan con el MCP de Figma (`get_design_context`) y se guardan sin modificar el contenido:
+  - Fotos y PNG se convierten a WebP y van en `drawable-nodpi/`.
+  - Los SVG se convierten a vector drawable.
+- Los assets que solo usa una feature viven en su módulo (p. ej. las fotos de cabecera de auth en `:feature:auth`). Los compartidos van en `:core:designsystem`.
+
 ## Reglas
 
 - Un componente entra al design system cuando se usa en ≥ 2 pantallas o es base de formularios.
-- Los componentes reciben `modifier: Modifier = Modifier` como primer parámetro opcional y no tienen tamaños fijos de ancho salvo que el diseño lo exija (preferir `fillMaxWidth()` desde el llamador).
+- Los componentes reciben `modifier: Modifier = Modifier` y el llamador puede cambiar el ancho por defecto.
 - Sin lógica de negocio ni strings de features: los textos llegan por parámetro.
 - Cada componente tiene un `@Preview`.
 
 ## Criterios de aceptación
 
-- [ ] Ninguna pantalla redefine el header título + campana ni el fondo curvo con su propio `Canvas`.
-- [ ] Los formularios de auth usan exclusivamente componentes del catálogo.
-- [ ] Los colores de las pantallas provienen de tokens (no literales `Color(0x...)` en features).
+- [x] Ninguna pantalla redefine el header título + campana ni el fondo curvo con su propio `Canvas`.
+- [x] Los formularios de auth usan exclusivamente componentes del catálogo.
+- [x] Los colores de las pantallas de auth provienen de tokens.
 
 ## Fuera de alcance
 
 - Modo oscuro de marca.
-- Fuentes personalizadas (pendiente de exportar desde Figma).
+- Reemplazar los literales de color que quedan en Home, Calendario, Perfil y Configuración (se revisarán cuando se rehagan desde Figma).
