@@ -66,6 +66,11 @@ Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tien
 - Los repositorios devuelven `AppResult<D, AuthError|DataError>` en lugar de lanzar excepciones.
 - La UI muestra `FieldFeedback(FieldStatus.Warning|Error, UiText)` bajo cada campo, con un aviso agrupado para campos vacíos. Los errores generales van a un Snackbar.
 
+**Formularios de auth adaptables:**
+- `AuthFormScaffold` (`feature/auth/components`) usa `AuthAdaptiveLayout`: mide primero el formulario y el botón, y la cabecera (foto + insignia) toma el espacio sobrante.
+- Con el teclado abierto (`WindowInsets.isImeVisible`) la cabecera se colapsa y el contenido recibe `isCompact`. Las pantallas lo pasan a `HuellitasTextField(compact = …)` y a sus espaciados.
+- No metas alturas fijas grandes en esos formularios. Para ver el modo teclado en previews, usa `forceKeyboardLayout`.
+
 **Google Sign-In:** `GoogleIdTokenRequester` (Credential Manager, en `feature.auth.google`) necesita un Activity. `MainActivity` le pasa `default_web_client_id` a `authGraph()`.
 
 ## Figma

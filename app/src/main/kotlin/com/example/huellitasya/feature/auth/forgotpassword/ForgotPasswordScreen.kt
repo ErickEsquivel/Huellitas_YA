@@ -77,6 +77,7 @@ internal fun ForgotPasswordScreen(
     snackbarHostState: SnackbarHostState,
     onAction: (ForgotPasswordAction) -> Unit,
     onBackClick: () -> Unit,
+    forceKeyboardLayout: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -85,9 +86,11 @@ internal fun ForgotPasswordScreen(
         badge = ForgotBadge,
         title = AnnotatedString(stringResource(R.string.auth_forgot_title)),
         titleFontSize = 32.sp,
+        compactTitleFontSize = 24.sp,
         subtitle = stringResource(R.string.auth_forgot_subtitle),
         onBackClick = onBackClick,
         backTint = Color.White,
+        forceKeyboardLayout = forceKeyboardLayout,
         snackbarHostState = snackbarHostState,
         bottomButton = {
             HuellitasButton(
@@ -103,8 +106,8 @@ internal fun ForgotPasswordScreen(
                 modifier = Modifier.width(319.dp),
             )
         },
-    ) {
-        Spacer(modifier = Modifier.height(35.dp))
+    ) { isCompact ->
+        Spacer(modifier = Modifier.height(if (isCompact) 12.dp else 35.dp))
         HuellitasTextField(
             value = state.email,
             onValueChange = { onAction(ForgotPasswordAction.EmailChanged(it)) },
@@ -112,6 +115,7 @@ internal fun ForgotPasswordScreen(
             status = state.emailFeedback?.status ?: FieldStatus.Default,
             message = state.emailFeedback?.message?.asString(),
             enabled = !state.isLoading,
+            compact = isCompact,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
@@ -145,6 +149,33 @@ private fun ForgotPasswordScreenPreview() {
             snackbarHostState = SnackbarHostState(),
             onAction = {},
             onBackClick = {},
+        )
+    }
+}
+
+@Preview(name = "Teléfono compacto", showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun ForgotPasswordScreenCompactPreview() {
+    HuellitasYATheme {
+        ForgotPasswordScreen(
+            state = ForgotPasswordUiState(),
+            snackbarHostState = SnackbarHostState(),
+            onAction = {},
+            onBackClick = {},
+        )
+    }
+}
+
+@Preview(name = "Teclado abierto", showBackground = true, widthDp = 412, heightDp = 420)
+@Composable
+private fun ForgotPasswordScreenKeyboardPreview() {
+    HuellitasYATheme {
+        ForgotPasswordScreen(
+            state = ForgotPasswordUiState(email = "Sa.company@"),
+            snackbarHostState = SnackbarHostState(),
+            onAction = {},
+            onBackClick = {},
+            forceKeyboardLayout = true,
         )
     }
 }

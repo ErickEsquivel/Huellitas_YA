@@ -84,6 +84,7 @@ internal fun LoginScreen(
     onAction: (LoginAction) -> Unit,
     onBackClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
+    forceKeyboardLayout: Boolean = false,
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -97,6 +98,7 @@ internal fun LoginScreen(
         subtitle = stringResource(R.string.auth_login_subtitle),
         subtitleTopSpacing = 10.dp,
         onBackClick = onBackClick,
+        forceKeyboardLayout = forceKeyboardLayout,
         snackbarHostState = snackbarHostState,
         bottomButton = {
             HuellitasButton(
@@ -112,8 +114,8 @@ internal fun LoginScreen(
                 modifier = Modifier.width(319.dp),
             )
         },
-    ) {
-        Spacer(modifier = Modifier.height(23.dp))
+    ) { isCompact ->
+        Spacer(modifier = Modifier.height(if (isCompact) 12.dp else 23.dp))
         HuellitasTextField(
             value = state.email,
             onValueChange = { onAction(LoginAction.EmailChanged(it)) },
@@ -121,6 +123,7 @@ internal fun LoginScreen(
             status = state.emailFeedback?.status ?: FieldStatus.Default,
             message = state.emailFeedback?.message?.asString(),
             enabled = !state.isLoading,
+            compact = isCompact,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -133,6 +136,7 @@ internal fun LoginScreen(
             status = state.passwordFeedback?.status ?: FieldStatus.Default,
             message = state.passwordFeedback?.message?.asString(),
             enabled = !state.isLoading,
+            compact = isCompact,
             imeAction = ImeAction.Done,
             keyboardActions = KeyboardActions(onDone = {
                 focusManager.clearFocus()
@@ -145,7 +149,7 @@ internal fun LoginScreen(
                 FieldMessage(text = message.asString(), status = feedback.status)
             }
         }
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(if (isCompact) 4.dp else 32.dp))
         HuellitasTextButton(
             text = stringResource(R.string.auth_login_forgot_password),
             onClick = onForgotPasswordClick,
@@ -166,6 +170,35 @@ private fun LoginScreenPreview() {
             onAction = {},
             onBackClick = {},
             onForgotPasswordClick = {},
+        )
+    }
+}
+
+@Preview(name = "Teléfono compacto", showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun LoginScreenCompactPreview() {
+    HuellitasYATheme {
+        LoginScreen(
+            state = LoginUiState(email = "Sa.company@hotmail.com", password = "secreto"),
+            snackbarHostState = SnackbarHostState(),
+            onAction = {},
+            onBackClick = {},
+            onForgotPasswordClick = {},
+        )
+    }
+}
+
+@Preview(name = "Teclado abierto", showBackground = true, widthDp = 412, heightDp = 420)
+@Composable
+private fun LoginScreenKeyboardPreview() {
+    HuellitasYATheme {
+        LoginScreen(
+            state = LoginUiState(email = "Sa.company@hotmail.com"),
+            snackbarHostState = SnackbarHostState(),
+            onAction = {},
+            onBackClick = {},
+            onForgotPasswordClick = {},
+            forceKeyboardLayout = true,
         )
     }
 }

@@ -32,10 +32,10 @@
     <string name="auth_login_button">Iniciar sesión</string>
 
     <!-- Registro (Figma "REGISTRO") -->
-    <string name="auth_register_title">¡Bienvenido a Huellitas </string>
+    <string name="auth_register_title">"¡Bienvenido a Huellitas "</string>
     <string name="auth_register_title_highlight">YA!</string>
     <string name="auth_register_subtitle">Completa tus datos para crear tu cuenta y empezar.</string>
-    <string name="auth_register_terms_prefix">Acepta los </string>
+    <string name="auth_register_terms_prefix">"Acepta los "</string>
     <string name="auth_register_terms">Términos</string>
     <string name="auth_register_terms_and">" y "</string>
     <string name="auth_register_conditions">Condiciones</string>

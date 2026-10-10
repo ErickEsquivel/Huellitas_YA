@@ -63,6 +63,9 @@ private val LabelColor = Color.Black.copy(alpha = 0.5f)
 /**
  * Campo de texto base de todos los formularios: etiqueta arriba, caja de 48 dp y,
  * opcionalmente, un mensaje con ícono debajo ([FieldMessage]).
+ *
+ * @param compact variante para pantallas bajas o con el teclado abierto: caja de 44 dp,
+ *   etiqueta de 14 sp y texto de 18 sp.
  */
 @Composable
 fun HuellitasTextField(
@@ -77,6 +80,7 @@ fun HuellitasTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailingIcon: @Composable (() -> Unit)? = null,
+    compact: Boolean = false,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -91,10 +95,10 @@ fun HuellitasTextField(
         Text(
             text = label,
             color = LabelColor,
-            fontSize = 16.sp,
+            fontSize = if (compact) 14.sp else 16.sp,
             fontWeight = FontWeight.ExtraBold,
         )
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(if (compact) 2.dp else 4.dp))
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
@@ -104,7 +108,7 @@ fun HuellitasTextField(
             textStyle = TextStyle(
                 fontFamily = Nunito,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = if (compact) 18.sp else 20.sp,
                 color = Color.Black,
             ),
             cursorBrush = SolidColor(GreenPrimary),
@@ -116,7 +120,7 @@ fun HuellitasTextField(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(if (compact) 44.dp else 48.dp)
                         .border(1.dp, borderColor, FieldShape)
                         .padding(start = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -147,6 +151,7 @@ fun HuellitasPasswordField(
     enabled: Boolean = true,
     imeAction: ImeAction = ImeAction.Next,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    compact: Boolean = false,
 ) {
     var isVisible by rememberSaveable { mutableStateOf(false) }
 
@@ -161,6 +166,7 @@ fun HuellitasPasswordField(
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = imeAction),
         keyboardActions = keyboardActions,
         visualTransformation = if (isVisible) VisualTransformation.None else PasswordVisualTransformation('*'),
+        compact = compact,
         trailingIcon = {
             IconButton(onClick = { isVisible = !isVisible }) {
                 Icon(
