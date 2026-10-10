@@ -1,6 +1,7 @@
 package com.example.huellitasya.feature.auth.google
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -24,14 +25,20 @@ import kotlinx.coroutines.CancellationException
  * autentica con Firebase mediante `SignInWithGoogleUseCase`.
  *
  * @param serverClientId "ID de cliente web" de Firebase (`R.string.default_web_client_id`).
+ *   Es `null` si `google-services.json` aún no trae el cliente OAuth web (spec 001): en ese
+ *   caso el inicio con Google falla con un aviso en lugar de impedir que la app compile.
  */
 internal class GoogleIdTokenRequester(
     private val activityContext: Context,
-    private val serverClientId: String,
+    private val serverClientId: String?,
 ) {
     private val credentialManager = CredentialManager.create(activityContext)
 
     suspend fun requestIdToken(): AppResult<String, AuthError> {
+        if (serverClientId == null) {
+            Log.w(TAG, "Falta default_web_client_id: habilita Google en Firebase Auth y vuelve a descargar google-services.json")
+            return AppResult.Failure(AuthError.GoogleSignInFailed)
+        }
         val request = GetCredentialRequest.Builder()
             .addCredentialOption(GetSignInWithGoogleOption.Builder(serverClientId).build())
             .build()
@@ -57,8 +64,10 @@ internal class GoogleIdTokenRequester(
     }
 }
 
+private const val TAG = "GoogleSignIn"
+
 @Composable
-internal fun rememberGoogleIdTokenRequester(serverClientId: String): GoogleIdTokenRequester {
+internal fun rememberGoogleIdTokenRequester(serverClientId: String?): GoogleIdTokenRequester {
     val context = LocalContext.current
     return remember(context, serverClientId) { GoogleIdTokenRequester(context, serverClientId) }
 }

@@ -68,7 +68,7 @@ private val ChooserHero = AuthHeroSpec(
 
 @Composable
 internal fun AuthChooserRoute(
-    googleServerClientId: String,
+    googleServerClientId: String?,
     onEmailClick: () -> Unit,
     onRegisterClick: () -> Unit,
     viewModel: AuthChooserViewModel = hiltViewModel(),

@@ -34,11 +34,12 @@ internal data object ForgotPasswordDestination
  * Presentación → Bienvenido → (correo → Login → Recuperar contraseña | Regístrate | Google).
  * Al autenticarse no se navega desde aquí: la app reemplaza este grafo al cambiar la sesión.
  *
- * @param googleServerClientId "ID de cliente web" de Firebase (`R.string.default_web_client_id`).
+ * @param googleServerClientId "ID de cliente web" de Firebase (`R.string.default_web_client_id`),
+ *   o `null` si todavía no está configurado.
  */
 fun NavGraphBuilder.authGraph(
     navController: NavController,
-    googleServerClientId: String,
+    googleServerClientId: String?,
 ) {
     navigation<AuthGraph>(startDestination = WelcomeDestination) {
         composable<WelcomeDestination> {

@@ -26,7 +26,7 @@ import com.example.huellitasya.feature.settings.navigation.settingsScreen
 @Composable
 fun HuellitasApp(
     sessionState: SessionState,
-    googleServerClientId: String,
+    googleServerClientId: String?,
 ) {
     when (sessionState) {
         // El splash del sistema cubre este estado (ver MainActivity).
@@ -37,7 +37,7 @@ fun HuellitasApp(
 }
 
 @Composable
-private fun AuthNavHost(googleServerClientId: String) {
+private fun AuthNavHost(googleServerClientId: String?) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = AuthGraph) {
         authGraph(navController = navController, googleServerClientId = googleServerClientId)

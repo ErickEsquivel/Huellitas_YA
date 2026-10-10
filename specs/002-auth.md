@@ -107,7 +107,7 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 ### Google Sign-In
 
 - `GoogleIdTokenRequester` (en `feature.auth.google`) abre el selector de cuentas con Credential Manager (`GetSignInWithGoogleOption`) y devuelve el ID token. Vive en la capa de UI porque necesita el `Context` de un Activity.
-- El `serverClientId` es `R.string.default_web_client_id`. Lo genera el plugin de Google Services a partir de `google-services.json` y `MainActivity` lo pasa a `authGraph(...)`.
+- El `serverClientId` es `R.string.default_web_client_id`. Lo genera el plugin de Google Services a partir de `google-services.json` y `MainActivity` lo busca por nombre y lo pasa a `authGraph(...)`. Si no existe (Google sin configurar), el botón de Google responde "No se pudo iniciar sesión con Google".
 
 ### Rutas (`feature.auth.navigation`)
 

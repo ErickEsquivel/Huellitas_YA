@@ -1,5 +1,6 @@
 package com.example.huellitasya
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,14 +26,26 @@ class MainActivity : ComponentActivity() {
         }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val googleClientId = googleServerClientId()
         setContent {
             val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
             HuellitasYATheme {
                 HuellitasApp(
                     sessionState = sessionState,
-                    googleServerClientId = getString(R.string.default_web_client_id),
+                    googleServerClientId = googleClientId,
                 )
             }
         }
     }
+
+    /**
+     * `default_web_client_id` lo genera el plugin de Google Services solo si `google-services.json`
+     * incluye el cliente OAuth web (proveedor Google habilitado + SHA-1 registrada). Se busca por
+     * nombre para que la app compile y funcione con correo aunque Google aún no esté configurado.
+     */
+    @SuppressLint("DiscouragedApi")
+    private fun googleServerClientId(): String? =
+        resources.getIdentifier("default_web_client_id", "string", packageName)
+            .takeIf { it != 0 }
+            ?.let(::getString)
 }
