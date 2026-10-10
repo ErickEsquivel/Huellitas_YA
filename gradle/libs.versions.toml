@@ -19,7 +19,6 @@ kotlinxSerializationJson = "1.8.0"
 kotlinxCoroutines = "1.10.2"
 credentials = "1.5.0"
 googleid = "1.1.1"
-javaxInject = "1"
 turbine = "1.2.1"
 
 [libraries]
@@ -47,39 +46,19 @@ androidx-credentials-play-services-auth = { group = "androidx.credentials", name
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
-dagger = { group = "com.google.dagger", name = "dagger", version.ref = "hilt" }
-dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "hilt" }
-javax-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
-# Dependencias de build-logic (convention plugins)
-android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
-kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-compose-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compiler-gradle-plugin", version.ref = "kotlin" }
-ksp-gradlePlugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
-hilt-gradlePlugin = { group = "com.google.dagger", name = "hilt-android-gradle-plugin", version.ref = "hilt" }
-
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 
-# Convention plugins (build-logic)
-huellitas-android-application = { id = "huellitas.android.application" }
-huellitas-android-library = { id = "huellitas.android.library" }
-huellitas-android-compose = { id = "huellitas.android.compose" }
-huellitas-android-feature = { id = "huellitas.android.feature" }
-huellitas-hilt = { id = "huellitas.hilt" }
-huellitas-jvm-library = { id = "huellitas.jvm.library" }

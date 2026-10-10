@@ -1,7 +1,7 @@
 # 001 — Firebase setup
 
 - **Estado:** Implemented
-- **Módulos:** :app, :core:data
+- **Paquetes:** `core.data` (en `:app`)
 
 ## Objetivo
 
@@ -14,7 +14,7 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
    - Copiarlo en `app/google-services.json`.
    - Está en `.gitignore`: **nunca** se commitea. Se comparte por un canal privado del equipo.
    - Sin este archivo el build falla en la tarea `processDebugGoogleServices` con `File google-services.json is missing`.
-   - Si el archivo no incluye un cliente OAuth web (proveedor Google sin habilitar), no se genera `R.string.default_web_client_id` y `:app` no compila. Habilita Google (paso 3) y vuelve a descargarlo.
+   - Si el archivo no incluye un cliente OAuth web (proveedor Google sin habilitar), no se genera `R.string.default_web_client_id` y la app no compila. Habilita Google (paso 3) y vuelve a descargarlo.
 
 2. **Huellas SHA (necesarias para Google Sign-In)**
    - Ejecutar `./gradlew signingReport` (o `gradlew.bat signingReport` en Windows) y copiar SHA-1 y SHA-256 de la variante `debug`.
@@ -31,9 +31,9 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
 
 ## Contratos
 
-- Plugin `com.google.gms.google-services` aplicado **solo** en `:app`.
-- Dependencias Firebase mediante BoM, solo en `:core:data` (`firebase-auth`, `firebase-firestore`).
-- Ningún otro módulo importa clases `com.google.firebase.*`.
+- Plugin `com.google.gms.google-services` aplicado en `:app`.
+- Dependencias Firebase mediante BoM (`firebase-auth`, `firebase-firestore`).
+- Solo el paquete `core.data` importa clases `com.google.firebase.*`.
 
 ## Criterios de aceptación
 

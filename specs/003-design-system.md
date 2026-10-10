@@ -1,7 +1,7 @@
 # 003 — Design system
 
 - **Estado:** Implemented
-- **Módulos:** :core:designsystem
+- **Paquetes:** `core.designsystem`, `core.ui`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-) (frame `ERRORES LAYOUTS` para los estados de campos)
 
 ## Objetivo
@@ -47,14 +47,14 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `LoadingOverlay` | Capa semitransparente con indicador de progreso. |
 | `AddPlaceholderCard` | Tarjeta gris con ícono "+" (agregar mascota/evento). |
 
-En `:core:ui`, `FieldFeedback(status, message: UiText?)` es lo que los ViewModels asignan a cada campo. Los mapeos `ValidationError.toFieldFeedback()` y `AuthError.toFieldFeedback()` aplican las reglas de la spec 002.
+En `core.ui`, `FieldFeedback(status, message: UiText?)` es lo que los ViewModels asignan a cada campo. Los mapeos `ValidationError.toFieldFeedback()` y `AuthError.toFieldFeedback()` aplican las reglas de la spec 002.
 
 ## Assets de Figma
 
 - Se descargan con el MCP de Figma (`get_design_context`) y se guardan sin modificar el contenido:
   - Fotos y PNG se convierten a WebP y van en `drawable-nodpi/`.
   - Los SVG se convierten a vector drawable.
-- Los assets que solo usa una feature viven en su módulo (p. ej. las fotos de cabecera de auth en `:feature:auth`). Los compartidos van en `:core:designsystem`.
+- Todos los recursos van en `app/src/main/res`. Los que solo usa una feature llevan su prefijo (p. ej. `img_auth_*`, `ic_settings_*`).
 
 ## Reglas
 

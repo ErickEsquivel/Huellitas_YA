@@ -1,7 +1,7 @@
 # 002 — Autenticación
 
 - **Estado:** Implemented (pendiente de QA en dispositivo con el proyecto Firebase real)
-- **Módulos:** :feature:auth, :core:domain, :core:data, :core:model, :core:ui, :app
+- **Paquetes:** `feature.auth`, `core.domain`, `core.data`, `core.model`, `core.ui`, `navigation`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-)
   - Presentación: `PRESENTACION` (19:80)
   - Bienvenido (elegir acceso): `BIENVENIDO` (43:3)
@@ -36,7 +36,7 @@ Configuración ──"Cerrar sesión"──► Presentación (historial limpio)
 - La navegación hacia Home **no** la hace la pantalla: la app observa `SessionState` y reemplaza el grafo de auth por el principal (y viceversa al cerrar sesión). Así el historial anterior desaparece siempre.
 - Los formularios tienen el botón "<" arriba a la izquierda para volver.
 
-## Reglas de validación (en cliente, `:core:domain`)
+## Reglas de validación (en cliente, `core.domain`)
 
 | Campo | Regla | Mensaje |
 |-------|-------|---------|
@@ -76,7 +76,7 @@ Diferencias con Figma, intencionales:
 
 ## Contratos
 
-### Modelos (`:core:model`)
+### Modelos (`core.model`)
 
 ```kotlin
 data class User(val uid: String, val name: String, val email: String, val photoUrl: String?, val provider: AuthProvider)
@@ -98,7 +98,7 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 - El documento se crea **solo si no existe** (`createIfMissing`) en registro, login con correo y login con Google. No se pisa `createdAt`, y si una creación falló, el siguiente login la reintenta.
 - Esa escritura corre en `@ApplicationScope`, porque la pantalla que la inicia se destruye en cuanto la sesión cambia.
 
-### Domain (`:core:domain`)
+### Domain (`core.domain`)
 
 - `AuthRepository`: `currentUser: Flow<User?>`, `signInWithEmail`, `registerWithEmail`, `signInWithGoogle(idToken)`, `sendPasswordReset`, `signOut`.
 - `UserRepository`: `createIfMissing(user)`.
@@ -106,10 +106,10 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 
 ### Google Sign-In
 
-- `GoogleIdTokenRequester` (en `:feature:auth`) abre el selector de cuentas con Credential Manager (`GetSignInWithGoogleOption`) y devuelve el ID token. Vive en la capa de UI porque necesita el `Context` de un Activity.
-- El `serverClientId` es `R.string.default_web_client_id`. Lo genera el plugin de Google Services a partir de `google-services.json` y `:app` lo pasa a `authGraph(...)`.
+- `GoogleIdTokenRequester` (en `feature.auth.google`) abre el selector de cuentas con Credential Manager (`GetSignInWithGoogleOption`) y devuelve el ID token. Vive en la capa de UI porque necesita el `Context` de un Activity.
+- El `serverClientId` es `R.string.default_web_client_id`. Lo genera el plugin de Google Services a partir de `google-services.json` y `MainActivity` lo pasa a `authGraph(...)`.
 
-### Rutas (`:feature:auth`)
+### Rutas (`feature.auth.navigation`)
 
 `AuthGraph` (grafo anidado) → `WelcomeDestination`, `AuthChooserDestination`, `LoginDestination`, `RegisterDestination`, `ForgotPasswordDestination`.
 
