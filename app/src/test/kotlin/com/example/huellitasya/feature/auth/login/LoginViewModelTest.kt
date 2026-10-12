@@ -79,7 +79,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun `error de red se muestra como mensaje`() = runTest {
+    fun `error de red pide mostrar el overlay sin conexion`() = runTest {
         authRepository.signInResult = AppResult.Failure(AuthError.Network)
         val viewModel = viewModel(appScope = this)
         viewModel.onAction(LoginAction.EmailChanged("sa.company@hotmail.com"))
@@ -87,7 +87,7 @@ class LoginViewModelTest {
 
         viewModel.events.test {
             viewModel.onAction(LoginAction.Submit)
-            assertEquals(LoginEvent.ShowMessage(AuthError.Network.toUiText()!!), awaitItem())
+            assertEquals(LoginEvent.NetworkError, awaitItem())
         }
     }
 

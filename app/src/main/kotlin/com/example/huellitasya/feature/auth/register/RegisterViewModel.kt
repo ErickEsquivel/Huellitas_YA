@@ -56,6 +56,9 @@ sealed interface RegisterAction {
 
 sealed interface RegisterEvent {
     data class ShowMessage(val message: UiText) : RegisterEvent
+
+    /** Firebase falló por red: la pantalla muestra el overlay "Sin conexión". */
+    data object NetworkError : RegisterEvent
 }
 
 @HiltViewModel
@@ -128,6 +131,7 @@ class RegisterViewModel @Inject constructor(
         when (error) {
             AuthError.EmailAlreadyInUse -> _uiState.update { it.copy(emailFeedback = error.toFieldFeedback()) }
             AuthError.WeakPassword -> _uiState.update { it.copy(passwordFeedback = error.toFieldFeedback()) }
+            AuthError.Network -> viewModelScope.launch { _events.send(RegisterEvent.NetworkError) }
             else -> error.toUiText()?.let { message ->
                 viewModelScope.launch { _events.send(RegisterEvent.ShowMessage(message)) }
             }

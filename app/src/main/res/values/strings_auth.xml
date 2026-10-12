@@ -46,4 +46,10 @@
     <string name="auth_forgot_subtitle">No te preocupes, te ayudaremos a recuperarla. Ingresa el correo electrónico que usaste para registrarte y te enviaremos un enlace para restablecerla.</string>
     <string name="auth_forgot_button">Enviar enlace</string>
     <string name="auth_forgot_success">Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña.</string>
+
+    <!-- Sin conexión (Figma "ERROR INTERNET Overlay") -->
+    <string name="auth_offline_title">¡Oh No! Sin Conexión</string>
+    <string name="auth_offline_message">Parece que hemos perdido el rastro del Wi-Fi. Por favor, comprueba tu conexión y vuelve a intentarlo.</string>
+    <string name="auth_offline_retry">Reintentar</string>
+    <string name="auth_offline_connecting">Conectando…</string>
 </resources>

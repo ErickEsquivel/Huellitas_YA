@@ -44,6 +44,9 @@ sealed interface LoginAction {
 
 sealed interface LoginEvent {
     data class ShowMessage(val message: UiText) : LoginEvent
+
+    /** Firebase falló por red: la pantalla muestra el overlay "Sin conexión". */
+    data object NetworkError : LoginEvent
 }
 
 /**
@@ -103,6 +106,7 @@ class LoginViewModel @Inject constructor(
         when (error) {
             // Figma muestra el rechazo bajo el campo de contraseña.
             AuthError.InvalidCredentials -> _uiState.update { it.copy(passwordFeedback = error.toFieldFeedback()) }
+            AuthError.Network -> viewModelScope.launch { _events.send(LoginEvent.NetworkError) }
             else -> error.toUiText()?.let { message ->
                 viewModelScope.launch { _events.send(LoginEvent.ShowMessage(message)) }
             }

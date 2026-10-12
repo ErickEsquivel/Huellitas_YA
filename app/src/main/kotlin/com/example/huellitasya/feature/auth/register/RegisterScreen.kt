@@ -66,6 +66,7 @@ private val CheckboxFill = Color(0xFFEBFFEE)
 @Composable
 internal fun RegisterRoute(
     onBackClick: () -> Unit,
+    onNetworkError: () -> Unit,
     viewModel: RegisterViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -78,6 +79,7 @@ internal fun RegisterRoute(
             is RegisterEvent.ShowMessage -> scope.launch {
                 snackbarHostState.showSnackbar(event.message.asString(context))
             }
+            RegisterEvent.NetworkError -> onNetworkError()
         }
     }
 

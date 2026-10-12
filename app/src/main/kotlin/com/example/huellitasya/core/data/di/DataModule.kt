@@ -1,9 +1,11 @@
 package com.example.huellitasya.core.data.di
 
 import com.example.huellitasya.core.common.ApplicationScope
+import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
+import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,7 +25,10 @@ internal object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance().apply {
+        // Correos de Auth (recuperar contraseña, etc.) en español, sin depender de la plantilla de la consola.
+        setLanguageCode("es")
+    }
 
     @Provides
     @Singleton
@@ -46,4 +51,8 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindUserRepository(impl: FirestoreUserRepository): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNetworkMonitor(impl: ConnectivityNetworkMonitor): NetworkMonitor
 }

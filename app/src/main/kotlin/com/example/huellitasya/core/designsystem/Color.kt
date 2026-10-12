@@ -21,5 +21,11 @@ val BorderSubtle = Color(0x33000000)
 val LinkBlue = Color(0xFF0077FF)
 /** Errores remotos o de coincidencia (borde rojo + ícono X). */
 val ErrorRed = Color(0xFFFF0000)
+/** Título de la pantalla "Sin conexión". */
+val AlertRed = Color(0xFFD13535)
+/** Spinner y texto de "Conectando...". */
+val GreenDeep = Color(0xFF378B5F)
+/** Velo translúcido de los overlays a pantalla completa. */
+val OverlayScrim = Color(0x99FFFFFF)
 /** Advertencias de validación (borde naranja + ícono de alerta). */
 val WarningOrange = Color(0x80FF6A00)

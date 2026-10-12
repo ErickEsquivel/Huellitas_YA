@@ -10,6 +10,7 @@ import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.AuthError
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
@@ -56,6 +57,10 @@ internal class GoogleIdTokenRequester(
             throw e
         } catch (e: GetCredentialCancellationException) {
             AppResult.Failure(AuthError.Cancelled)
+        } catch (e: NoCredentialException) {
+            // El dispositivo no tiene cuentas de Google o ninguna está disponible para esta app.
+            Log.w(TAG, "No hay cuentas de Google disponibles en el dispositivo", e)
+            AppResult.Failure(AuthError.GoogleSignInFailed)
         } catch (e: GetCredentialException) {
             AppResult.Failure(AuthError.GoogleSignInFailed)
         } catch (e: GoogleIdTokenParsingException) {

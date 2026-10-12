@@ -52,13 +52,13 @@ class ForgotPasswordViewModelTest {
     }
 
     @Test
-    fun `error de red se informa`() = runTest {
+    fun `error de red pide mostrar el overlay sin conexion`() = runTest {
         authRepository.passwordResetResult = AppResult.Failure(AuthError.Network)
         viewModel.onAction(ForgotPasswordAction.EmailChanged("sa.company@hotmail.com"))
 
         viewModel.events.test {
             viewModel.onAction(ForgotPasswordAction.Submit)
-            assertEquals(ForgotPasswordEvent.ShowMessage(AuthError.Network.toUiText()!!), awaitItem())
+            assertEquals(ForgotPasswordEvent.NetworkError, awaitItem())
         }
         assertFalse(viewModel.uiState.value.isEmailSent)
     }

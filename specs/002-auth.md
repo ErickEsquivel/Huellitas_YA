@@ -84,6 +84,20 @@ Verificado en un Vivo V2436 (384×857 dp, Android 16):
 - con la pantalla simulada a 360×640 dp, sin scroll sin teclado.
 - En 360×640 dp **con** teclado, Login usa el respaldo.
 
+## Sin conexión
+
+- **Figma:** `ERROR INTERNET Overlay` (159:647).
+- **Dónde:** cubre todas las pantallas del flujo de autenticación: Presentación, Bienvenido, Inicio de sesión, Registro y Recuperar contraseña.
+- **Cuándo aparece:**
+  - cuando el dispositivo no tiene una red con internet **validado** (`NetworkMonitor`);
+  - cuando una operación de Firebase falla con `AuthError.Network`, aunque el sistema crea que hay red (p. ej. un wifi sin salida a internet).
+- **Estados:**
+  - **Sin conexión:** velo blanco al 60 %, con la pantalla de fondo desenfocada en Android 12+. Tarjeta con el cachorro, "¡Oh No! Sin Conexión", un mensaje y el botón **Reintentar**. Bloquea los toques sobre la pantalla de abajo.
+  - **Conectando…:** al pulsar Reintentar se muestra el spinner de Figma, que da 3 vueltas lineales en 2.4 s, durante al menos 1.2 s. Si hay internet, el overlay se cierra; si no, vuelve a "Sin conexión".
+- **Cierre automático:** cuando el sistema recupera la red, el overlay se cierra solo.
+- **Reintentar** no repite la acción que falló: el usuario vuelve a pulsar el botón del formulario.
+- **Estado compartido:** lo lleva `ConnectivityViewModel`, que vive en la entrada del grafo `AuthGraph`, así el overlay no se reinicia al navegar entre pantallas.
+
 ## Errores remotos (`AuthError` → presentación)
 
 | Excepción Firebase | `AuthError` | Dónde | Mensaje |
@@ -91,7 +105,7 @@ Verificado en un Vivo V2436 (384×857 dp, Android 16):
 | `FirebaseAuthInvalidCredentialsException` / `FirebaseAuthInvalidUserException` | `InvalidCredentials` | Bajo la contraseña (login) | "Correo o contraseña incorrectos" |
 | `FirebaseAuthUserCollisionException` | `EmailAlreadyInUse` | Bajo el correo (registro) | "Este correo ya está registrado" |
 | `FirebaseAuthWeakPasswordException` | `WeakPassword` | Bajo la contraseña (registro) | "La contraseña es demasiado débil" |
-| `FirebaseNetworkException` | `Network` | Snackbar | "Sin conexión. Revisa tu internet" |
+| `FirebaseNetworkException` | `Network` | Overlay "Sin conexión" | "¡Oh No! Sin Conexión" |
 | `FirebaseTooManyRequestsException` | `TooManyRequests` | Snackbar | "Demasiados intentos. Intenta más tarde" |
 | Google: usuario cancela | `Cancelled` | — | (sin mensaje) |
 | Google: sin cuentas / credencial inválida | `GoogleSignInFailed` | Snackbar | "No se pudo iniciar sesión con Google" |
@@ -160,6 +174,7 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 - [ ] Mientras una petición está en curso, el botón principal no se puede pulsar dos veces.
 - [x] Login, Registro y Recuperar no necesitan scroll, con o sin teclado, en pantallas de ≥ 800 dp de alto; sin teclado, tampoco desde 640 dp.
 - [x] Al abrir el teclado se ocultan con animación la foto, la insignia y el subtítulo, y el botón queda encima del teclado; al cerrarlo, reaparecen.
+- [x] Sin internet aparece el overlay "Sin conexión" en cualquier pantalla de auth; "Reintentar" muestra "Conectando…" y el overlay se cierra al volver la red. Verificado en el Vivo V2436 con modo avión, sobre Presentación; las demás pantallas usan el mismo envoltorio.
 
 ## Fuera de alcance
 

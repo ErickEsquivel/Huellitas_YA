@@ -27,6 +27,9 @@ sealed interface AuthChooserEvent {
     /** La Route debe abrir el selector de cuentas y devolver el resultado con [AuthChooserViewModel.onGoogleIdTokenResult]. */
     data object LaunchGoogleSignIn : AuthChooserEvent
     data class ShowMessage(val message: UiText) : AuthChooserEvent
+
+    /** Firebase falló por red: la pantalla muestra el overlay "Sin conexión". */
+    data object NetworkError : AuthChooserEvent
 }
 
 /**
@@ -61,6 +64,10 @@ class AuthChooserViewModel @Inject constructor(
 
     private fun fail(error: AuthError) {
         _uiState.update { it.copy(isLoading = false) }
+        if (error == AuthError.Network) {
+            viewModelScope.launch { _events.send(AuthChooserEvent.NetworkError) }
+            return
+        }
         val message = error.toUiText() ?: return
         viewModelScope.launch { _events.send(AuthChooserEvent.ShowMessage(message)) }
     }

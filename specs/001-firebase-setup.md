@@ -23,12 +23,30 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
    - Cada desarrollador tiene su propio keystore debug, así que cada uno debe registrar sus huellas.
    - Tras agregar huellas, volver a descargar `google-services.json` (incluye el cliente OAuth).
 
-3. **Authentication** → Método de acceso → habilitar:
-   - Correo electrónico/contraseña.
-   - Google (define el correo de soporte). El "ID de cliente web" que se crea es el que la app usa como `serverClientId`; el plugin de Google Services lo genera como recurso `R.string.default_web_client_id`.
+3. **Authentication** (ya hecho en `huellitasya-3fd78`; solo hace falta en un proyecto nuevo):
+   - Pulsar **Comenzar**.
+   - En Método de acceso, habilitar Correo electrónico/contraseña.
+   - En Método de acceso, habilitar Google (define el correo de soporte). El "ID de cliente web" que se crea es el que la app usa como `serverClientId`; el plugin de Google Services lo genera como recurso `R.string.default_web_client_id`.
+   - En Plantillas, poner el idioma de la plantilla en **Español**. La app además llama a `FirebaseAuth.setLanguageCode("es")`, así el correo de recuperación de contraseña llega en español.
 
-4. **Firestore Database** → crear base (modo producción) en la región más cercana (p. ej. `southamerica-east1` o `us-east1`).
-   - Publicar las reglas de [`firebase/firestore.rules`](../firebase/firestore.rules) (pegar en la pestaña Reglas de la consola o `firebase deploy --only firestore:rules`).
+4. **Firestore Database**: base `(default)` en **`southamerica-east1`** (São Paulo, la región más cercana a Colombia), modo producción.
+   - La región no se puede cambiar después.
+   - Crearla requiere el rol Owner del proyecto: la cuenta con rol Editor recibe `403 The caller does not have permission`.
+
+5. **Reglas de seguridad**: el repo trae `firebase.json` y `.firebaserc` (proyecto por defecto `huellitasya-3fd78`). Para publicar [`firebase/firestore.rules`](../firebase/firestore.rules):
+
+   ```bash
+   firebase deploy --only firestore:rules
+   ```
+
+### Por CLI (alternativa a la consola para los pasos 1 y 2)
+
+```bash
+firebase apps:android:sha:create <APP_ID> <SHA-1 o SHA-256>
+firebase apps:sdkconfig ANDROID <APP_ID> -o app/google-services.json
+```
+
+El `APP_ID` de la app Android es `1:498312883676:android:15060b8cb85e28d2b3b319`.
 
 ## Contratos
 
@@ -38,8 +56,10 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
 
 ## Criterios de aceptación
 
-- [ ] `git status` no muestra `app/google-services.json` después de copiarlo.
-- [ ] `./gradlew assembleDebug` compila con el archivo presente.
+- [x] `git status` no muestra `app/google-services.json` después de copiarlo.
+- [x] `./gradlew assembleDebug` compila con el archivo presente.
+- [x] Authentication tiene habilitados Correo/contraseña y Google, con plantillas en español.
+- [x] `google-services.json` incluye el cliente OAuth web (`client_type` 3) y el de Android con la SHA-1 registrada.
 - [ ] Las reglas de Firestore impiden leer o escribir `users/{uid}` de otro usuario.
 
 ## Fuera de alcance

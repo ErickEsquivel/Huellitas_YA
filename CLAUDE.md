@@ -20,6 +20,7 @@ En Windows usar `gradlew.bat` (o `./gradlew` desde Git Bash).
 ./gradlew testDebugUnitTest --tests "*LoginViewModelTest"  # Un test/clase
 ./gradlew lint
 ./gradlew signingReport                                    # SHA-1/SHA-256 para registrar en Firebase
+firebase deploy --only firestore:rules                     # Publicar firebase/firestore.rules (firebase.json en la raíz)
 ```
 
 - `app/google-services.json` (en `app/`, no en la raíz) **no** está en el repo (`.gitignore`). Sin él falla `processDebugGoogleServices`. Nunca lo commitees.
@@ -70,6 +71,11 @@ Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tien
 - `AuthFormScaffold` (`feature/auth/components`) usa `AuthAdaptiveLayout`: mide primero el formulario y el botón, y la cabecera (foto + insignia) toma el espacio sobrante.
 - Con el teclado abierto (`WindowInsets.isImeVisible`) la cabecera se colapsa y el contenido recibe `isCompact`. Las pantallas lo pasan a `HuellitasTextField(compact = …)` y a sus espaciados.
 - No metas alturas fijas grandes en esos formularios. Para ver el modo teclado en previews, usa `forceKeyboardLayout`.
+
+**Sin conexión:**
+- `NetworkMonitor` (dominio) se implementa en `core.data.network.ConnectivityNetworkMonitor` (internet validado).
+- En `feature.auth.connectivity`, `ConnectivityViewModel` vive en la entrada de `AuthGraph` y `ConnectivityAware` envuelve cada destino del grafo con el overlay.
+- Los ViewModels de auth emiten `XEvent.NetworkError` ante `AuthError.Network`, y la Route llama a `onNetworkError`.
 
 **Google Sign-In:** `GoogleIdTokenRequester` (Credential Manager, en `feature.auth.google`) necesita un Activity. `MainActivity` le pasa `default_web_client_id` a `authGraph()`.
 

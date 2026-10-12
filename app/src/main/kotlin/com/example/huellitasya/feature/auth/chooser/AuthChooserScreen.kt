@@ -71,6 +71,7 @@ internal fun AuthChooserRoute(
     googleServerClientId: String?,
     onEmailClick: () -> Unit,
     onRegisterClick: () -> Unit,
+    onNetworkError: () -> Unit,
     viewModel: AuthChooserViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -87,6 +88,7 @@ internal fun AuthChooserRoute(
             is AuthChooserEvent.ShowMessage -> scope.launch {
                 snackbarHostState.showSnackbar(event.message.asString(context))
             }
+            AuthChooserEvent.NetworkError -> onNetworkError()
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.huellitasya.feature.auth.forgotpassword
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.huellitasya.core.common.AppResult
+import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.usecase.SendPasswordResetUseCase
 import com.example.huellitasya.core.domain.validation.ValidateEmailUseCase
 import com.example.huellitasya.core.ui.FieldFeedback
@@ -39,6 +40,9 @@ sealed interface ForgotPasswordAction {
 
 sealed interface ForgotPasswordEvent {
     data class ShowMessage(val message: UiText) : ForgotPasswordEvent
+
+    /** Firebase falló por red: la pantalla muestra el overlay "Sin conexión". */
+    data object NetworkError : ForgotPasswordEvent
 }
 
 /**
@@ -84,7 +88,11 @@ class ForgotPasswordViewModel @Inject constructor(
                 is AppResult.Success -> _uiState.update { it.copy(isLoading = false, isEmailSent = true) }
                 is AppResult.Failure -> {
                     _uiState.update { it.copy(isLoading = false) }
-                    result.error.toUiText()?.let { _events.send(ForgotPasswordEvent.ShowMessage(it)) }
+                    if (result.error == AuthError.Network) {
+                        _events.send(ForgotPasswordEvent.NetworkError)
+                    } else {
+                        result.error.toUiText()?.let { _events.send(ForgotPasswordEvent.ShowMessage(it)) }
+                    }
                 }
             }
         }

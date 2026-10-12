@@ -48,6 +48,7 @@ private val ForgotBadge = AuthBadgeSpec(R.drawable.img_auth_badge_lock, 293f, Dp
 @Composable
 internal fun ForgotPasswordRoute(
     onBackClick: () -> Unit,
+    onNetworkError: () -> Unit,
     viewModel: ForgotPasswordViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -60,6 +61,7 @@ internal fun ForgotPasswordRoute(
             is ForgotPasswordEvent.ShowMessage -> scope.launch {
                 snackbarHostState.showSnackbar(event.message.asString(context))
             }
+            ForgotPasswordEvent.NetworkError -> onNetworkError()
         }
     }
 

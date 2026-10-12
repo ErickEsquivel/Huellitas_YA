@@ -53,6 +53,7 @@ private val LoginBadge = AuthBadgeSpec(R.drawable.img_auth_badge_clipboard, 323f
 internal fun LoginRoute(
     onBackClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
+    onNetworkError: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -65,6 +66,7 @@ internal fun LoginRoute(
             is LoginEvent.ShowMessage -> scope.launch {
                 snackbarHostState.showSnackbar(event.message.asString(context))
             }
+            LoginEvent.NetworkError -> onNetworkError()
         }
     }
 
