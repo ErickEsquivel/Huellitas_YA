@@ -1,8 +1,10 @@
 package com.example.huellitasya.feature.auth.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -13,7 +15,9 @@ import com.example.huellitasya.feature.auth.connectivity.ConnectivityAware
 import com.example.huellitasya.feature.auth.connectivity.ConnectivityViewModel
 import com.example.huellitasya.feature.auth.forgotpassword.ForgotPasswordRoute
 import com.example.huellitasya.feature.auth.login.LoginRoute
+import com.example.huellitasya.feature.auth.newpassword.NewPasswordRoute
 import com.example.huellitasya.feature.auth.register.RegisterRoute
+import com.example.huellitasya.feature.auth.verifycode.VerifyResetCodeRoute
 import com.example.huellitasya.feature.auth.welcome.WelcomeScreen
 import kotlinx.serialization.Serializable
 
@@ -36,8 +40,20 @@ internal data object RegisterDestination
 @Serializable
 internal data object ForgotPasswordDestination
 
+/** "Verifica tu correo": el nombre de la propiedad es la clave que lee `VerifyResetCodeViewModel`. */
+@Serializable
+internal data class VerifyResetCodeDestination(val email: String)
+
+/** "Crear nueva contraseña": las propiedades son las claves que lee `NewPasswordViewModel`. */
+@Serializable
+internal data class NewPasswordDestination(val email: String, val resetToken: String)
+
+/** Clave en el `savedStateHandle` de Login para mostrar "Tu contraseña se actualizó". */
+private const val PASSWORD_RESET_KEY = "password_reset"
+
 /**
  * Presentación → Bienvenido → (correo → Login → Recuperar contraseña | Regístrate | Google).
+ * Recuperar contraseña → Verifica tu correo (código) → Crear nueva contraseña → vuelve a Login.
  * Al autenticarse no se navega desde aquí: la app reemplaza este grafo al cambiar la sesión.
  *
  * Todas las pantallas comparten el overlay "Sin conexión" ([ConnectivityAware]).
@@ -69,11 +85,16 @@ fun NavGraphBuilder.authGraph(
         }
         composable<LoginDestination> { entry ->
             val connectivity = authConnectivityViewModel(navController, entry)
+            val passwordReset by entry.savedStateHandle
+                .getStateFlow(PASSWORD_RESET_KEY, false)
+                .collectAsStateWithLifecycle()
             ConnectivityAware(connectivity) {
                 LoginRoute(
                     onBackClick = navController::navigateUp,
                     onForgotPasswordClick = { navController.navigate(ForgotPasswordDestination) },
                     onNetworkError = connectivity::onNetworkError,
+                    showPasswordResetMessage = passwordReset,
+                    onPasswordResetMessageShown = { entry.savedStateHandle[PASSWORD_RESET_KEY] = false },
                 )
             }
         }
@@ -91,6 +112,35 @@ fun NavGraphBuilder.authGraph(
             ConnectivityAware(connectivity) {
                 ForgotPasswordRoute(
                     onBackClick = navController::navigateUp,
+                    onCodeSent = { email -> navController.navigate(VerifyResetCodeDestination(email)) },
+                    onNetworkError = connectivity::onNetworkError,
+                )
+            }
+        }
+        composable<VerifyResetCodeDestination> { entry ->
+            val connectivity = authConnectivityViewModel(navController, entry)
+            ConnectivityAware(connectivity) {
+                VerifyResetCodeRoute(
+                    onBackClick = navController::navigateUp,
+                    onCodeVerified = { email, resetToken ->
+                        // El código ya se usó: atrás desde "Crear nueva contraseña" vuelve a "¿Olvidaste…?".
+                        navController.navigate(NewPasswordDestination(email, resetToken)) {
+                            popUpTo<VerifyResetCodeDestination> { inclusive = true }
+                        }
+                    },
+                    onNetworkError = connectivity::onNetworkError,
+                )
+            }
+        }
+        composable<NewPasswordDestination> { entry ->
+            val connectivity = authConnectivityViewModel(navController, entry)
+            ConnectivityAware(connectivity) {
+                NewPasswordRoute(
+                    onBackClick = navController::navigateUp,
+                    onPasswordReset = {
+                        navController.getBackStackEntry<LoginDestination>().savedStateHandle[PASSWORD_RESET_KEY] = true
+                        navController.popBackStack<LoginDestination>(inclusive = false)
+                    },
                     onNetworkError = connectivity::onNetworkError,
                 )
             }

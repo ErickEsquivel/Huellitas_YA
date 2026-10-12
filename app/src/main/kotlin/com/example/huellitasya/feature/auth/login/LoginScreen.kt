@@ -8,6 +8,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -54,12 +55,23 @@ internal fun LoginRoute(
     onBackClick: () -> Unit,
     onForgotPasswordClick: () -> Unit,
     onNetworkError: () -> Unit,
+    showPasswordResetMessage: Boolean = false,
+    onPasswordResetMessageShown: () -> Unit = {},
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    // Al volver de "Crear nueva contraseña" (spec 002).
+    val passwordResetMessage = stringResource(R.string.auth_newpassword_success)
+    LaunchedEffect(showPasswordResetMessage) {
+        if (showPasswordResetMessage) {
+            onPasswordResetMessageShown()
+            snackbarHostState.showSnackbar(passwordResetMessage)
+        }
+    }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {

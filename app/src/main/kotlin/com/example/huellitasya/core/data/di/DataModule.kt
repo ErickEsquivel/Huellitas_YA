@@ -4,11 +4,14 @@ import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
+import com.example.huellitasya.core.data.repository.FunctionsPasswordResetRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
+import com.example.huellitasya.core.domain.repository.PasswordResetRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -34,6 +37,11 @@ internal object FirebaseModule {
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore = FirebaseFirestore.getInstance()
 
+    /** Misma región que las Cloud Functions de `functions/` y que Firestore. */
+    @Provides
+    @Singleton
+    fun provideFirebaseFunctions(): FirebaseFunctions = FirebaseFunctions.getInstance(FUNCTIONS_REGION)
+
     @Provides
     @Singleton
     @ApplicationScope
@@ -55,4 +63,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindNetworkMonitor(impl: ConnectivityNetworkMonitor): NetworkMonitor
+
+    @Binds
+    @Singleton
+    abstract fun bindPasswordResetRepository(impl: FunctionsPasswordResetRepository): PasswordResetRepository
 }
+
+private const val FUNCTIONS_REGION = "southamerica-east1"

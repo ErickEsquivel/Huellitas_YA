@@ -211,7 +211,7 @@ internal fun AuthFormScaffold(
     hero: AuthHeroSpec,
     badge: AuthBadgeSpec,
     title: AnnotatedString,
-    subtitle: String,
+    subtitle: String?,
     onBackClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
     bottomButton: @Composable () -> Unit,
@@ -220,6 +220,8 @@ internal fun AuthFormScaffold(
     titleFontSize: TextUnit = 24.sp,
     compactTitleFontSize: TextUnit = 20.sp,
     subtitleTopSpacing: Dp = 0.dp,
+    subtitleFontSize: TextUnit = 20.sp,
+    subtitleColor: Color = GrayText,
     forceKeyboardLayout: Boolean = false,
     content: @Composable ColumnScope.(isCompact: Boolean) -> Unit,
 ) {
@@ -270,14 +272,14 @@ internal fun AuthFormScaffold(
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     AnimatedVisibility(
-                        visible = !isKeyboardOpen,
+                        visible = subtitle != null && !isKeyboardOpen,
                         enter = fadeIn() + expandVertically(),
                         exit = fadeOut() + shrinkVertically(),
                     ) {
                         Text(
-                            text = subtitle,
-                            color = GrayText,
-                            fontSize = if (isCompact) 16.sp else 20.sp,
+                            text = subtitle.orEmpty(),
+                            color = subtitleColor,
+                            fontSize = if (isCompact) minOf(16f, subtitleFontSize.value).sp else subtitleFontSize,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(start = 48.dp, end = 48.dp, top = subtitleTopSpacing)

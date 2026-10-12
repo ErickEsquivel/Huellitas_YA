@@ -39,6 +39,33 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
    firebase deploy --only firestore:rules
    ```
 
+6. **Plan Blaze** (lo hace el Owner): ⚙ → Uso y facturación → Modificar plan. Cloud Functions lo exige.
+   - Conviene una **alerta de presupuesto** (p. ej. US$1). El uso de la app cabe en la capa gratuita.
+
+7. **Gmail *noreply*** para el código de recuperación de contraseña (spec 002):
+   - Crear una cuenta dedicada (p. ej. `huellitasya.noreply@gmail.com`).
+   - Activarle la verificación en 2 pasos.
+   - Generar una **contraseña de aplicación** en https://myaccount.google.com/apppasswords.
+   - Guardarla como secreto: cada comando pide el valor y no queda en el repo.
+
+     ```bash
+     firebase functions:secrets:set SMTP_USER          # el correo noreply
+     firebase functions:secrets:set SMTP_PASSWORD      # la contraseña de aplicación (16 letras)
+     firebase functions:secrets:set RESET_CODE_PEPPER  # un valor aleatorio largo (p. ej. openssl rand -hex 32)
+     ```
+
+   - Gmail admite unos 500 correos por día. Si la app crece, se cambia a un servicio con dominio propio (Resend, Brevo) sin tocar la app.
+
+8. **Cloud Functions** (`functions/`, TypeScript, Node 22, región `southamerica-east1`):
+
+   ```bash
+   npm --prefix functions install
+   npm --prefix functions test                          # tests de la lógica de códigos
+   firebase deploy --only functions,firestore:rules     # compila y despliega
+   ```
+
+   Si el deploy falla por permisos (IAM), la cuenta necesita los roles *Cloud Functions Admin* y *Service Account User*, o el Owner hace el primer deploy.
+
 ### Por CLI (alternativa a la consola para los pasos 1 y 2)
 
 ```bash
@@ -52,7 +79,8 @@ El `APP_ID` de la app Android es `1:498312883676:android:15060b8cb85e28d2b3b319`
 
 - Plugin `com.google.gms.google-services` aplicado en `:app`.
 - Dependencias Firebase mediante BoM (`firebase-auth`, `firebase-firestore`).
-- Solo el paquete `core.data` importa clases `com.google.firebase.*`.
+- Solo el paquete `core.data` importa clases `com.google.firebase.*` (incluido `firebase-functions`).
+- Las Cloud Functions y Firestore están en `southamerica-east1`; la app llama a las funciones en esa región.
 
 ## Criterios de aceptación
 
@@ -66,4 +94,5 @@ El `APP_ID` de la app Android es `1:498312883676:android:15060b8cb85e28d2b3b319`
 
 - Entornos separados (dev/prod) con flavors.
 - Firebase Emulator Suite.
-- Cloud Functions, Storage, Messaging.
+- Storage, Messaging.
+- Firebase Emulator Suite para probar las Cloud Functions en local.

@@ -3,6 +3,7 @@ package com.example.huellitasya.core.ui
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.domain.error.AuthError
+import com.example.huellitasya.core.domain.error.PasswordResetError
 import com.example.huellitasya.core.domain.error.ValidationError
 import com.example.huellitasya.core.domain.error.isMissingValue
 
@@ -58,4 +59,15 @@ fun AuthError.toUiText(): UiText? = when (this) {
     AuthError.TooManyRequests -> UiText.Resource(R.string.error_too_many_requests)
     AuthError.GoogleSignInFailed -> UiText.Resource(R.string.error_google_sign_in)
     AuthError.Unknown -> UiText.Resource(R.string.error_unknown)
+}
+
+/** Mensajes del restablecimiento con código. `Network` no tiene mensaje: se muestra el overlay "Sin conexión". */
+fun PasswordResetError.toUiText(): UiText? = when (this) {
+    PasswordResetError.Network -> null
+    PasswordResetError.InvalidCode -> UiText.Resource(R.string.error_reset_code_invalid)
+    PasswordResetError.ExpiredCode -> UiText.Resource(R.string.error_reset_code_expired)
+    PasswordResetError.TooManyAttempts -> UiText.Resource(R.string.error_reset_code_attempts)
+    is PasswordResetError.TooManyRequests -> UiText.Resource(R.string.error_reset_too_many_requests, retryAfterSeconds)
+    PasswordResetError.WeakPassword -> UiText.Resource(R.string.error_reset_weak_password)
+    PasswordResetError.Unknown -> UiText.Resource(R.string.error_unknown)
 }

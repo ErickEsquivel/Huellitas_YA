@@ -70,4 +70,17 @@ class ValidatorsTest {
         assertEquals(ValidationError.PasswordsDoNotMatch, validatePassword.confirmation("Huellitas1", "Huellitas2"))
         assertNull(validatePassword.confirmation("Huellitas1", "Huellitas1"))
     }
+
+    @Test
+    fun `requisitos de contrasena uno por uno`() {
+        assertEquals(
+            PasswordRequirements(hasMinLength = false, hasUppercase = false, hasDigitOrSymbol = false, matchesConfirmation = false),
+            validatePassword.requirements("", ""),
+        )
+        assertEquals(
+            PasswordRequirements(hasMinLength = true, hasUppercase = true, hasDigitOrSymbol = true, matchesConfirmation = true),
+            validatePassword.requirements("Huellitas!", "Huellitas!"),
+        )
+        assertEquals(false, validatePassword.requirements("Huellitas1", "Huellitas2").matchesConfirmation)
+    }
 }

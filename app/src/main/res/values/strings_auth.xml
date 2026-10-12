@@ -43,13 +43,36 @@
 
     <!-- Recuperar contraseña (Figma "OLVIDO CONTRASEÑA") -->
     <string name="auth_forgot_title">¿Olvidaste tu contraseña?</string>
-    <string name="auth_forgot_subtitle">No te preocupes, te ayudaremos a recuperarla. Ingresa el correo electrónico que usaste para registrarte y te enviaremos un enlace para restablecerla.</string>
-    <string name="auth_forgot_button">Enviar enlace</string>
-    <string name="auth_forgot_success">Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña.</string>
+    <string name="auth_forgot_subtitle">No te preocupes, te ayudaremos a recuperarla. Ingresa el correo electrónico que usaste para registrarte y te enviaremos un código para restablecerla.</string>
+    <string name="auth_forgot_button">Enviar código</string>
 
     <!-- Sin conexión (Figma "ERROR INTERNET Overlay") -->
     <string name="auth_offline_title">¡Oh No! Sin Conexión</string>
     <string name="auth_offline_message">Parece que hemos perdido el rastro del Wi-Fi. Por favor, comprueba tu conexión y vuelve a intentarlo.</string>
     <string name="auth_offline_retry">Reintentar</string>
     <string name="auth_offline_connecting">Conectando…</string>
+
+    <!-- Verificar código (Figma "VERIFICACION CORREO") -->
+    <string name="auth_verify_title">Verifica tu correo</string>
+    <string name="auth_verify_subtitle">Hemos enviado un código de verificación de 4 dígitos a tu correo.</string>
+    <string name="auth_verify_code_label">Ingresa código</string>
+    <string name="auth_verify_button">Verificar código</string>
+    <string name="auth_verify_not_received">¿No recibiste el código?</string>
+    <string name="auth_verify_resend">Reenviar código</string>
+    <string name="auth_verify_resend_in">Reenviar en %1$d s</string>
+    <string name="auth_verify_resent">Te enviamos un código nuevo</string>
+    <string name="auth_verify_code_description">Código de 4 dígitos</string>
+
+    <!-- Crear nueva contraseña (Figma "CREAR CONTRASEÑA") -->
+    <string name="auth_newpassword_title">Crear nueva contraseña</string>
+    <string name="auth_newpassword_field">Nueva contraseña</string>
+    <string name="auth_newpassword_confirm">Confirmar contraseña</string>
+    <string name="auth_newpassword_rule_length">Mínimo 8 caracteres</string>
+    <string name="auth_newpassword_rule_uppercase">Una letra mayúscula</string>
+    <string name="auth_newpassword_rule_digit">Un número o carácter especial</string>
+    <string name="auth_newpassword_rule_match">¿Concuerdan las contraseñas?</string>
+    <string name="auth_newpassword_rule_met">Cumplido</string>
+    <string name="auth_newpassword_rule_unmet">Pendiente</string>
+    <string name="auth_newpassword_button">Restablecer contraseña</string>
+    <string name="auth_newpassword_success">Tu contraseña se actualizó. Inicia sesión.</string>
 </resources>

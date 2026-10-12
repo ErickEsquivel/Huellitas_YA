@@ -46,16 +46,6 @@ internal class FirebaseAuthRepository @Inject constructor(
             checkNotNull(firebaseAuth.signInWithCredential(credential).await().user).toUser()
         }
 
-    override suspend fun sendPasswordReset(email: String): AppResult<Unit, AuthError> {
-        val result = runAuth { firebaseAuth.sendPasswordResetEmail(email).await(); Unit }
-        // Spec 002: no revelar si el correo existe. Solo se reportan errores de red o de límite.
-        return if (result is AppResult.Failure && result.error == AuthError.InvalidCredentials) {
-            AppResult.Success(Unit)
-        } else {
-            result
-        }
-    }
-
     override suspend fun signOut() {
         firebaseAuth.signOut()
     }

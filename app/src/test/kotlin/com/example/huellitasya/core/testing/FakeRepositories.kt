@@ -27,12 +27,10 @@ class FakeAuthRepository : AuthRepository {
     var signInResult: AppResult<User, AuthError> = AppResult.Success(TestUser)
     var registerResult: AppResult<User, AuthError> = AppResult.Success(TestUser)
     var googleResult: AppResult<User, AuthError> = AppResult.Success(TestUser.copy(provider = AuthProvider.GOOGLE))
-    var passwordResetResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
 
     val signInCalls = mutableListOf<Pair<String, String>>()
     val registerCalls = mutableListOf<Triple<String, String, String>>()
     val googleTokens = mutableListOf<String>()
-    val passwordResetEmails = mutableListOf<String>()
     var signOutCount = 0
         private set
 
@@ -49,11 +47,6 @@ class FakeAuthRepository : AuthRepository {
     override suspend fun signInWithGoogle(idToken: String): AppResult<User, AuthError> {
         googleTokens += idToken
         return googleResult.alsoSignIn()
-    }
-
-    override suspend fun sendPasswordReset(email: String): AppResult<Unit, AuthError> {
-        passwordResetEmails += email
-        return passwordResetResult
     }
 
     override suspend fun signOut() {

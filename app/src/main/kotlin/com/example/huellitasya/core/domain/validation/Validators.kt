@@ -37,6 +37,16 @@ class ValidateEmailUseCase @Inject constructor() {
     }
 }
 
+/** Estado de cada requisito de la contraseña (Figma "Crear nueva contraseña"). */
+data class PasswordRequirements(
+    val hasMinLength: Boolean,
+    val hasUppercase: Boolean,
+    val hasDigitOrSymbol: Boolean,
+    val matchesConfirmation: Boolean,
+) {
+    val allMet: Boolean get() = hasMinLength && hasUppercase && hasDigitOrSymbol && matchesConfirmation
+}
+
 class ValidatePasswordUseCase @Inject constructor() {
     /**
      * Reglas de registro (Figma "CREAR CONTRASEÑA"): mínimo 8 caracteres, una letra
@@ -49,6 +59,14 @@ class ValidatePasswordUseCase @Inject constructor() {
         password.none { it.isDigit() || !it.isLetterOrDigit() } -> ValidationError.PasswordNeedsDigitOrSymbol
         else -> null
     }
+
+    /** Mismas reglas que [forRegistration], una por una, para mostrarlas en vivo. */
+    fun requirements(password: String, confirmation: String): PasswordRequirements = PasswordRequirements(
+        hasMinLength = password.length >= MIN_PASSWORD_LENGTH,
+        hasUppercase = password.any { it.isUpperCase() },
+        hasDigitOrSymbol = password.any { it.isDigit() || !it.isLetterOrDigit() },
+        matchesConfirmation = password.isNotEmpty() && password == confirmation,
+    )
 
     /** En login solo se exige que no esté vacía: la verificación real la hace Firebase. */
     fun forLogin(password: String): ValidationError? =

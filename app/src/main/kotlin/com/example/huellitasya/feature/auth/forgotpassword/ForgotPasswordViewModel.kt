@@ -3,8 +3,8 @@ package com.example.huellitasya.feature.auth.forgotpassword
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.huellitasya.core.common.AppResult
-import com.example.huellitasya.core.domain.error.AuthError
-import com.example.huellitasya.core.domain.usecase.SendPasswordResetUseCase
+import com.example.huellitasya.core.domain.error.PasswordResetError
+import com.example.huellitasya.core.domain.usecase.RequestPasswordResetCodeUseCase
 import com.example.huellitasya.core.domain.validation.ValidateEmailUseCase
 import com.example.huellitasya.core.ui.FieldFeedback
 import com.example.huellitasya.core.ui.UiText
@@ -27,8 +27,6 @@ data class ForgotPasswordUiState(
     val emailFeedback: FieldFeedback? = null,
     val formFeedback: FieldFeedback? = null,
     val isLoading: Boolean = false,
-    /** Se envió el enlace: la pantalla muestra la confirmación genérica. */
-    val isEmailSent: Boolean = false,
 ) {
     val isComplete: Boolean get() = email.isNotBlank()
 }
@@ -41,17 +39,20 @@ sealed interface ForgotPasswordAction {
 sealed interface ForgotPasswordEvent {
     data class ShowMessage(val message: UiText) : ForgotPasswordEvent
 
-    /** Firebase falló por red: la pantalla muestra el overlay "Sin conexión". */
+    /** Se pidió el código: la pantalla pasa a "Verifica tu correo". */
+    data class NavigateToVerifyCode(val email: String) : ForgotPasswordEvent
+
+    /** Falló por red: la pantalla muestra el overlay "Sin conexión". */
     data object NetworkError : ForgotPasswordEvent
 }
 
 /**
- * Firebase envía un enlace de restablecimiento. Por privacidad (spec 002) el mensaje de éxito
- * es el mismo exista o no la cuenta.
+ * Pide el código de 4 dígitos por correo (spec 002, "Recuperar contraseña"). Por privacidad el
+ * backend responde igual exista o no la cuenta, así que siempre se avanza a "Verifica tu correo".
  */
 @HiltViewModel
 class ForgotPasswordViewModel @Inject constructor(
-    private val sendPasswordReset: SendPasswordResetUseCase,
+    private val requestCode: RequestPasswordResetCodeUseCase,
     private val validateEmail: ValidateEmailUseCase,
 ) : ViewModel() {
 
@@ -64,7 +65,7 @@ class ForgotPasswordViewModel @Inject constructor(
     fun onAction(action: ForgotPasswordAction) {
         when (action) {
             is ForgotPasswordAction.EmailChanged -> _uiState.update {
-                it.copy(email = action.value, emailFeedback = null, formFeedback = null, isEmailSent = false)
+                it.copy(email = action.value, emailFeedback = null, formFeedback = null)
             }
             ForgotPasswordAction.Submit -> submit()
         }
@@ -84,16 +85,17 @@ class ForgotPasswordViewModel @Inject constructor(
 
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            when (val result = sendPasswordReset(state.email)) {
-                is AppResult.Success -> _uiState.update { it.copy(isLoading = false, isEmailSent = true) }
-                is AppResult.Failure -> {
-                    _uiState.update { it.copy(isLoading = false) }
-                    if (result.error == AuthError.Network) {
-                        _events.send(ForgotPasswordEvent.NetworkError)
-                    } else {
-                        result.error.toUiText()?.let { _events.send(ForgotPasswordEvent.ShowMessage(it)) }
-                    }
-                }
+            val result = requestCode(state.email)
+            _uiState.update { it.copy(isLoading = false) }
+            when {
+                // Si ya se envió un código hace poco, ese sigue sirviendo: se avanza igual.
+                result is AppResult.Success ||
+                    (result is AppResult.Failure && result.error is PasswordResetError.TooManyRequests) ->
+                    _events.send(ForgotPasswordEvent.NavigateToVerifyCode(state.email.trim()))
+                result is AppResult.Failure && result.error == PasswordResetError.Network ->
+                    _events.send(ForgotPasswordEvent.NetworkError)
+                result is AppResult.Failure ->
+                    result.error.toUiText()?.let { _events.send(ForgotPasswordEvent.ShowMessage(it)) }
             }
         }
     }

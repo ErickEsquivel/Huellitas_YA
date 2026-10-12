@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -29,7 +28,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.ButtonIncomplete
 import com.example.huellitasya.core.designsystem.GreenAction
-import com.example.huellitasya.core.designsystem.GreenPrimary
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.components.FieldMessage
 import com.example.huellitasya.core.designsystem.components.FieldStatus
@@ -48,6 +46,7 @@ private val ForgotBadge = AuthBadgeSpec(R.drawable.img_auth_badge_lock, 293f, Dp
 @Composable
 internal fun ForgotPasswordRoute(
     onBackClick: () -> Unit,
+    onCodeSent: (email: String) -> Unit,
     onNetworkError: () -> Unit,
     viewModel: ForgotPasswordViewModel = hiltViewModel(),
 ) {
@@ -61,6 +60,7 @@ internal fun ForgotPasswordRoute(
             is ForgotPasswordEvent.ShowMessage -> scope.launch {
                 snackbarHostState.showSnackbar(event.message.asString(context))
             }
+            is ForgotPasswordEvent.NavigateToVerifyCode -> onCodeSent(event.email)
             ForgotPasswordEvent.NetworkError -> onNetworkError()
         }
     }
@@ -129,15 +129,6 @@ internal fun ForgotPasswordScreen(
                 Spacer(modifier = Modifier.height(8.dp))
                 FieldMessage(text = message.asString(), status = feedback.status)
             }
-        }
-        if (state.isEmailSent) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = stringResource(R.string.auth_forgot_success),
-                color = GreenPrimary,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-            )
         }
     }
 }

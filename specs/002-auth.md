@@ -8,6 +8,8 @@
   - Inicio de sesión: `INICIO SESION CORREO` (158:1303); con datos `INICIO SESION CORREO 2` (84:5); errores `Android Compact - 14/15/36`
   - Registro: `REGISTRO` (158:1329); errores `Android Compact - 6/7/35`
   - Recuperar contraseña: `OLVIDO CONTRASEÑA` (141:1069); errores `OC ERROR 1-4`
+  - Verificar código: `VERIFICACION CORREO` (139:822); errores `VC ERROR 1-4`
+  - Crear nueva contraseña: `CREAR CONTRASEÑA` (141:996); estados `CC ERROR 1-4`
 
 ## Objetivo
 
@@ -17,7 +19,7 @@ Permitir que el dueño de una mascota cree una cuenta e inicie sesión (correo/c
 
 - Como usuario nuevo, quiero registrarme con nombre, correo y contraseña para guardar la información de mis mascotas.
 - Como usuario, quiero iniciar sesión con mi correo o con Google para entrar rápido.
-- Como usuario que olvidó su contraseña, quiero recibir un correo para restablecerla.
+- Como usuario que olvidó su contraseña, quiero recibir un código por correo para crear una nueva.
 - Como usuario con sesión abierta, quiero entrar directo al inicio al abrir la app.
 - Como usuario, quiero cerrar sesión desde Configuración.
 
@@ -84,6 +86,37 @@ Verificado en un Vivo V2436 (384×857 dp, Android 16):
 - con la pantalla simulada a 360×640 dp, sin scroll sin teclado.
 - En 360×640 dp **con** teclado, Login usa el respaldo.
 
+## Recuperar contraseña con código
+
+```
+Inicio de sesión ─ "¿Se te olvidó la contraseña?" ─► ¿Olvidaste tu contraseña? ─ "Enviar código" ─►
+Verifica tu correo (4 dígitos) ─ "Verificar código" ─► Crear nueva contraseña ─ "Restablecer contraseña" ─►
+Inicio de sesión + "Tu contraseña se actualizó. Inicia sesión."
+```
+
+- **Backend:** Firebase Auth no tiene códigos de recuperación, así que el flujo lo resuelven 3 Cloud Functions en `southamerica-east1` (`functions/src/index.ts`). Cambiar la contraseña de un usuario sin sesión solo es posible con el Admin SDK.
+  - `requestPasswordResetCode({email})` genera el código y lo envía.
+  - `verifyPasswordResetCode({email, code})` valida el código y devuelve un `resetToken` de un solo uso.
+  - `resetPasswordWithToken({email, resetToken, newPassword})` cambia la contraseña y cierra las sesiones abiertas (`revokeRefreshTokens`).
+- **Correo:** sale de un Gmail dedicado *noreply* (`"Huellitas YA" <SMTP_USER>`, ver spec 001), en español. Lleva el código grande, la vigencia, "Si no lo pediste, ignora este correo" y "No respondas a este mensaje".
+- **Código:** 4 dígitos (`crypto.randomInt`).
+  - Vence a los **10 min** y admite **5 intentos**; después hay que pedir uno nuevo.
+  - Se guarda hasheado (HMAC con el secreto `RESET_CODE_PEPPER`) en `passwordResetCodes/{sha256(correo)}`. Las reglas de Firestore niegan esa colección a los clientes.
+- **Reenvío:** "Reenviar código" se habilita a los **60 s**, con una cuenta regresiva en el botón, y admite máximo **5 envíos por hora**.
+- **Privacidad:** si el correo no tiene cuenta, el backend responde igual y no envía nada. La app siempre avanza a "Verifica tu correo".
+- **Token:** vale 10 min y un solo uso. Al pasar a "Crear nueva contraseña" se saca "Verifica tu correo" del historial: atrás vuelve a "¿Olvidaste tu contraseña?".
+
+| Situación | Presentación |
+|-----------|--------------|
+| Código incompleto | Casillas en naranja + "Ingresa un número válido" |
+| Código incorrecto | Casillas en rojo + "El código ingresado no es correcto" |
+| Código vencido | Rojo + "El código venció. Pide uno nuevo" |
+| 5 intentos fallidos | Rojo + "Demasiados intentos. Pide un código nuevo" |
+| Reenvío antes de tiempo | La cuenta regresiva usa el tiempo que indica el servidor |
+| Contraseña nueva | Checklist en vivo: ✗ naranja / ✓ verde por cada regla (8 caracteres, mayúscula, número o símbolo, coinciden). El servidor valida la misma política. |
+| Token vencido al restablecer | Snackbar "El código venció. Pide uno nuevo" |
+| Sin red | Overlay "Sin conexión" |
+
 ## Sin conexión
 
 - **Figma:** `ERROR INTERNET Overlay` (159:647).
@@ -113,7 +146,7 @@ Verificado en un Vivo V2436 (384×857 dp, Android 16):
 
 Diferencias con Figma, intencionales:
 - Figma separa "Este correo no se encuentra registrado" de "La contraseña no coincide". Firebase, con la protección contra enumeración de correos que viene activa por defecto, devuelve el mismo error en ambos casos. Por eso se muestra un único mensaje bajo la contraseña.
-- Recuperar contraseña muestra siempre la misma confirmación ("Si el correo está registrado, te enviamos un enlace…"), para no revelar qué correos existen. Por eso no se implementa el estado `OC ERROR 1` ("Este correo no se encuentra registrado").
+- Recuperar contraseña avanza siempre a "Verifica tu correo", exista o no la cuenta, para no revelar qué correos existen. Por eso no se implementa el estado `OC ERROR 1` ("Este correo no se encuentra registrado").
 
 ## Contratos
 
@@ -141,9 +174,10 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 
 ### Domain (`core.domain`)
 
-- `AuthRepository`: `currentUser: Flow<User?>`, `signInWithEmail`, `registerWithEmail`, `signInWithGoogle(idToken)`, `sendPasswordReset`, `signOut`.
+- `AuthRepository`: `currentUser: Flow<User?>`, `signInWithEmail`, `registerWithEmail`, `signInWithGoogle(idToken)`, `signOut`.
+- `PasswordResetRepository` (implementado sobre Cloud Functions): `requestCode`, `verifyCode` → `resetToken`, `resetPassword`. Errores en `PasswordResetError`.
 - `UserRepository`: `createIfMissing(user)`.
-- Use cases: `ObserveSessionUseCase`, `SignInWithEmailUseCase`, `RegisterUseCase`, `SignInWithGoogleUseCase`, `SendPasswordResetUseCase`, `SignOutUseCase`, `ValidateNameUseCase`, `ValidateEmailUseCase`, `ValidatePasswordUseCase`.
+- Use cases: `ObserveSessionUseCase`, `SignInWithEmailUseCase`, `RegisterUseCase`, `SignInWithGoogleUseCase`, `RequestPasswordResetCodeUseCase`, `VerifyPasswordResetCodeUseCase`, `ResetPasswordUseCase`, `SignOutUseCase`, `ValidateNameUseCase`, `ValidateEmailUseCase`, `ValidatePasswordUseCase`.
 
 ### Google Sign-In
 
@@ -152,11 +186,11 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 
 ### Rutas (`feature.auth.navigation`)
 
-`AuthGraph` (grafo anidado) → `WelcomeDestination`, `AuthChooserDestination`, `LoginDestination`, `RegisterDestination`, `ForgotPasswordDestination`.
+`AuthGraph` (grafo anidado) → `WelcomeDestination`, `AuthChooserDestination`, `LoginDestination`, `RegisterDestination`, `ForgotPasswordDestination`, `VerifyResetCodeDestination(email)`, `NewPasswordDestination(email, resetToken)`.
 
 ## Criterios de aceptación
 
-> Lógica cubierta por unit tests (`LoginViewModelTest`, `RegisterViewModelTest`, `ForgotPasswordViewModelTest`, `AuthChooserViewModelTest`, `AuthUseCasesTest`, `MainViewModelTest`). Marcar cada casilla al verificarla en dispositivo.
+> Lógica cubierta por unit tests (`LoginViewModelTest`, `RegisterViewModelTest`, `ForgotPasswordViewModelTest`, `VerifyResetCodeViewModelTest`, `NewPasswordViewModelTest`, `AuthChooserViewModelTest`, `AuthUseCasesTest`, `MainViewModelTest`). Marcar cada casilla al verificarla en dispositivo.
 
 - [ ] Sin sesión, la app abre en Presentación; "Comenzar" lleva a Bienvenido.
 - [ ] "Continuar con correo" abre Inicio de sesión; "Regístrate" abre Registro.
@@ -168,7 +202,10 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 - [ ] Registro sin aceptar Términos y Condiciones no se envía.
 - [ ] "Continuar con Google" abre el selector de cuentas; al elegir una se entra a Home y se crea `users/{uid}` con `provider = "google"` solo la primera vez.
 - [ ] Cancelar el selector de Google no muestra error.
-- [ ] Recuperar contraseña con correo válido muestra la confirmación genérica y envía el correo.
+- [ ] Recuperar contraseña con un correo registrado envía un correo en español desde el Gmail *noreply*, con un código de 4 dígitos.
+- [ ] Un código incorrecto se marca en rojo; tras 5 intentos o 10 minutos hay que pedir otro.
+- [ ] "Reenviar código" solo se activa después de 60 s.
+- [ ] Con el código correcto se crea la nueva contraseña (checklist en verde), se vuelve a Login con el mensaje de éxito, y la contraseña anterior deja de funcionar.
 - [ ] Con sesión activa, al reabrir la app se entra a Home sin ver Presentación (el splash se mantiene mientras se resuelve la sesión).
 - [ ] "Cerrar sesión" en Configuración regresa a Presentación con el historial limpio.
 - [ ] Mientras una petición está en curso, el botón principal no se puede pulsar dos veces.
@@ -178,7 +215,7 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 
 ## Fuera de alcance
 
-- **Restablecer contraseña con código de 4 dígitos** (Figma `VERIFICACION CORREO` y `CREAR CONTRASEÑA`). Firebase Auth restablece contraseñas con un enlace por correo, no con códigos. Implementar ese flujo requiere un backend propio (Cloud Functions) o manejar el `oobCode` del enlace con un deep link. Queda para una spec futura.
+- App Check en las Cloud Functions (recomendado antes de publicar la app).
 - Contenido de Términos y Condiciones: los enlaces se muestran, pero aún no abren nada.
 - Verificación de correo obligatoria.
 - Login con Facebook, Apple o teléfono.

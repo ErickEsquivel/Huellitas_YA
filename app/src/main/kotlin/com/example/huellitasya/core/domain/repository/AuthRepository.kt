@@ -16,7 +16,5 @@ interface AuthRepository {
     /** Autentica con el ID token obtenido del selector de cuentas de Google. */
     suspend fun signInWithGoogle(idToken: String): AppResult<User, AuthError>
 
-    suspend fun sendPasswordReset(email: String): AppResult<Unit, AuthError>
-
     suspend fun signOut()
 }

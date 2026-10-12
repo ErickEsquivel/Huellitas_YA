@@ -21,6 +21,8 @@ En Windows usar `gradlew.bat` (o `./gradlew` desde Git Bash).
 ./gradlew lint
 ./gradlew signingReport                                    # SHA-1/SHA-256 para registrar en Firebase
 firebase deploy --only firestore:rules                     # Publicar firebase/firestore.rules (firebase.json en la raíz)
+npm --prefix functions test                                # Tests del backend (lógica de códigos de recuperación)
+firebase deploy --only functions                           # Desplegar las Cloud Functions (requiere plan Blaze y secretos)
 ```
 
 - `app/google-services.json` (en `app/`, no en la raíz) **no** está en el repo (`.gitignore`). Sin él falla `processDebugGoogleServices`. Nunca lo commitees.
@@ -76,6 +78,13 @@ Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tien
 - `NetworkMonitor` (dominio) se implementa en `core.data.network.ConnectivityNetworkMonitor` (internet validado).
 - En `feature.auth.connectivity`, `ConnectivityViewModel` vive en la entrada de `AuthGraph` y `ConnectivityAware` envuelve cada destino del grafo con el overlay.
 - Los ViewModels de auth emiten `XEvent.NetworkError` ante `AuthError.Network`, y la Route llama a `onNetworkError`.
+
+**Recuperar contraseña con código (backend en `functions/`):**
+- Firebase Auth no tiene códigos de recuperación. Los generan, envían y validan 3 Cloud Functions callable (`functions/src/index.ts`, región `southamerica-east1`) con el Admin SDK y un Gmail noreply (secretos `SMTP_USER`, `SMTP_PASSWORD` y `RESET_CODE_PEPPER`).
+- La lógica pura vive en `functions/src/resetCodes.ts` y se prueba con `node --test`.
+- En la app, `PasswordResetRepository` (dominio) se implementa en `core.data.repository.FunctionsPasswordResetRepository`, y las pantallas son `feature.auth.forgotpassword` → `verifycode` → `newpassword`.
+- El contrato con el backend son los códigos `HttpsError` y `details.reason`. Si cambias uno, cambia el otro.
+- La política de contraseña está duplicada a propósito: `ValidatePasswordUseCase` (app) y `passwordProblems` (backend).
 
 **Google Sign-In:** `GoogleIdTokenRequester` (Credential Manager, en `feature.auth.google`) necesita un Activity. `MainActivity` le pasa `default_web_client_id` a `authGraph()`.
 

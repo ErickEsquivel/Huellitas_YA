@@ -20,4 +20,12 @@
     <string name="error_too_many_requests">Demasiados intentos. Intenta más tarde</string>
     <string name="error_google_sign_in">No se pudo iniciar sesión con Google</string>
     <string name="error_unknown">Ocurrió un error inesperado</string>
+
+    <!-- Recuperar contraseña con código (spec 002) -->
+    <string name="error_reset_code_incomplete">Ingresa un número válido</string>
+    <string name="error_reset_code_invalid">El código ingresado no es correcto</string>
+    <string name="error_reset_code_expired">El código venció. Pide uno nuevo</string>
+    <string name="error_reset_code_attempts">Demasiados intentos. Pide un código nuevo</string>
+    <string name="error_reset_too_many_requests">Espera %1$d s para pedir otro código</string>
+    <string name="error_reset_weak_password">La contraseña no cumple los requisitos</string>
 </resources>

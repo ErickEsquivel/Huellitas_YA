@@ -53,10 +53,3 @@ class SignInWithGoogleUseCase @Inject constructor(
                 .onSuccess { userRepository.createIfMissing(it) }
         }.await()
 }
-
-class SendPasswordResetUseCase @Inject constructor(
-    private val authRepository: AuthRepository,
-) {
-    suspend operator fun invoke(email: String): AppResult<Unit, AuthError> =
-        authRepository.sendPasswordReset(email.trim())
-}

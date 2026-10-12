@@ -16,6 +16,9 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // passwordResetCodes (códigos de recuperación hasheados) solo lo usan las Cloud Functions
+    // con el Admin SDK: queda denegado para los clientes por la regla de abajo.
+
     // Todo lo demás queda denegado hasta que una spec lo defina.
     match /{document=**} {
       allow read, write: if false;
