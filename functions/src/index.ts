@@ -10,7 +10,7 @@
  */
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 import { setGlobalOptions } from "firebase-functions/v2";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
@@ -98,11 +98,12 @@ export const requestPasswordResetCode = onCall(
     const message = buildResetCodeEmail(code);
     const transport = nodemailer.createTransport({
       service: "gmail",
-      auth: { user: SMTP_USER.value(), pass: SMTP_PASSWORD.value() },
+      // Google muestra la contraseña de aplicación en grupos de 4 con espacios: se ignoran.
+      auth: { user: SMTP_USER.value().trim(), pass: SMTP_PASSWORD.value().replace(/\s+/g, "") },
     });
     try {
       await transport.sendMail({
-        from: `"Huellitas YA" <${SMTP_USER.value()}>`,
+        from: `"Huellitas YA" <${SMTP_USER.value().trim()}>`,
         to: email,
         subject: message.subject,
         text: message.text,
@@ -110,6 +111,8 @@ export const requestPasswordResetCode = onCall(
       });
     } catch (error) {
       logger.error("No se pudo enviar el correo con el código", error);
+      // El correo no salió: se anula el código y este envío no cuenta para la espera de 60 s.
+      await ref.update({ codeHash: null, sends: FieldValue.arrayRemove(now) });
       throw new HttpsError("unavailable", "No se pudo enviar el correo. Intenta de nuevo.", { reason: "email_failed" });
     }
     return { ok: true };
