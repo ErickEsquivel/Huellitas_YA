@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -35,11 +37,16 @@ import com.example.huellitasya.core.designsystem.WarningOrange
 
 private val BoxShape = RoundedCornerShape(10.dp)
 private val BoxBorder = Color.Black.copy(alpha = 0.4f)
+private val BoxWidth = 50.dp
+private val MaxGap = 34.dp
 
 /**
- * Código numérico en casillas (Figma "Verifica tu correo": 50x64 dp, 34 dp de separación).
+ * Código numérico en casillas (Figma "Verifica tu correo": 50x64 dp, hasta 34 dp de separación).
  * Es un único campo de texto: se puede escribir dígito a dígito o pegar el código completo.
  * La casilla que recibe el siguiente dígito se resalta en verde.
+ *
+ * El espacio entre casillas se reparte según el ancho disponible (máx. el de Figma), así entran
+ * en pantallas angostas. Si el código ya está completo, escribir otro dígito empieza uno nuevo.
  */
 @Composable
 fun OtpCodeField(
@@ -57,7 +64,16 @@ fun OtpCodeField(
 
     BasicTextField(
         value = value,
-        onValueChange = { input -> onValueChange(input.filter(Char::isDigit).take(length)) },
+        onValueChange = { input ->
+            val digits = input.filter(Char::isDigit)
+            val next = if (value.length == length && digits.length > length) {
+                // Ya estaba completo: lo nuevo reemplaza al código anterior (también al pegar).
+                digits.drop(length).take(length)
+            } else {
+                digits.take(length)
+            }
+            onValueChange(next)
+        },
         modifier = modifier.semantics { this.contentDescription = contentDescription },
         enabled = enabled,
         singleLine = true,
@@ -65,7 +81,12 @@ fun OtpCodeField(
         keyboardActions = KeyboardActions(onDone = { onDone() }),
         interactionSource = interactionSource,
         decorationBox = {
-            Row(horizontalArrangement = Arrangement.spacedBy(34.dp)) {
+            Row(
+                modifier = Modifier
+                    .widthIn(max = BoxWidth * length + MaxGap * (length - 1))
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
                 repeat(length) { index ->
                     val isNext = isFocused && index == value.length.coerceAtMost(length - 1)
                     val borderColor = when {
@@ -76,7 +97,7 @@ fun OtpCodeField(
                     }
                     Box(
                         modifier = Modifier
-                            .size(width = 50.dp, height = 64.dp)
+                            .size(width = BoxWidth, height = 64.dp)
                             .border(width = if (isNext) 2.dp else 1.dp, color = borderColor, shape = BoxShape),
                         contentAlignment = Alignment.Center,
                     ) {

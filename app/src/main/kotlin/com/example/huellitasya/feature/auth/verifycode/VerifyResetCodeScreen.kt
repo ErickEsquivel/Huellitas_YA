@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -142,6 +143,7 @@ internal fun VerifyResetCodeScreen(
                 onValueChange = { onAction(VerifyResetCodeAction.CodeChanged(it)) },
                 length = PASSWORD_RESET_CODE_LENGTH,
                 contentDescription = stringResource(R.string.auth_verify_code_description),
+                modifier = Modifier.fillMaxWidth(),
                 status = state.codeFeedback?.status ?: FieldStatus.Default,
                 enabled = !state.isLoading,
                 onDone = submit,
