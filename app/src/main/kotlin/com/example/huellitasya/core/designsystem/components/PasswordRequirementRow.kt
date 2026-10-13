@@ -45,7 +45,7 @@ fun PasswordRequirementRow(
             Image(
                 painter = painterResource(if (isMet) R.drawable.ic_password_rule_met else R.drawable.ic_password_rule_unmet),
                 contentDescription = null,
-                modifier = if (isMet) Modifier.size(16.5.dp) else Modifier.size(width = 24.dp, height = 20.dp),
+                modifier = Modifier.size(16.5.dp),
             )
         }
         Spacer(modifier = Modifier.width(2.dp))

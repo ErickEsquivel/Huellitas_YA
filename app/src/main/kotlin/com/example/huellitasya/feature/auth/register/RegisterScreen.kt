@@ -1,5 +1,6 @@
 package com.example.huellitasya.feature.auth.register
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -227,8 +232,20 @@ private fun TermsCheckbox(
                 .border(1.dp, if (isWarning) WarningOrange else Color.Black),
             contentAlignment = Alignment.Center,
         ) {
+            // Visto dibujado: el carácter "✓" no está en Nunito y salía recortado dentro de 12x11 dp.
             if (checked) {
-                Text(text = "✓", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.ExtraBold)
+                Canvas(modifier = Modifier.size(width = 8.dp, height = 7.dp)) {
+                    val check = Path().apply {
+                        moveTo(size.width * 0.05f, size.height * 0.55f)
+                        lineTo(size.width * 0.38f, size.height * 0.9f)
+                        lineTo(size.width * 0.95f, size.height * 0.1f)
+                    }
+                    drawPath(
+                        path = check,
+                        color = Color.White,
+                        style = Stroke(width = 1.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.width(6.dp))
