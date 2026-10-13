@@ -73,7 +73,7 @@ Reglas:
 - El sufijo `Destination` se usa para los objetos de ruta, porque `XRoute` es el nombre del composable stateful.
 - `navigation/HuellitasApp.kt` decide el NavHost según `SessionState`:
   - `SignedOut` → NavHost de auth (`authGraph`).
-  - `SignedIn` → NavHost principal con barra inferior (`TopLevelDestination`).
+  - `SignedIn` → NavHost principal con barra inferior (`TopLevelDestination`). Por ahora empieza en Perfil y Home/Calendario están inhabilitados (spec 004).
 - Iniciar o cerrar sesión **no** navega: reemplaza el NavHost completo, y con él el historial.
 
 ## Inyección de dependencias

@@ -35,6 +35,7 @@ Configuración ──"Eliminar cuenta"──► Diálogo de confirmación ──
 Perfil ──tocar la foto──► Photo Picker del sistema ──► subida ──► foto actualizada
 ```
 
+- **Temporal:** al iniciar sesión, la app abre en Perfil (`startDestination` de `MainNavHost`). Home y Calendario se ven atenuados en la barra inferior y no se pueden abrir (`TopLevelDestination.isEnabled = false`) hasta que tengan su spec; entonces Home vuelve a ser la pestaña inicial.
 - Datos Personales vive en `feature.profile`, que expone `NavGraphBuilder.personalDataScreen(onBack)`.
 - Configuración no importa `feature.profile`: recibe la lambda `onNavigateToPersonalData`, y `MainNavHost` (`navigation/HuellitasApp.kt`) la resuelve.
 - Eliminar la cuenta **no navega**. Al terminar, la app cierra la sesión local, `SessionState` pasa a `SignedOut` y se reemplaza el NavHost, como en el logout de la spec 002.

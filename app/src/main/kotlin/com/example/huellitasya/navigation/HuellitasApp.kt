@@ -13,9 +13,9 @@ import com.example.huellitasya.core.model.SessionState
 import com.example.huellitasya.feature.auth.navigation.AuthGraph
 import com.example.huellitasya.feature.auth.navigation.authGraph
 import com.example.huellitasya.feature.calendar.navigation.calendarScreen
-import com.example.huellitasya.feature.home.navigation.HomeDestination
 import com.example.huellitasya.feature.home.navigation.homeScreen
 import com.example.huellitasya.feature.profile.navigation.PersonalDataDestination
+import com.example.huellitasya.feature.profile.navigation.ProfileDestination
 import com.example.huellitasya.feature.profile.navigation.personalDataScreen
 import com.example.huellitasya.feature.profile.navigation.profileScreen
 import com.example.huellitasya.feature.settings.navigation.settingsScreen
@@ -67,7 +67,9 @@ private fun MainNavHost(googleServerClientId: String?) {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = HomeDestination,
+            // Por ahora la app abre en Perfil: Home y Calendario están inhabilitados hasta tener su spec.
+            // Cuando Home esté listo, volver a `HomeDestination` y habilitarlo en TopLevelDestination.
+            startDestination = ProfileDestination,
             modifier = Modifier.padding(innerPadding), // Evita que el contenido quede debajo de la barra
         ) {
             homeScreen()
