@@ -54,7 +54,7 @@ import com.example.huellitasya.feature.auth.components.AuthHero
 import com.example.huellitasya.feature.auth.components.AuthHeroSpec
 import com.example.huellitasya.feature.auth.components.PawDivider
 import com.example.huellitasya.feature.auth.components.TextDivider
-import com.example.huellitasya.feature.auth.google.rememberGoogleIdTokenRequester
+import com.example.huellitasya.core.ui.google.rememberGoogleIdTokenRequester
 import kotlinx.coroutines.launch
 
 // Figma "BIENVENIDO" (43:3)

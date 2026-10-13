@@ -1,4 +1,4 @@
-package com.example.huellitasya.feature.auth.google
+package com.example.huellitasya.core.ui.google
 
 import android.content.Context
 import android.util.Log
