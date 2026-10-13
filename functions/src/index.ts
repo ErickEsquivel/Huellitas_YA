@@ -1,22 +1,28 @@
 /**
- * Recuperación de contraseña con código de 4 dígitos por correo (spec 002).
+ * Backend de Huellitas YA! (Cloud Functions callable, Admin SDK).
  *
+ * Recuperación de contraseña con código de 4 dígitos por correo (spec 002):
  * 1. requestPasswordResetCode   → genera el código y lo envía desde el Gmail "noreply".
  * 2. verifyPasswordResetCode    → valida el código y entrega un token de un solo uso.
  * 3. resetPasswordWithToken     → con el token, cambia la contraseña (Admin SDK).
  *
  * Los códigos y tokens se guardan hasheados en `passwordResetCodes/{sha256(email)}`; las reglas
  * de Firestore impiden que los clientes lean esa colección.
+ *
+ * Eliminación de cuenta (spec 004):
+ * - deleteAccount → borra la foto, `users/{uid}` (con subcolecciones) y el usuario de Auth.
  */
 import { initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 import { FieldValue, getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 import { setGlobalOptions } from "firebase-functions/v2";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { logger } from "firebase-functions";
 import { defineSecret } from "firebase-functions/params";
 import nodemailer from "nodemailer";
 
+import { isRecentLogin, userStoragePrefix } from "./account";
 import { buildResetCodeEmail } from "./email";
 import {
   canSendCode,
@@ -201,3 +207,45 @@ export const resetPasswordWithToken = onCall(
     return { ok: true };
   },
 );
+
+/**
+ * Elimina la cuenta del usuario que llama (spec 004, "Eliminar cuenta"). Es idempotente: si
+ * falla a la mitad, al reintentar se salta lo que ya no existe.
+ *
+ * Contrato con la app (`FunctionsAccountRepository`):
+ * - sin sesión → `unauthenticated`;
+ * - inicio de sesión de hace más de 5 min → `failed-precondition` con `reason: "requires_recent_login"`;
+ * - éxito → `{ deleted: true }`.
+ */
+export const deleteAccount = onCall({ enforceAppCheck: false }, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Inicia sesión para eliminar tu cuenta.");
+  }
+  if (!isRecentLogin(request.auth.token.auth_time, Date.now())) {
+    throw new HttpsError("failed-precondition", "Vuelve a confirmar tu identidad.", {
+      reason: "requires_recent_login",
+    });
+  }
+  const uid = request.auth.uid;
+
+  // 1. Foto (y cualquier archivo futuro del usuario). Sin bucket o sin archivos no hay nada que borrar.
+  try {
+    await getStorage().bucket().deleteFiles({ prefix: userStoragePrefix(uid) });
+  } catch (error) {
+    if ((error as { code?: number }).code !== 404) throw error;
+  }
+
+  // 2. Perfil con sus subcolecciones (p. ej. mascotas, cuando exista su spec).
+  const firestore = getFirestore();
+  await firestore.recursiveDelete(firestore.collection("users").doc(uid));
+
+  // 3. Usuario de Auth. Va al final: si algo falla antes, la cuenta sigue usable para reintentar.
+  try {
+    await getAuth().deleteUser(uid);
+  } catch (error) {
+    if ((error as { code?: string }).code !== "auth/user-not-found") throw error;
+  }
+
+  logger.info("Cuenta eliminada", { uid });
+  return { deleted: true };
+});

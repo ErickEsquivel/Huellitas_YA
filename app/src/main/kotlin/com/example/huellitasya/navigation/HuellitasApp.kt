@@ -34,7 +34,7 @@ fun HuellitasApp(
         // El splash del sistema cubre este estado (ver MainActivity).
         SessionState.Loading -> Unit
         SessionState.SignedOut -> AuthNavHost(googleServerClientId)
-        is SessionState.SignedIn -> MainNavHost()
+        is SessionState.SignedIn -> MainNavHost(googleServerClientId)
     }
 }
 
@@ -47,7 +47,7 @@ private fun AuthNavHost(googleServerClientId: String?) {
 }
 
 @Composable
-private fun MainNavHost() {
+private fun MainNavHost(googleServerClientId: String?) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -73,7 +73,10 @@ private fun MainNavHost() {
             homeScreen()
             calendarScreen()
             profileScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
-            settingsScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
+            settingsScreen(
+                googleServerClientId = googleServerClientId,
+                onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) },
+            )
             personalDataScreen(onBack = { navController.popBackStack() })
         }
     }

@@ -1,7 +1,7 @@
 {
   "name": "huellitasya-functions",
   "private": true,
-  "description": "Backend de Huellitas YA!: recuperación de contraseña con código por correo (spec 002).",
+  "description": "Backend de Huellitas YA!: recuperación de contraseña con código por correo (spec 002) y eliminación de cuenta (spec 004).",
   "main": "lib/index.js",
   "engines": {
     "node": "22"

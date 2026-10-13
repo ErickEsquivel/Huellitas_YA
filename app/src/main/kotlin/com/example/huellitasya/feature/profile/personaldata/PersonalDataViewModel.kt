@@ -22,6 +22,7 @@ import com.example.huellitasya.core.model.Field
 import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.model.UserProfile
 import com.example.huellitasya.core.ui.FieldFeedback
+import com.example.huellitasya.core.ui.PasswordPromptState
 import com.example.huellitasya.core.ui.UiText
 import com.example.huellitasya.core.ui.formFeedbackFor
 import com.example.huellitasya.core.ui.toFieldFeedback
@@ -59,17 +60,11 @@ data class PersonalDataUiState(
     val hasChanges: Boolean = false,
     val isSaving: Boolean = false,
     /** Diálogo "Confirma tu contraseña" antes de cambiar el correo; `null` si está cerrado. */
-    val reauth: ReauthState? = null,
+    val reauth: PasswordPromptState? = null,
 ) {
     /** El correo de una cuenta Google pertenece a Google: no se puede cambiar aquí (spec 004). */
     val canEditEmail: Boolean get() = saved?.provider == AuthProvider.EMAIL
 }
-
-data class ReauthState(
-    val password: String = "",
-    val feedback: FieldFeedback? = null,
-    val isLoading: Boolean = false,
-)
 
 sealed interface PersonalDataAction {
     /** Lápiz de "Datos Dueño": activa la edición o, si ya está activa, descarta los cambios. */
@@ -227,7 +222,7 @@ class PersonalDataViewModel @Inject constructor(
             is AppResult.Failure -> {
                 _uiState.update { it.copy(isSaving = false) }
                 when (result.error) {
-                    AuthError.RequiresRecentLogin -> _uiState.update { it.copy(reauth = ReauthState()) }
+                    AuthError.RequiresRecentLogin -> _uiState.update { it.copy(reauth = PasswordPromptState()) }
                     AuthError.EmailAlreadyInUse -> _uiState.update {
                         it.copy(emailFeedback = result.error.toFieldFeedback())
                     }

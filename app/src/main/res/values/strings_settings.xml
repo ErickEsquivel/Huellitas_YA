@@ -8,4 +8,22 @@
     <string name="settings_security">Seguridad</string>
     <string name="settings_security_subtitle">Cambiar contraseña</string>
     <string name="settings_logout">Cerrar sesión</string>
+
+    <!-- Eliminar cuenta (spec 004; diálogo de Figma 3050:1515) -->
+    <string name="settings_delete_account">Eliminar cuenta</string>
+    <string name="settings_delete_account_subtitle">Borrar tu cuenta y tus datos</string>
+    <string name="settings_delete_title">¿Seguro deseas eliminarlo?</string>
+    <string name="settings_delete_message">No podrás recuperar los datos luego de confirmar la eliminación.</string>
+    <string name="settings_delete_confirm">Eliminar cuenta</string>
+    <string name="settings_delete_close">Cerrar</string>
+    <string name="settings_delete_image_description">Cachorro triste junto a una papelera</string>
+
+    <!-- Reautenticación antes de eliminar -->
+    <string name="settings_reauth_title">Confirma tu contraseña</string>
+    <string name="settings_reauth_message">Por seguridad, ingresa tu contraseña para eliminar tu cuenta.</string>
+    <string name="settings_reauth_password">Contraseña</string>
+    <string name="settings_reauth_show_password">Mostrar contraseña</string>
+    <string name="settings_reauth_hide_password">Ocultar contraseña</string>
+    <string name="settings_reauth_confirm">Eliminar</string>
+    <string name="settings_reauth_cancel">Cancelar</string>
 </resources>

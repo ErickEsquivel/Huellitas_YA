@@ -5,6 +5,8 @@ import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.model.Field
 import com.example.huellitasya.core.model.ProfileChanges
+import com.example.huellitasya.core.domain.error.AuthError
+import com.example.huellitasya.core.testing.FakeAccountRepository
 import com.example.huellitasya.core.testing.FakeAuthRepository
 import com.example.huellitasya.core.testing.FakeProfilePhotoRepository
 import com.example.huellitasya.core.testing.FakeUserRepository
@@ -117,5 +119,29 @@ class ProfileUseCasesTest {
 
         assertEquals(AppResult.Failure(DataError.FileTooLarge), result)
         assertTrue(userRepository.photoUrls.isEmpty())
+    }
+
+    @Test
+    fun `eliminar la cuenta cierra la sesion local`() = runTest {
+        authRepository.currentUser.value = TestUser
+        val accountRepository = FakeAccountRepository()
+
+        val result = DeleteAccountUseCase(accountRepository, authRepository, backgroundScope)()
+
+        assertEquals(AppResult.Success(Unit), result)
+        assertEquals(1, accountRepository.deleteCount)
+        assertEquals(1, authRepository.signOutCount)
+    }
+
+    @Test
+    fun `si el backend falla la sesion sigue abierta`() = runTest {
+        authRepository.currentUser.value = TestUser
+        val accountRepository = FakeAccountRepository().apply { result = AppResult.Failure(AuthError.Network) }
+
+        val result = DeleteAccountUseCase(accountRepository, authRepository, backgroundScope)()
+
+        assertEquals(AppResult.Failure(AuthError.Network), result)
+        assertEquals(0, authRepository.signOutCount)
+        assertEquals(TestUser, authRepository.currentUser.value)
     }
 }

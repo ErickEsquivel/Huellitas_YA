@@ -8,8 +8,18 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object SettingsDestination
 
-fun NavGraphBuilder.settingsScreen(onNavigateToPersonalData: () -> Unit) {
+/**
+ * @param googleServerClientId "ID de cliente web" de Firebase, para reautenticar con Google antes
+ *   de eliminar la cuenta (spec 004). `null` si Google no está configurado (spec 001).
+ */
+fun NavGraphBuilder.settingsScreen(
+    googleServerClientId: String?,
+    onNavigateToPersonalData: () -> Unit,
+) {
     composable<SettingsDestination> {
-        SettingsRoute(onPersonalDataClick = onNavigateToPersonalData)
+        SettingsRoute(
+            googleServerClientId = googleServerClientId,
+            onPersonalDataClick = onNavigateToPersonalData,
+        )
     }
 }

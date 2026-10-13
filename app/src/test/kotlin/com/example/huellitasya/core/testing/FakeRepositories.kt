@@ -3,6 +3,7 @@ package com.example.huellitasya.core.testing
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
+import com.example.huellitasya.core.domain.repository.AccountRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
@@ -171,6 +172,17 @@ class FakeProfilePhotoRepository : ProfilePhotoRepository {
 
     override suspend fun upload(uid: String, localUri: String): AppResult<String, DataError> {
         uploads += uid to localUri
+        return result
+    }
+}
+
+class FakeAccountRepository : AccountRepository {
+    var result: AppResult<Unit, AuthError> = AppResult.Success(Unit)
+    var deleteCount = 0
+        private set
+
+    override suspend fun deleteAccount(): AppResult<Unit, AuthError> {
+        deleteCount++
         return result
     }
 }

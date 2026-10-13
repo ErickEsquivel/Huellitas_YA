@@ -3,9 +3,11 @@ package com.example.huellitasya.core.data.di
 import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
+import com.example.huellitasya.core.data.repository.FunctionsAccountRepository
 import com.example.huellitasya.core.data.repository.FirebaseStorageProfilePhotoRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
 import com.example.huellitasya.core.data.repository.FunctionsPasswordResetRepository
+import com.example.huellitasya.core.domain.repository.AccountRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.repository.PasswordResetRepository
@@ -79,6 +81,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindProfilePhotoRepository(impl: FirebaseStorageProfilePhotoRepository): ProfilePhotoRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAccountRepository(impl: FunctionsAccountRepository): AccountRepository
 }
 
 private const val FUNCTIONS_REGION = "southamerica-east1"
