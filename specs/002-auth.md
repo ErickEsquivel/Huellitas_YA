@@ -219,5 +219,5 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 - Contenido de Términos y Condiciones: los enlaces se muestran, pero aún no abren nada.
 - Verificación de correo obligatoria.
 - Login con Facebook, Apple o teléfono.
-- Edición de perfil y cambio de contraseña (Configuración → Seguridad).
-- Eliminación de cuenta.
+- Edición de perfil y eliminación de cuenta: ver la [spec 004](004-perfil-usuario.md).
+- Cambio de contraseña (Configuración → Seguridad): spec futura.
