@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Perfil de usuario: solo su dueño puede leerlo y escribirlo.
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.uid == uid;
+      allow update: if request.auth != null
+                    && request.auth.uid == uid
+                    && request.resource.data.uid == resource.data.uid
+                    && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if false;
+    }
+
+    // passwordResetCodes (códigos de recuperación hasheados) solo lo usan las Cloud Functions
+    // con el Admin SDK: queda denegado para los clientes por la regla de abajo.
+
+    // Todo lo demás queda denegado hasta que una spec lo defina.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,78 @@
+<resources>
+    <!-- Presentación (Figma "PRESENTACION") -->
+    <string name="auth_logo_description">Logo Huellitas YA!</string>
+    <string name="auth_welcome_slogan">El cuidado de tu mascota, en\nun solo lugar. 🐾</string>
+    <string name="auth_welcome_description">Organiza vacunas, historial médico y\ngestiona la frecuencia de vacunación\nde tu mascota.</string>
+    <string name="auth_welcome_pets_description">Perro y gato</string>
+    <string name="auth_welcome_start">Comenzar</string>
+    <string name="auth_welcome_footer">Tu mascota merece el mejor cuidado 💚</string>
+
+    <!-- Selector de acceso (Figma "BIENVENIDO") -->
+    <string name="auth_chooser_subtitle">Inicia sesión para seguir cuidando a tu mascota.</string>
+    <string name="auth_chooser_title">¡Bienvenido!</string>
+    <string name="auth_chooser_email">Continuar con correo</string>
+    <string name="auth_chooser_google">Continuar con Google</string>
+    <string name="auth_chooser_or">o</string>
+    <string name="auth_chooser_register">Regístrate</string>
+
+    <!-- Campos comunes -->
+    <string name="auth_field_name">Nombre</string>
+    <string name="auth_field_email">Correo</string>
+    <string name="auth_field_password">Contraseña</string>
+    <string name="auth_field_confirm_password">Confirmar contraseña</string>
+    <string name="auth_show_password">Mostrar contraseña</string>
+    <string name="auth_hide_password">Ocultar contraseña</string>
+    <string name="auth_back">Volver</string>
+
+    <!-- Inicio de sesión (Figma "INICIO SESION CORREO") -->
+    <string name="auth_login_title">¡Bienvenido de nuevo</string>
+    <string name="auth_login_title_highlight">!</string>
+    <string name="auth_login_subtitle">Inicia sesión para continuar cuidando a tu mascota</string>
+    <string name="auth_login_forgot_password">¿Se te olvidó la contraseña?</string>
+    <string name="auth_login_button">Iniciar sesión</string>
+
+    <!-- Registro (Figma "REGISTRO") -->
+    <string name="auth_register_title">"¡Bienvenido a Huellitas "</string>
+    <string name="auth_register_title_highlight">YA!</string>
+    <string name="auth_register_subtitle">Completa tus datos para crear tu cuenta y empezar.</string>
+    <string name="auth_register_terms_prefix">"Acepta los "</string>
+    <string name="auth_register_terms">Términos</string>
+    <string name="auth_register_terms_and">" y "</string>
+    <string name="auth_register_conditions">Condiciones</string>
+    <string name="auth_register_button">Crear cuenta</string>
+
+    <!-- Recuperar contraseña (Figma "OLVIDO CONTRASEÑA") -->
+    <string name="auth_forgot_title">¿Olvidaste tu contraseña?</string>
+    <string name="auth_forgot_subtitle">No te preocupes, te ayudaremos a recuperarla. Ingresa el correo electrónico que usaste para registrarte y te enviaremos un código para restablecerla.</string>
+    <string name="auth_forgot_button">Enviar código</string>
+
+    <!-- Sin conexión (Figma "ERROR INTERNET Overlay") -->
+    <string name="auth_offline_title">¡Oh No! Sin Conexión</string>
+    <string name="auth_offline_message">Parece que hemos perdido el rastro del Wi-Fi. Por favor, comprueba tu conexión y vuelve a intentarlo.</string>
+    <string name="auth_offline_retry">Reintentar</string>
+    <string name="auth_offline_connecting">Conectando…</string>
+
+    <!-- Verificar código (Figma "VERIFICACION CORREO") -->
+    <string name="auth_verify_title">Verifica tu correo</string>
+    <string name="auth_verify_subtitle">Hemos enviado un código de verificación de 4 dígitos a tu correo.</string>
+    <string name="auth_verify_code_label">Ingresa código</string>
+    <string name="auth_verify_button">Verificar código</string>
+    <string name="auth_verify_not_received">¿No recibiste el código?</string>
+    <string name="auth_verify_resend">Reenviar código</string>
+    <string name="auth_verify_resend_in">Reenviar en %1$d s</string>
+    <string name="auth_verify_resent">Te enviamos un código nuevo</string>
+    <string name="auth_verify_code_description">Código de 4 dígitos</string>
+
+    <!-- Crear nueva contraseña (Figma "CREAR CONTRASEÑA") -->
+    <string name="auth_newpassword_title">Crear nueva contraseña</string>
+    <string name="auth_newpassword_field">Nueva contraseña</string>
+    <string name="auth_newpassword_confirm">Confirmar contraseña</string>
+    <string name="auth_newpassword_rule_length">Mínimo 8 caracteres</string>
+    <string name="auth_newpassword_rule_uppercase">Una letra mayúscula</string>
+    <string name="auth_newpassword_rule_digit">Un número o carácter especial</string>
+    <string name="auth_newpassword_rule_match">¿Concuerdan las contraseñas?</string>
+    <string name="auth_newpassword_rule_met">Cumplido</string>
+    <string name="auth_newpassword_rule_unmet">Pendiente</string>
+    <string name="auth_newpassword_button">Restablecer contraseña</string>
+    <string name="auth_newpassword_success">Tu contraseña se actualizó. Inicia sesión.</string>
+</resources>

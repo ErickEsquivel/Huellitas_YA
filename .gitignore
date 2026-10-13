@@ -9,7 +9,13 @@
 /.idea/assetWizardSettings.xml
 .DS_Store
 /build
+build/
+.kotlin/
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Firebase: credenciales del proyecto (ver specs/001-firebase-setup.md)
+google-services.json
+**/google-services.json

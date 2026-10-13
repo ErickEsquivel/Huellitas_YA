@@ -1,0 +1,23 @@
+package com.example.huellitasya.core.domain.error
+
+import com.example.huellitasya.core.common.AppError
+
+/** Errores remotos de autenticación (spec 002, tabla "Errores remotos"). */
+enum class AuthError : AppError {
+    InvalidCredentials,
+    EmailAlreadyInUse,
+    WeakPassword,
+    Network,
+    TooManyRequests,
+    /** El usuario cerró el selector de cuentas de Google: no se muestra mensaje. */
+    Cancelled,
+    GoogleSignInFailed,
+    Unknown,
+}
+
+/** Errores de lectura/escritura de datos (Firestore). */
+enum class DataError : AppError {
+    Network,
+    PermissionDenied,
+    Unknown,
+}
