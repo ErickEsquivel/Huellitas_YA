@@ -2,10 +2,12 @@ package com.example.huellitasya.core.designsystem.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -56,6 +58,8 @@ fun HuellitasButton(
         ),
         shape = RoundedCornerShape(50),
         border = BorderStroke(1.dp, BorderSubtle),
+        // Figma centra textos casi tan anchos como el botón ("Actualizar información" en 279 dp).
+        contentPadding = PaddingValues(horizontal = 12.dp),
     ) {
         if (isLoading) {
             CircularProgressIndicator(
@@ -64,11 +68,13 @@ fun HuellitasButton(
                 strokeWidth = 2.dp,
             )
         } else {
+            // Una sola línea: si no cabe (pantalla angosta o fuente del sistema grande), se reduce.
             Text(
                 text = text,
                 color = Color.White,
-                fontSize = fontSize,
                 fontWeight = fontWeight,
+                maxLines = 1,
+                autoSize = TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = fontSize),
             )
         }
     }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -100,6 +101,7 @@ private fun DeleteAccountDialogContent(
                 .align(Alignment.Center)
                 .padding(horizontal = 9.dp),
         ) {
+            // Tarjeta y textos se escalan juntos; Figma mide 393.65 dp y un teléfono de 384 dp no la deja entera.
             val scale = minOf(1f, maxWidth.value / CardWidth)
             Box(
                 modifier = Modifier
@@ -122,18 +124,21 @@ private fun DeleteAccountDialogContent(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Spacer(modifier = Modifier.height((TitleTop * scale).dp))
+                    // La zona blanca de la tarjeta es más angosta que la imagen: el título se reduce si no cabe.
                     Text(
                         text = stringResource(R.string.settings_delete_title),
                         color = AlertRed,
-                        fontSize = 26.sp,
+                        maxLines = 1,
+                        autoSize = TextAutoSize.StepBased(minFontSize = 16.sp, maxFontSize = (26 * scale).sp),
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = (32 * scale).dp),
                     )
                     Spacer(modifier = Modifier.height((16 * scale).dp))
                     Text(
                         text = stringResource(R.string.settings_delete_message),
                         color = Color.Black.copy(alpha = 0.5f),
-                        fontSize = 16.sp,
+                        fontSize = (16 * scale).sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.width((253 * scale).dp),
@@ -151,7 +156,8 @@ private fun DeleteAccountDialogContent(
                         Text(
                             text = stringResource(R.string.settings_delete_confirm),
                             color = Color.White,
-                            fontSize = 20.sp,
+                            fontSize = (20 * scale).sp,
+                            maxLines = 1,
                             fontWeight = FontWeight.ExtraBold,
                         )
                     }

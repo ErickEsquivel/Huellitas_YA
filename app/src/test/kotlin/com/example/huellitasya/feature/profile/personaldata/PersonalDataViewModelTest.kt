@@ -79,12 +79,12 @@ class PersonalDataViewModelTest {
     }
 
     @Test
-    fun `el boton sin el lapiz abre la edicion sin guardar`() {
+    fun `el boton sin el lapiz no abre la edicion ni guarda`() {
         val viewModel = viewModel()
 
         viewModel.onAction(PersonalDataAction.Save)
 
-        assertTrue(viewModel.uiState.value.isEditing)
+        assertFalse(viewModel.uiState.value.isEditing)
         assertTrue(userRepository.updates.isEmpty())
     }
 

@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -310,8 +311,10 @@ private fun BirthDatePickerDialog(
             override fun isSelectableYear(year: Int): Boolean = year in MinBirthYear..LocalDate.now().year
         },
     )
+    val colors = DatePickerDefaults.colors(containerColor = Color.White)
     DatePickerDialog(
         onDismissRequest = onDismiss,
+        colors = colors,
         confirmButton = {
             TextButton(
                 onClick = {
@@ -332,7 +335,7 @@ private fun BirthDatePickerDialog(
             }
         },
     ) {
-        DatePicker(state = datePickerState)
+        DatePicker(state = datePickerState, colors = colors)
     }
 }
 

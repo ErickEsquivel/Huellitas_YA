@@ -161,15 +161,13 @@ class PersonalDataViewModel @Inject constructor(
         val state = _uiState.value
         val saved = state.saved ?: return
         if (state.isSaving) return
-        if (!state.isEditing) {
-            // Sin el lápiz, el botón también abre la edición: nada que guardar todavía.
-            toggleEditing()
-            return
-        }
+        // Solo el lápiz activa la edición (spec 004): en modo lectura el botón no hace nada.
+        if (!state.isEditing) return
         if (!state.hasChanges) return
 
         val nameError = validateName(state.name)
-        val emailError = validateEmail(state.email)
+        // El correo de una cuenta Google no se edita aquí: no debe bloquear el guardado del resto.
+        val emailError = if (state.canEditEmail) validateEmail(state.email) else null
         val phoneError = validatePhone(state.phone)
         val addressError = validateAddress(state.address)
         val birthDateError = validateBirthDate(state.birthDate)

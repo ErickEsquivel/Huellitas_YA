@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -92,63 +94,74 @@ internal fun ProfileScreen(
 ) {
     val profile = state.profile
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        // Figma (99:723): la ola empieza poco antes del botón, sin tapar los datos.
         CurvedBackground(
-            modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.3f)
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.2f)
         )
 
         Column(
             modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
-
-            ScreenHeader(
-                title = stringResource(R.string.profile_title),
-                subtitle = stringResource(R.string.profile_subtitle),
-                notificationsDescription = stringResource(R.string.profile_notifications),
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            ProfileAvatar(
-                photoUrl = profile?.photoUrl,
-                contentDescription = stringResource(R.string.profile_photo_description),
-                changePhotoDescription = stringResource(R.string.profile_change_photo),
-                isUploading = state.isUploadingPhoto,
-                onClick = onPhotoClick,
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = profile?.name.orEmpty(),
-                color = Color.Black,
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
+            // En pantallas bajas los datos se desplazan; el botón queda siempre visible.
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                ProfileInfoItem(
-                    label = stringResource(R.string.profile_field_email),
-                    value = profile?.email,
-                    isLink = true,
-                )
-                ProfileInfoItem(label = stringResource(R.string.profile_field_phone), value = profile?.phone)
-                ProfileInfoItem(label = stringResource(R.string.profile_field_address), value = profile?.address)
-                ProfileInfoItem(
-                    label = stringResource(R.string.profile_field_birth_date),
-                    value = profile?.birthDate?.format(BirthDateFormatter),
-                )
-            }
+                // Figma pone el título a 45 dp incluyendo la barra de estado, que el Scaffold ya descuenta.
+                Spacer(modifier = Modifier.height(24.dp))
 
-            Spacer(modifier = Modifier.weight(1f))
+                ScreenHeader(
+                    title = stringResource(R.string.profile_title),
+                    subtitle = stringResource(R.string.profile_subtitle),
+                    notificationsDescription = stringResource(R.string.profile_notifications),
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                ProfileAvatar(
+                    photoUrl = profile?.photoUrl,
+                    contentDescription = stringResource(R.string.profile_photo_description),
+                    changePhotoDescription = stringResource(R.string.profile_change_photo),
+                    isUploading = state.isUploadingPhoto,
+                    onClick = onPhotoClick,
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = profile?.name.orEmpty(),
+                    color = Color.Black,
+                    fontSize = 25.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                Spacer(modifier = Modifier.height(40.dp))
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    ProfileInfoItem(
+                        label = stringResource(R.string.profile_field_email),
+                        value = profile?.email,
+                        isLink = true,
+                    )
+                    ProfileInfoItem(label = stringResource(R.string.profile_field_phone), value = profile?.phone)
+                    ProfileInfoItem(label = stringResource(R.string.profile_field_address), value = profile?.address)
+                    ProfileInfoItem(
+                        label = stringResource(R.string.profile_field_birth_date),
+                        value = profile?.birthDate?.format(BirthDateFormatter),
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
             HuellitasButton(
                 text = stringResource(R.string.profile_edit),
@@ -158,7 +171,7 @@ internal fun ProfileScreen(
                 modifier = Modifier.size(width = 279.dp, height = 48.dp),
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(28.dp))
         }
 
         SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))

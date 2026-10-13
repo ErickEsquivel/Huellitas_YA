@@ -54,7 +54,7 @@ Perfil ──tocar la foto──► Photo Picker del sistema ──► subida �
 
 - Por defecto se muestra en modo lectura. El lápiz de la tarjeta "Datos Dueño" activa la edición; si se pulsa otra vez durante la edición, descarta los cambios.
 - "Actualizar información" se ve gris (`ButtonIncomplete`) mientras no hay cambios y verde (`GreenAction`) cuando los hay. Igual que en la spec 002, sigue siendo pulsable en gris y, con una petición en curso, muestra un indicador y no acepta otro clic.
-- Pulsar "Actualizar información" en modo lectura abre la edición, igual que el lápiz.
+- Solo el lápiz activa la edición: en modo lectura, "Actualizar información" no hace nada.
 - Escribir de nuevo el valor guardado (p. ej. el mismo teléfono con espacios) no cuenta como cambio.
 - Si el perfil cambia en otro dispositivo durante la edición, no se pisan los campos que se están editando.
 - Al pulsarlo se valida y se guardan **solo los campos modificados**, más `updatedAt`.
@@ -284,13 +284,13 @@ Hechos en el PR de implementación:
 
 > Marcar cada casilla al verificarla en dispositivo.
 
-- [ ] Perfil muestra los datos reales de `users/{uid}`, sin textos fijos, y se actualiza en vivo al guardar cambios.
-- [ ] Los campos opcionales vacíos muestran "Sin registrar".
-- [ ] "Editar información" (Perfil) y Configuración → "Datos personales" abren la misma pantalla.
-- [ ] En Datos Personales no se puede escribir hasta pulsar el lápiz.
-- [ ] Sin cambios, "Actualizar información" se ve gris; con cambios, verde.
-- [ ] Un cambio válido se guarda, muestra "Datos actualizados" y la pantalla sale del modo edición.
-- [ ] Datos inválidos muestran su aviso bajo el campo y no se escribe nada en Firestore.
+- [x] Perfil muestra los datos reales de `users/{uid}`, sin textos fijos, y se actualiza en vivo al guardar cambios.
+- [x] Los campos opcionales vacíos muestran "Sin registrar".
+- [x] "Editar información" (Perfil) y Configuración → "Datos personales" abren la misma pantalla.
+- [x] En Datos Personales no se puede escribir hasta pulsar el lápiz.
+- [x] Sin cambios, "Actualizar información" se ve gris; con cambios, verde.
+- [x] Un cambio válido se guarda, muestra "Datos actualizados" y la pantalla sale del modo edición.
+- [x] Datos inválidos muestran su aviso bajo el campo y no se escribe nada en Firestore.
 - [ ] Vaciar el teléfono, la dirección o la fecha los borra del documento.
 - [ ] Cambiar el correo pide la contraseña si Firebase lo exige, envía el enlace de verificación (en español) y el correo mostrado no cambia hasta confirmarlo.
 - [ ] Tras confirmar el correo nuevo y volver a iniciar sesión, `users/{uid}.email` tiene el correo nuevo.
