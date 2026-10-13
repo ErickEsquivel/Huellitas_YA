@@ -348,7 +348,7 @@ Hechos en el PR de implementación:
 - [x] Sin cambios, "Actualizar información" se ve gris; con cambios, verde.
 - [x] Un cambio válido se guarda, muestra "Datos actualizados" y la pantalla sale del modo edición.
 - [x] Datos inválidos muestran su aviso bajo el campo y no se escribe nada en Firestore.
-- [ ] Vaciar el teléfono, la dirección o la fecha los borra del documento.
+- [x] Vaciar el teléfono, la dirección o la fecha los borra del documento.
 - [ ] Cambiar el correo pide la contraseña si el backend lo exige y abre "Verifica tu correo"; llega un código de 4 dígitos al correo nuevo, desde el Gmail *noreply*.
 - [ ] Con el código correcto, Datos Personales muestra el correo nuevo sin cerrar la sesión, y `users/{uid}.email` y Auth tienen el correo nuevo.
 - [ ] Un código incorrecto se marca en rojo; tras 5 intentos o 10 minutos hay que pedir otro; "Reenviar código" solo se activa después de 60 s.
@@ -359,10 +359,10 @@ Hechos en el PR de implementación:
 - [ ] Con la contraseña actual incorrecta, Seguridad muestra "La contraseña ingresada no es correcta" en rojo y no cambia nada.
 - [x] En una cuenta Google, la fila Seguridad solo muestra el aviso.
 - [ ] Restablecer la contraseña con el código (spec 002) también envía el aviso "Tu contraseña cambió".
-- [ ] Elegir una foto la sube a Storage y el avatar la muestra; cancelar el selector no hace nada.
-- [ ] "Eliminar cuenta" pide confirmación y reautenticación; luego desaparecen la foto, el documento y el usuario de Auth, y la app vuelve a Presentación con el historial limpio.
+- [x] Elegir una foto la sube a Storage y el avatar la muestra; cancelar el selector no hace nada.
+- [x] "Eliminar cuenta" pide confirmación y reautenticación; luego desaparecen la foto, el documento y el usuario de Auth, y la app vuelve a Presentación con el historial limpio.
 - [ ] Llamar a `deleteAccount` con un inicio de sesión de hace más de 5 min responde `requires_recent_login` y no borra nada.
-- [ ] Después de eliminar la cuenta, el mismo correo se puede volver a registrar.
+- [x] Después de eliminar la cuenta, el mismo correo se puede volver a registrar.
 - [ ] Las reglas impiden leer o editar el perfil o la foto de otro usuario, borrar cualquiera de los dos desde el cliente, y cambiar `uid`, `provider` o `createdAt`.
 - [ ] Sin conexión, Perfil muestra los datos en caché, y guardar, subir la foto o eliminar la cuenta muestran "Sin conexión. Revisa tu internet" sin quedarse cargando.
 
