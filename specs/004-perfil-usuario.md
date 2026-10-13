@@ -1,9 +1,9 @@
 # 004 — Perfil de usuario
 
-- **Estado:** Implemented (pendiente de QA en dispositivo y de desplegar reglas, Storage y `deleteAccount`)
+- **Estado:** Implemented (criterios verificados en dispositivo; reglas, Storage y Cloud Functions desplegados)
   - Revisada contra `master` después del PR #2 (auth con código OTP, overlay "Sin conexión" y Cloud Functions).
   - Las [desviaciones de Figma](#desviaciones-de-figma) quedaron decididas con el equipo.
-  - Antes de probar en dispositivo, el Owner debe crear el bucket de Storage y desplegar: `firebase deploy --only firestore:rules,storage,functions` (spec 001, pasos 8 y 9). El cambio de correo con código y el aviso de contraseña necesitan volver a desplegar `functions`.
+  - Para probar en otro proyecto de Firebase, el Owner crea el bucket de Storage y despliega: `firebase deploy --only firestore:rules,storage,functions` (spec 001, pasos 8 y 9).
 - **Paquetes:** `feature.profile`, `feature.settings`, `core.domain`, `core.model`, `core.data`, `core.ui`, `core.designsystem`, `navigation`, y el backend en `functions/`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-)
   - Perfil (ver): `PERFIL` (99:723)
@@ -87,7 +87,9 @@ Con un código de 4 dígitos, igual que la recuperación de contraseña (spec 00
   - el código vence a los 10 min y admite 5 intentos;
   - "Reenviar código" se habilita a los 60 s, con cuenta regresiva, y como máximo 5 envíos por hora;
   - si reenviar pasa de los 5 min de sesión, se pide volver a guardar el correo desde Datos Personales.
-- Con el código correcto, `confirmEmailChange` cambia el correo en Auth (`emailVerified = true`) y en `users/{uid}` a la vez. La app recarga la sesión, vuelve a Datos Personales y muestra "Tu correo ahora es <correo>". La sesión sigue abierta.
+- Con el código correcto, `confirmEmailChange` cambia el correo en Auth (`emailVerified = true`) y en `users/{uid}` a la vez. La app vuelve a Datos Personales y muestra "Tu correo ahora es <correo>". La sesión sigue abierta:
+  - cambiar el correo con el Admin SDK revoca las sesiones del usuario, así que el backend devuelve también un custom token;
+  - la app inicia sesión con él (`signInWithCustomToken`) en `@ApplicationScope`, para que el cambio de sesión no interrumpa el use case.
 - Después, el backend avisa al correo anterior: "El correo de tu cuenta ahora es n****@…", con el contacto de soporte por si no fue el usuario.
 
 ### Eliminar cuenta
@@ -142,6 +144,7 @@ Decididas con el equipo (Figma no las cubre):
 - **Fila "Eliminar cuenta"** en "Mi cuenta" de Configuración. Usa la misma tarjeta que "Datos personales" y "Seguridad", con el título y un ícono de papelera en `AlertRed`, para que se distinga como acción destructiva.
 - **Insignia de cámara** sobre el avatar de Perfil: círculo verde abajo a la derecha, para indicar que la foto se puede tocar.
 - **Subtítulo de Perfil:** "Gestiona tu información personal". El de Figma ("Gestiona los eventos de tu mascota") estaba copiado de otra pantalla.
+- **Ícono de regla no cumplida** en la checklist de contraseña (`ic_password_rule_unmet`): una X naranja dentro del círculo, con la misma geometría que el visto verde (`ic_password_rule_met`). El glifo de Figma (un visto cruzado por una X) se leía como cumplido.
 - **Campos subrayados en Datos Personales**, no la caja de `HuellitasTextField`. Se crea `PersonalDataField` en `feature/profile/components`. Si la edición de mascotas ("EDIT PERRO") usa el mismo estilo, sube a `core.designsystem` (regla de ≥ 2 pantallas, spec 003).
 
 ## Reglas de validación (en cliente, `core.domain`)
@@ -257,7 +260,8 @@ Callables en `functions/src/index.ts`, con las `setGlobalOptions` existentes (re
   - Guarda el código hasheado en `emailChangeCodes/{uid}` (`newEmail`, `codeHash`, `expiresAt`, `attempts`, `sends`). Las reglas de Firestore niegan esa colección a los clientes.
 - **`confirmEmailChange({ code })`**
   - Mismos errores del código que `verifyPasswordResetCode`: `invalid_code`, `too_many_attempts`, `expired`. También `email_in_use`, si otra cuenta tomó el correo mientras tanto.
-  - Éxito: `{ email }`. Cambia Auth y `users/{uid}`, borra el registro y avisa al correo anterior (best-effort).
+  - Éxito: `{ email, customToken }`. Cambia Auth y `users/{uid}`, borra el registro y avisa al correo anterior (best-effort).
+  - El cambio revoca las sesiones, por eso devuelve un custom token. Firmarlo requiere `iam.serviceAccounts.signBlob`: la función corre con la cuenta del Admin SDK (`firebase-adminsdk-fbsvc@<proyecto>.iam.gserviceaccount.com`), que tiene "Service Account Token Creator"; la cuenta de Compute por defecto no lo tiene.
 - **`notifyPasswordChanged()`**
   - Exige sesión reciente; como máximo un aviso por minuto (`passwordChangeNotices/{uid}`).
   - Éxito: `{ sent }`.
@@ -278,17 +282,17 @@ Callables en `functions/src/index.ts`, con las `setGlobalOptions` existentes (re
   - `notifyPasswordChanged(): AppResult<Unit, AuthError>`
 - `EmailChangeRepository` (nuevo; implementación `FunctionsEmailChangeRepository`), con errores en `EmailChangeError`:
   - `requestCode(newEmail): AppResult<Unit, EmailChangeError>`
-  - `confirm(code): AppResult<String, EmailChangeError>`: devuelve el correo nuevo.
+  - `confirm(code): AppResult<ConfirmedEmailChange, EmailChangeError>`: devuelve el correo nuevo y el custom token.
 - `AuthRepository`, se agregan:
   - `reauthenticateWithPassword(password): AppResult<Unit, AuthError>`
   - `reauthenticateWithGoogle(idToken): AppResult<Unit, AuthError>`
   - `updatePassword(newPassword): AppResult<Unit, AuthError>`
-  - `reload(): AppResult<Unit, AuthError>`: recarga el usuario y el token tras cambiar el correo.
+  - `signInWithCustomToken(token): AppResult<User, AuthError>`: vuelve a entrar tras cambiar el correo, porque el cambio revoca la sesión.
   - `updateDisplayName(name): AppResult<Unit, AuthError>`. Se hace sin bloquear el guardado y mantiene al día el `User.name` de la sesión.
 - Use cases:
   - `ObserveUserProfileUseCase`: si `users/{uid}` aún no existe, emite un perfil con los datos de la sesión.
   - `UpdateUserProfileUseCase`: guarda los cambios ya validados y, si cambió el nombre, llama a `updateDisplayName`. La validación por campo y el cambio de correo los coordina `PersonalDataViewModel`, para mostrar cada aviso bajo su campo.
-  - `RequestEmailChangeCodeUseCase` y `ConfirmEmailChangeUseCase` (al confirmar, recarga la sesión)
+  - `RequestEmailChangeCodeUseCase` y `ConfirmEmailChangeUseCase` (`@ApplicationScope`; al confirmar, entra con el custom token)
   - `ChangePasswordUseCase`: reautentica con la actual, cambia la contraseña y pide el aviso (best-effort)
   - `ChangeProfilePhotoUseCase`: sube la foto y actualiza `photoUrl`.
   - `ReauthenticateUseCase`
@@ -349,22 +353,22 @@ Hechos en el PR de implementación:
 - [x] Un cambio válido se guarda, muestra "Datos actualizados" y la pantalla sale del modo edición.
 - [x] Datos inválidos muestran su aviso bajo el campo y no se escribe nada en Firestore.
 - [x] Vaciar el teléfono, la dirección o la fecha los borra del documento.
-- [ ] Cambiar el correo pide la contraseña si el backend lo exige y abre "Verifica tu correo"; llega un código de 4 dígitos al correo nuevo, desde el Gmail *noreply*.
-- [ ] Con el código correcto, Datos Personales muestra el correo nuevo sin cerrar la sesión, y `users/{uid}.email` y Auth tienen el correo nuevo.
-- [ ] Un código incorrecto se marca en rojo; tras 5 intentos o 10 minutos hay que pedir otro; "Reenviar código" solo se activa después de 60 s.
-- [ ] Al correo anterior llega el aviso "Tu correo cambió" con el correo nuevo enmascarado.
-- [ ] Un correo que ya es de otra cuenta se marca en rojo bajo el campo y no se envía código.
+- [x] Cambiar el correo pide la contraseña si el backend lo exige y abre "Verifica tu correo"; llega un código de 4 dígitos al correo nuevo, desde el Gmail *noreply*.
+- [x] Con el código correcto, Datos Personales muestra el correo nuevo sin cerrar la sesión, y `users/{uid}.email` y Auth tienen el correo nuevo.
+- [x] Un código incorrecto se marca en rojo; tras 5 intentos o 10 minutos hay que pedir otro; "Reenviar código" solo se activa después de 60 s. (En dispositivo se verificaron el rojo y los 60 s; los 5 intentos y los 10 minutos, con los tests de `functions`.) (Verificados en dispositivo: el rojo y los 60 s. Los 5 intentos y los 10 minutos, con los tests de `functions`.)
+- [x] Al correo anterior llega el aviso "Tu correo cambió" con el correo nuevo enmascarado.
+- [x] Un correo que ya es de otra cuenta se marca en rojo bajo el campo y no se envía código.
 - [x] En una cuenta Google, el correo no se puede editar.
-- [ ] Seguridad cambia la contraseña con la actual correcta, limpia el formulario y llega el aviso "Tu contraseña cambió"; la sesión sigue abierta y la contraseña anterior deja de funcionar.
-- [ ] Con la contraseña actual incorrecta, Seguridad muestra "La contraseña ingresada no es correcta" en rojo y no cambia nada.
+- [x] Seguridad cambia la contraseña con la actual correcta, limpia el formulario y llega el aviso "Tu contraseña cambió"; la sesión sigue abierta y la contraseña anterior deja de funcionar.
+- [x] Con la contraseña actual incorrecta, Seguridad muestra "La contraseña ingresada no es correcta" en rojo y no cambia nada.
 - [x] En una cuenta Google, la fila Seguridad solo muestra el aviso.
-- [ ] Restablecer la contraseña con el código (spec 002) también envía el aviso "Tu contraseña cambió".
+- [x] Restablecer la contraseña con el código (spec 002) también envía el aviso "Tu contraseña cambió".
 - [x] Elegir una foto la sube a Storage y el avatar la muestra; cancelar el selector no hace nada.
 - [x] "Eliminar cuenta" pide confirmación y reautenticación; luego desaparecen la foto, el documento y el usuario de Auth, y la app vuelve a Presentación con el historial limpio.
-- [ ] Llamar a `deleteAccount` con un inicio de sesión de hace más de 5 min responde `requires_recent_login` y no borra nada.
+- [x] Llamar a `deleteAccount` con un inicio de sesión de hace más de 5 min responde `requires_recent_login` y no borra nada.
 - [x] Después de eliminar la cuenta, el mismo correo se puede volver a registrar.
-- [ ] Las reglas impiden leer o editar el perfil o la foto de otro usuario, borrar cualquiera de los dos desde el cliente, y cambiar `uid`, `provider` o `createdAt`.
-- [ ] Sin conexión, Perfil muestra los datos en caché, y guardar, subir la foto o eliminar la cuenta muestran "Sin conexión. Revisa tu internet" sin quedarse cargando.
+- [x] Las reglas impiden leer o editar el perfil o la foto de otro usuario, borrar cualquiera de los dos desde el cliente, y cambiar `uid`, `provider` o `createdAt`.
+- [x] Sin conexión, Perfil muestra los datos en caché, y guardar, subir la foto o eliminar la cuenta muestran "Sin conexión. Revisa tu internet" sin quedarse cargando.
 
 ## Plan de tests
 

@@ -25,8 +25,11 @@ interface AuthRepository {
     /** Cambia la contraseña de la sesión actual (Seguridad, spec 004). Requiere reautenticar antes. */
     suspend fun updatePassword(newPassword: String): AppResult<Unit, AuthError>
 
-    /** Vuelve a leer el usuario de Auth (p. ej. tras cambiar el correo en el backend). */
-    suspend fun reload(): AppResult<Unit, AuthError>
+    /**
+     * Inicia sesión con un custom token del backend. Tras cambiar el correo, Firebase revoca las
+     * sesiones; así la app sigue con la sesión abierta (spec 004).
+     */
+    suspend fun signInWithCustomToken(token: String): AppResult<User, AuthError>
 
     /** Mantiene el nombre de Auth igual al del perfil, para que `User.name` de la sesión no quede desfasado. */
     suspend fun updateDisplayName(name: String): AppResult<Unit, AuthError>

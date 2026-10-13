@@ -90,6 +90,7 @@ Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tien
 **Perfil (spec 004):**
 - Perfil y Datos Personales escuchan `users/{uid}` en vivo (`ObserveUserProfileUseCase`). Antes de escribir se consulta `NetworkMonitor`: sin red, Firestore encola la escritura y el `await()` no termina.
 - Cambiar el correo usa un código de 4 dígitos como la recuperación de contraseña: `requestEmailChangeCode` → "Verifica tu correo" → `confirmEmailChange`, que cambia Auth y `users/{uid}` a la vez y avisa al correo anterior. `EmailChangeRepository` se implementa en `FunctionsEmailChangeRepository`.
+  - Ese cambio con el Admin SDK revoca las sesiones: `confirmEmailChange` devuelve un custom token (corre con la cuenta `firebase-adminsdk-fbsvc@…`, que puede firmarlo) y `ConfirmEmailChangeUseCase` vuelve a entrar con `signInWithCustomToken` en `@ApplicationScope`.
 - Seguridad (`feature.settings.security`) cambia la contraseña en el cliente (`reauthenticate` + `updatePassword`) y luego llama a `notifyPasswordChanged` para el aviso por correo.
 - Las plantillas de correo están en `functions/src/email.ts` (una sola `layout` con la marca); las callables nuevas reutilizan `canSendCode`/`checkCode` de `resetCodes.ts`.
 - La foto va a Storage (`users/{uid}/profile.jpg`), comprimida en `FirebaseStorageProfilePhotoRepository`.

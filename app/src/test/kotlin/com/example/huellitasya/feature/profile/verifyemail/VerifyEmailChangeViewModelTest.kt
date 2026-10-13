@@ -12,6 +12,7 @@ import com.example.huellitasya.core.testing.FakeAuthRepository
 import com.example.huellitasya.core.testing.FakeEmailChangeRepository
 import com.example.huellitasya.core.testing.MainDispatcherRule
 import com.example.huellitasya.core.ui.UiText
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
@@ -31,15 +32,15 @@ class VerifyEmailChangeViewModelTest {
     private val authRepository = FakeAuthRepository()
     private val emailChangeRepository = FakeEmailChangeRepository()
 
-    private fun viewModel() = VerifyEmailChangeViewModel(
+    private fun viewModel(appScope: CoroutineScope) = VerifyEmailChangeViewModel(
         savedStateHandle = SavedStateHandle(mapOf(VerifyEmailChangeViewModel.NEW_EMAIL_ARG to "nuevo@correo.com")),
-        confirmEmailChange = ConfirmEmailChangeUseCase(emailChangeRepository, authRepository),
+        confirmEmailChange = ConfirmEmailChangeUseCase(emailChangeRepository, authRepository, appScope),
         requestEmailChangeCode = RequestEmailChangeCodeUseCase(emailChangeRepository),
     )
 
     @Test
     fun `solo acepta digitos y como maximo cuatro`() = runTest(mainDispatcherRule.testDispatcher) {
-        val viewModel = viewModel()
+        val viewModel = viewModel(appScope = this)
 
         viewModel.onAction(VerifyEmailChangeAction.CodeChanged("12a345"))
 
@@ -49,7 +50,7 @@ class VerifyEmailChangeViewModelTest {
 
     @Test
     fun `codigo incompleto se marca sin llamar al backend`() = runTest(mainDispatcherRule.testDispatcher) {
-        val viewModel = viewModel()
+        val viewModel = viewModel(appScope = this)
         viewModel.onAction(VerifyEmailChangeAction.CodeChanged("12"))
 
         viewModel.onAction(VerifyEmailChangeAction.Submit)
@@ -60,7 +61,7 @@ class VerifyEmailChangeViewModelTest {
 
     @Test
     fun `codigo correcto devuelve el correo nuevo`() = runTest(mainDispatcherRule.testDispatcher) {
-        val viewModel = viewModel()
+        val viewModel = viewModel(appScope = this)
         viewModel.onAction(VerifyEmailChangeAction.CodeChanged("4821"))
 
         viewModel.events.test {
@@ -73,7 +74,7 @@ class VerifyEmailChangeViewModelTest {
     @Test
     fun `codigo incorrecto se marca en rojo`() = runTest(mainDispatcherRule.testDispatcher) {
         emailChangeRepository.confirmResult = AppResult.Failure(EmailChangeError.InvalidCode)
-        val viewModel = viewModel()
+        val viewModel = viewModel(appScope = this)
         viewModel.onAction(VerifyEmailChangeAction.CodeChanged("0000"))
 
         viewModel.onAction(VerifyEmailChangeAction.Submit)
@@ -85,7 +86,7 @@ class VerifyEmailChangeViewModelTest {
 
     @Test
     fun `reenviar solo se habilita a los 60 segundos`() = runTest(mainDispatcherRule.testDispatcher) {
-        val viewModel = viewModel()
+        val viewModel = viewModel(appScope = this)
         testScheduler.runCurrent()
 
         viewModel.onAction(VerifyEmailChangeAction.Resend)
@@ -106,7 +107,7 @@ class VerifyEmailChangeViewModelTest {
     @Test
     fun `reenviar con la sesion vieja pide volver a guardar el correo`() = runTest(mainDispatcherRule.testDispatcher) {
         emailChangeRepository.requestResults = listOf(AppResult.Failure(EmailChangeError.RequiresRecentLogin))
-        val viewModel = viewModel()
+        val viewModel = viewModel(appScope = this)
         advanceTimeBy(60_001)
 
         viewModel.events.test {

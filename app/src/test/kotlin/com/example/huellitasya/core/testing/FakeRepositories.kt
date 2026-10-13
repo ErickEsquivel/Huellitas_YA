@@ -6,6 +6,7 @@ import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.error.EmailChangeError
 import com.example.huellitasya.core.domain.repository.AccountRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
+import com.example.huellitasya.core.domain.repository.ConfirmedEmailChange
 import com.example.huellitasya.core.domain.repository.EmailChangeRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
@@ -73,17 +74,18 @@ class FakeAuthRepository : AuthRepository {
 
     var updatePasswordResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
     val updatedPasswords = mutableListOf<String>()
-    var reloadCount = 0
-        private set
+    val customTokens = mutableListOf<String>()
 
     override suspend fun updatePassword(newPassword: String): AppResult<Unit, AuthError> {
         updatedPasswords += newPassword
         return updatePasswordResult
     }
 
-    override suspend fun reload(): AppResult<Unit, AuthError> {
-        reloadCount++
-        return AppResult.Success(Unit)
+    override suspend fun signInWithCustomToken(token: String): AppResult<User, AuthError> {
+        customTokens += token
+        val user = (currentUser.value ?: TestUser)
+        currentUser.value = user
+        return AppResult.Success(user)
     }
 
     var updateDisplayNameResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
@@ -209,7 +211,8 @@ class FakeEmailChangeRepository : EmailChangeRepository {
     /** Resultados en orden para cada pedido de código; el último se repite. */
     var requestResults: List<AppResult<Unit, EmailChangeError>> = listOf(AppResult.Success(Unit))
     val requestedEmails = mutableListOf<String>()
-    var confirmResult: AppResult<String, EmailChangeError> = AppResult.Success("nuevo@correo.com")
+    var confirmResult: AppResult<ConfirmedEmailChange, EmailChangeError> =
+        AppResult.Success(ConfirmedEmailChange("nuevo@correo.com", "custom-token"))
     val confirmedCodes = mutableListOf<String>()
 
     override suspend fun requestCode(newEmail: String): AppResult<Unit, EmailChangeError> {
@@ -217,7 +220,7 @@ class FakeEmailChangeRepository : EmailChangeRepository {
         return requestResults[minOf(requestedEmails.size, requestResults.size) - 1]
     }
 
-    override suspend fun confirm(code: String): AppResult<String, EmailChangeError> {
+    override suspend fun confirm(code: String): AppResult<ConfirmedEmailChange, EmailChangeError> {
         confirmedCodes += code
         return confirmResult
     }

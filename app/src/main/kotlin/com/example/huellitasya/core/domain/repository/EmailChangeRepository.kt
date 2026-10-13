@@ -11,6 +11,11 @@ interface EmailChangeRepository {
     /** Envía el código a [newEmail]. Exige un inicio de sesión reciente. */
     suspend fun requestCode(newEmail: String): AppResult<Unit, EmailChangeError>
 
-    /** Valida el código y cambia el correo en Auth y en `users/{uid}`. Devuelve el correo nuevo. */
-    suspend fun confirm(code: String): AppResult<String, EmailChangeError>
+    /**
+     * Valida el código y cambia el correo en Auth y en `users/{uid}`. Como el cambio revoca las
+     * sesiones, el backend devuelve también un custom token para seguir con la sesión abierta.
+     */
+    suspend fun confirm(code: String): AppResult<ConfirmedEmailChange, EmailChangeError>
 }
+
+data class ConfirmedEmailChange(val email: String, val customToken: String)
