@@ -39,7 +39,7 @@ Al ser un solo módulo, el compilador no impone estas reglas. Se revisan en code
 - Un paquete `feature.*` **nunca** importa `core.data` ni otra feature. Solo conoce interfaces de `core.domain`, y Hilt inyecta las implementaciones.
 - `core.model`, `core.common` y `core.domain` son Kotlin puro: nada de `android.*`, `androidx.*` ni Firebase. Así se pueden mover a módulos JVM si el proyecto crece.
 - `core.designsystem` no conoce modelos de dominio ni ViewModels.
-- Firebase solo se importa desde `core.data`. Credential Manager solo desde `feature.auth.google`.
+- Firebase solo se importa desde `core.data`. Credential Manager solo desde `core.ui.google` (lo usan Auth y Configuración, spec 004).
 
 Comprobación rápida (debe salir vacío):
 

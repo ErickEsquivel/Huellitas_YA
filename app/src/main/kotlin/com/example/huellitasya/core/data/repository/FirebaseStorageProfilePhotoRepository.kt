@@ -7,6 +7,7 @@ import android.graphics.ImageDecoder
 import android.graphics.Matrix
 import android.net.Uri
 import android.os.Build
+import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.data.mapper.toDataError
@@ -35,7 +36,7 @@ internal class FirebaseStorageProfilePhotoRepository @Inject constructor(
 
     override suspend fun upload(uid: String, localUri: String): AppResult<String, DataError> {
         return try {
-            val bytes = withContext(Dispatchers.IO) { compress(Uri.parse(localUri)) }
+            val bytes = withContext(Dispatchers.IO) { compress(localUri.toUri()) }
             if (bytes.size > MAX_BYTES) return AppResult.Failure(DataError.FileTooLarge)
 
             val reference = storage.reference.child("users/$uid/profile.jpg")

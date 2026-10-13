@@ -171,17 +171,18 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 
 - El documento se crea **solo si no existe** (`createIfMissing`) en registro, login con correo y login con Google. No se pisa `createdAt`, y si una creación falló, el siguiente login la reintenta.
 - Esa escritura corre en `@ApplicationScope`, porque la pantalla que la inicia se destruye en cuanto la sesión cambia.
+- Los campos del perfil (`phone`, `address`, `birthDate`, `updatedAt`) y las reglas de edición los define la spec 004.
 
 ### Domain (`core.domain`)
 
-- `AuthRepository`: `currentUser: Flow<User?>`, `signInWithEmail`, `registerWithEmail`, `signInWithGoogle(idToken)`, `signOut`.
+- `AuthRepository`: `currentUser: Flow<User?>`, `signInWithEmail`, `registerWithEmail`, `signInWithGoogle(idToken)`, `signOut`. La spec 004 agrega la reautenticación, el cambio de correo y `updateDisplayName`.
 - `PasswordResetRepository` (implementado sobre Cloud Functions): `requestCode`, `verifyCode` → `resetToken`, `resetPassword`. Errores en `PasswordResetError`.
-- `UserRepository`: `createIfMissing(user)`.
+- `UserRepository`: `createIfMissing(user)`. Después del login también se llama a `syncEmail` (spec 004). Lectura y edición del perfil: spec 004.
 - Use cases: `ObserveSessionUseCase`, `SignInWithEmailUseCase`, `RegisterUseCase`, `SignInWithGoogleUseCase`, `RequestPasswordResetCodeUseCase`, `VerifyPasswordResetCodeUseCase`, `ResetPasswordUseCase`, `SignOutUseCase`, `ValidateNameUseCase`, `ValidateEmailUseCase`, `ValidatePasswordUseCase`.
 
 ### Google Sign-In
 
-- `GoogleIdTokenRequester` (en `feature.auth.google`) abre el selector de cuentas con Credential Manager (`GetSignInWithGoogleOption`) y devuelve el ID token. Vive en la capa de UI porque necesita el `Context` de un Activity.
+- `GoogleIdTokenRequester` (en `core.ui.google`, porque Configuración también lo usa para reautenticar) abre el selector de cuentas con Credential Manager (`GetSignInWithGoogleOption`) y devuelve el ID token. Vive en la capa de UI porque necesita el `Context` de un Activity.
 - El `serverClientId` es `R.string.default_web_client_id`. Lo genera el plugin de Google Services a partir de `google-services.json` y `MainActivity` lo busca por nombre y lo pasa a `authGraph(...)`. Si no existe (Google sin configurar), el botón de Google responde "No se pudo iniciar sesión con Google".
 
 ### Rutas (`feature.auth.navigation`)

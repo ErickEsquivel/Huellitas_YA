@@ -1,8 +1,9 @@
 # 004 — Perfil de usuario
 
-- **Estado:** Approved (en implementación en la rama `feature/perfil-usuario`)
+- **Estado:** Implemented (pendiente de QA en dispositivo y de desplegar reglas, Storage y `deleteAccount`)
   - Revisada contra `master` después del PR #2 (auth con código OTP, overlay "Sin conexión" y Cloud Functions).
   - Las [desviaciones de Figma](#desviaciones-de-figma) quedaron decididas con el equipo.
+  - Antes de probar en dispositivo, el Owner debe crear el bucket de Storage y desplegar: `firebase deploy --only firestore:rules,storage,functions` (spec 001, pasos 8 y 9).
 - **Paquetes:** `feature.profile`, `feature.settings`, `core.domain`, `core.model`, `core.data`, `core.ui`, `core.designsystem`, `navigation`, y el backend en `functions/`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-)
   - Perfil (ver): `PERFIL` (99:723)
@@ -247,7 +248,8 @@ Se agregan estos campos a la tabla de la spec 002:
 
 - `feature/profile`: `ProfileUiState`, `ProfileAction`, `ProfileEvent`, `ProfileViewModel`, `ProfileRoute` y `ProfileScreen`. Reemplaza la `ProfileScreen` estática actual.
 - `feature/profile/personaldata`: `PersonalData*` con el mismo patrón. El estado incluye `isEditing`, `hasChanges` y un `FieldFeedback` por campo.
-- `feature/settings`: `SettingsViewModel` agrega la acción de eliminar cuenta, el estado del diálogo y el de la reautenticación. Las filas de "Mi cuenta" se rehacen según 3452:1018.
+- `feature/settings`: `SettingsViewModel` pasa al patrón `UiState`/`Action`/`Event` y agrega eliminar la cuenta (confirmación, reautenticación y `LaunchGoogleReauth`). Las filas de "Mi cuenta" se rehacen según 3452:1018; el diálogo es `components/DeleteAccountDialog.kt`, con la tarjeta de Figma como imagen (`img_settings_delete_dialog`).
+- `core.designsystem`: `HuellitasBackButton` (antes `AuthBackButton`) y `PasswordConfirmDialog`, compartidos por Auth, Perfil y Configuración. Su estado vive en `core.ui.PasswordPromptState`.
 - `GoogleIdTokenRequester` sale de `feature.auth.google` y pasa a `core.ui.google`, porque Configuración también lo necesita para reautenticar y una feature no importa otra.
 - Strings en `res/values/strings_profile.xml` y `strings_settings.xml`; los errores nuevos, en `strings_errors.xml`. Recursos con prefijo `img_profile_*` / `ic_profile_*` e `ic_settings_*`.
 
@@ -263,21 +265,15 @@ Se agregan estos campos a la tabla de la spec 002:
 - `coil-compose` y `coil-network-okhttp` (Coil 3)
 - `desugar_jdk_libs`
 
-## Cambios a otras specs al implementar
+## Cambios a otras specs
 
-Se hacen en el mismo PR de implementación:
+Hechos en el PR de implementación:
 
-- **001 — Firebase setup:**
-  - agregar el paso "Storage": el Owner crea el bucket en `southamerica-east1`; luego `firebase deploy --only storage`;
-  - sacar Storage de "Fuera de alcance";
-  - en Contratos, sumar `firebase-storage`.
-- **000 — Arquitectura:** la regla "Credential Manager solo desde `feature.auth.google`" pasa a `core.ui.google`.
-- **002 — Autenticación:** tabla de `users/{uid}` y lista de métodos de `UserRepository`/`AuthRepository`, o un enlace a esta spec.
-- **003 — Design system:** catálogo, si `PersonalDataField` o el diálogo de confirmación suben a `core.designsystem`.
-- **CLAUDE.md:**
-  - nueva ubicación de `GoogleIdTokenRequester`;
-  - la callable `deleteAccount` en la sección de Cloud Functions;
-  - el comando `firebase deploy --only storage`.
+- **000 — Arquitectura:** Credential Manager solo desde `core.ui.google`.
+- **001 — Firebase setup:** paso 9 "Storage", `firebase-storage` en Contratos y criterio de las reglas de Storage.
+- **002 — Autenticación:** enlaces a esta spec en `users/{uid}`, `AuthRepository`, `UserRepository` y Google Sign-In.
+- **003 — Design system:** `HuellitasBackButton` y `PasswordConfirmDialog` en el catálogo.
+- **CLAUDE.md:** sección "Perfil (spec 004)", nueva ubicación de `GoogleIdTokenRequester` y `firebase deploy --only storage`.
 
 ## Riesgos
 
@@ -314,6 +310,7 @@ Unit tests en la JVM, con los fakes de `core/testing`:
 - Use cases: `ProfileUseCasesTest` (actualizar, cambio de correo, foto, eliminar + `signOut`).
 - ViewModels: `ProfileViewModelTest`, `PersonalDataViewModelTest`, `SettingsViewModelTest`. Eliminar la cuenta se prueba con `appScope = this`, y el caso sin red con `FakeNetworkMonitor(initiallyOnline = false)`.
 - Fakes: ampliar `FakeUserRepository` y `FakeAuthRepository` (`FakeRepositories.kt`), y agregar `FakeProfilePhotoRepository` y `FakeAccountRepository`.
+- Las reglas de Firestore y Storage no tienen tests automáticos (no se usa el Emulator Suite, spec 001): se verifican con los criterios de aceptación.
 - Backend: `functions/src/account.test.ts` (`npm --prefix functions test`).
 
 ## Fuera de alcance

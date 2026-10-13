@@ -21,8 +21,9 @@ En Windows usar `gradlew.bat` (o `./gradlew` desde Git Bash).
 ./gradlew lint
 ./gradlew signingReport                                    # SHA-1/SHA-256 para registrar en Firebase
 firebase deploy --only firestore:rules                     # Publicar firebase/firestore.rules (firebase.json en la raíz)
-npm --prefix functions test                                # Tests del backend (lógica de códigos de recuperación)
+npm --prefix functions test                                # Tests del backend (códigos de recuperación, eliminar cuenta)
 firebase deploy --only functions                           # Desplegar las Cloud Functions (requiere plan Blaze y secretos)
+firebase deploy --only storage                             # Publicar firebase/storage.rules (fotos de perfil)
 ```
 
 - `app/google-services.json` (en `app/`, no en la raíz) **no** está en el repo (`.gitignore`). Sin él falla `processDebugGoogleServices`. Nunca lo commitees.
@@ -36,13 +37,13 @@ firebase deploy --only functions                           # Desplegar las Cloud
 MainActivity, HuellitasApplication, MainViewModel   splash + gate de sesión, @HiltAndroidApp
 navigation/          HuellitasApp (NavHost según sesión), barra inferior, TopLevelDestination
 core/model|common|domain   Modelos, AppResult/AppError, @ApplicationScope, repos (interfaces), use cases, validadores
-core/data            Firebase (FirebaseAuthRepository, FirestoreUserRepository) + módulos Hilt (di/)
+core/data            Firebase (Auth, Firestore, Storage, Functions) + módulos Hilt (di/)
 core/designsystem    Tema (Nunito, tokens de color), componentes Compose sin lógica
-core/ui              UiText, FieldFeedback, mapeo error→mensaje, ObserveAsEvents
+core/ui              UiText, FieldFeedback, mapeo error→mensaje, ObserveAsEvents, google/ (GoogleIdTokenRequester)
 feature/auth|home|calendar|profile|settings
 ```
 
-Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tiene `FakeAuthRepository`, `FakeUserRepository` y `MainDispatcherRule`.
+Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tiene los fakes de cada repositorio (`FakeRepositories.kt`, `FakeNetworkMonitor`, `FakePasswordResetRepository`) y `MainDispatcherRule`.
 
 **Reglas de capas.** El compilador no las impone porque todo es un solo módulo, así que respétalas a mano (spec 000):
 - `feature.*` nunca importa `core.data` ni otra feature.
@@ -86,7 +87,13 @@ Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tien
 - El contrato con el backend son los códigos `HttpsError` y `details.reason`. Si cambias uno, cambia el otro.
 - La política de contraseña está duplicada a propósito: `ValidatePasswordUseCase` (app) y `passwordProblems` (backend).
 
-**Google Sign-In:** `GoogleIdTokenRequester` (Credential Manager, en `feature.auth.google`) necesita un Activity. `MainActivity` le pasa `default_web_client_id` a `authGraph()`.
+**Perfil (spec 004):**
+- Perfil y Datos Personales escuchan `users/{uid}` en vivo (`ObserveUserProfileUseCase`). Antes de escribir se consulta `NetworkMonitor`: sin red, Firestore encola la escritura y el `await()` no termina.
+- Cambiar el correo usa `verifyBeforeUpdateEmail`; la copia en Firestore se sincroniza al iniciar sesión (`syncEmail`).
+- La foto va a Storage (`users/{uid}/profile.jpg`), comprimida en `FirebaseStorageProfilePhotoRepository`.
+- Eliminar la cuenta lo hace la callable `deleteAccount` (`functions/src/index.ts`, lógica pura en `account.ts`): exige un inicio de sesión de hace ≤ 5 min, así que la app reautentica antes (`PasswordConfirmDialog` o Google) y luego cierra la sesión local.
+
+**Google Sign-In:** `GoogleIdTokenRequester` (Credential Manager, en `core.ui.google`) necesita un Activity. `MainActivity` le pasa `default_web_client_id` a `HuellitasApp`, que lo entrega a `authGraph()` y a `settingsScreen()` (reautenticación antes de eliminar la cuenta).
 
 ## Figma
 
