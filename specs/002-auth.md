@@ -79,6 +79,7 @@ Login, Registro y Recuperar contraseña comparten `AuthFormScaffold` y se ajusta
   - espacios reducidos;
   - margen inferior del botón de 12 dp.
 - **Barra de navegación del sistema.** Sin teclado, el botón queda por encima de ella (la app dibuja edge-to-edge).
+- **Presentación y Bienvenido** también dejan el botón y el pie encima de la barra de navegación. En Presentación, la foto mide 386 dp como en Figma y se encoge si no cabe; en Bienvenido, si el contenido no cabe, se desplaza.
 - **Respaldo.** Si el contenido no cabe ni así (p. ej. un teléfono de 640 dp de alto con el teclado abierto, o una fuente del sistema muy grande), el formulario se puede desplazar. Nunca se corta contenido.
 
 Verificado en un Vivo V2436 (384×857 dp, Android 16):

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -154,7 +155,7 @@ internal fun AuthChooserScreen(
                     fontWeight = FontWeight.ExtraBold
                 )
                 PawDivider()
-                Spacer(modifier = Modifier.height(25.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 HuellitasOptionButton(
                     text = stringResource(R.string.auth_chooser_email),
@@ -173,8 +174,12 @@ internal fun AuthChooserScreen(
                 )
             }
 
+            // Márgenes mínimos: en pantallas altas `SpaceBetween` agrega el resto. "Regístrate" queda
+            // encima de la barra de navegación (la app dibuja edge-to-edge).
             Column(
-                modifier = Modifier.padding(top = 32.dp, bottom = 48.dp),
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(top = 16.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 TextDivider(text = stringResource(R.string.auth_chooser_or))
