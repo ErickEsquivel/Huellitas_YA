@@ -25,14 +25,25 @@ class RequestEmailChangeCodeUseCase @Inject constructor(
 
 /**
  * Paso 2 del cambio de correo: valida el código. El backend ya cambió el correo en Auth y en
- * Firestore; aquí solo se recarga el usuario de la sesión para que tenga el correo nuevo.
+ * Firestore, lo que revoca la sesión; se vuelve a entrar con su custom token para no cerrarla.
+ * Corre en [ApplicationScope] para que el cambio de sesión no la interrumpa a medias.
  */
 class ConfirmEmailChangeUseCase @Inject constructor(
     private val emailChangeRepository: EmailChangeRepository,
     private val authRepository: AuthRepository,
+    @param:ApplicationScope private val appScope: CoroutineScope,
 ) {
     suspend operator fun invoke(code: String): AppResult<String, EmailChangeError> =
-        emailChangeRepository.confirm(code).onSuccess { authRepository.reload() }
+        appScope.async {
+            when (val result = emailChangeRepository.confirm(code)) {
+                is AppResult.Success -> {
+                    // Si esto fallara, el correo igual ya cambió: el usuario entra con el correo nuevo.
+                    authRepository.signInWithCustomToken(result.data.customToken)
+                    AppResult.Success(result.data.email)
+                }
+                is AppResult.Failure -> result
+            }
+        }.await()
 }
 
 /** Reautenticación antes de cambiar el correo o la contraseña, o de eliminar la cuenta (spec 004). */

@@ -348,10 +348,20 @@ export const requestEmailChangeCode = onCall(
  *
  * Contrato con la app: los mismos códigos que `verifyPasswordResetCode` (`invalid_code`,
  * `too_many_attempts`, `expired`) y `email_in_use` si otra cuenta tomó el correo entretanto.
- * Éxito → `{ email }` con el correo nuevo.
+ * Éxito → `{ email, customToken }`.
+ *
+ * Cambiar el correo con el Admin SDK revoca las sesiones abiertas (Firebase lo trata como un
+ * cambio sensible). Para que la app no cierre sesión, se devuelve un custom token y la app inicia
+ * sesión con él. Firmarlo requiere `iam.serviceAccounts.signBlob`: la función corre con la cuenta
+ * del Admin SDK, que tiene "Service Account Token Creator" (la de Compute no).
  */
 export const confirmEmailChange = onCall(
-  { secrets: [SMTP_USER, SMTP_PASSWORD, RESET_CODE_PEPPER], enforceAppCheck: false },
+  {
+    secrets: [SMTP_USER, SMTP_PASSWORD, RESET_CODE_PEPPER],
+    enforceAppCheck: false,
+    // Cuenta del Admin SDK del proyecto (la CLI define GCLOUD_PROJECT al desplegar).
+    serviceAccount: `firebase-adminsdk-fbsvc@${process.env.GCLOUD_PROJECT}.iam.gserviceaccount.com`,
+  },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Inicia sesión para continuar.");
@@ -411,7 +421,8 @@ export const confirmEmailChange = onCall(
 
     await sendNotice(oldEmail, buildEmailChangedEmail(maskEmail(newEmail)));
     logger.info("Correo cambiado", { uid });
-    return { email: newEmail };
+    const customToken = await getAuth().createCustomToken(uid);
+    return { email: newEmail, customToken };
   },
 );
 

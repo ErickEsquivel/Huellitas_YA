@@ -148,26 +148,26 @@ class ProfileUseCasesTest {
     }
 
     @Test
-    fun `confirmar el correo recarga la sesion para tener el correo nuevo`() = runTest {
+    fun `confirmar el correo vuelve a entrar con el custom token para no cerrar la sesion`() = runTest {
         val emailChangeRepository = FakeEmailChangeRepository()
 
-        val result = ConfirmEmailChangeUseCase(emailChangeRepository, authRepository)("4821")
+        val result = ConfirmEmailChangeUseCase(emailChangeRepository, authRepository, backgroundScope)("4821")
 
         assertEquals(AppResult.Success("nuevo@correo.com"), result)
         assertEquals(listOf("4821"), emailChangeRepository.confirmedCodes)
-        assertEquals(1, authRepository.reloadCount)
+        assertEquals(listOf("custom-token"), authRepository.customTokens)
     }
 
     @Test
-    fun `un codigo incorrecto no recarga la sesion`() = runTest {
+    fun `un codigo incorrecto no toca la sesion`() = runTest {
         val emailChangeRepository = FakeEmailChangeRepository().apply {
             confirmResult = AppResult.Failure(EmailChangeError.InvalidCode)
         }
 
-        val result = ConfirmEmailChangeUseCase(emailChangeRepository, authRepository)("0000")
+        val result = ConfirmEmailChangeUseCase(emailChangeRepository, authRepository, backgroundScope)("0000")
 
         assertEquals(AppResult.Failure(EmailChangeError.InvalidCode), result)
-        assertEquals(0, authRepository.reloadCount)
+        assertTrue(authRepository.customTokens.isEmpty())
     }
 
     @Test

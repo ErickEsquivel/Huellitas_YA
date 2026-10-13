@@ -2,6 +2,7 @@ package com.example.huellitasya.core.data.repository
 
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.EmailChangeError
+import com.example.huellitasya.core.domain.repository.ConfirmedEmailChange
 import com.example.huellitasya.core.domain.repository.EmailChangeRepository
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.functions.FirebaseFunctions
@@ -24,9 +25,13 @@ internal class FunctionsEmailChangeRepository @Inject constructor(
     override suspend fun requestCode(newEmail: String): AppResult<Unit, EmailChangeError> =
         call("requestEmailChangeCode", mapOf("newEmail" to newEmail)) { }
 
-    override suspend fun confirm(code: String): AppResult<String, EmailChangeError> =
+    override suspend fun confirm(code: String): AppResult<ConfirmedEmailChange, EmailChangeError> =
         call("confirmEmailChange", mapOf("code" to code)) { data ->
-            checkNotNull((data as? Map<*, *>)?.get("email") as? String) { "Respuesta sin email" }
+            val map = data as? Map<*, *>
+            ConfirmedEmailChange(
+                email = checkNotNull(map?.get("email") as? String) { "Respuesta sin email" },
+                customToken = checkNotNull(map?.get("customToken") as? String) { "Respuesta sin customToken" },
+            )
         }
 
     private suspend fun <T> call(

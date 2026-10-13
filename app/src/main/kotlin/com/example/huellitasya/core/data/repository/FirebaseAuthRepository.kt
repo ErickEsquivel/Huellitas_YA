@@ -69,13 +69,9 @@ internal class FirebaseAuthRepository @Inject constructor(
             Unit
         }
 
-    override suspend fun reload(): AppResult<Unit, AuthError> =
+    override suspend fun signInWithCustomToken(token: String): AppResult<User, AuthError> =
         runAuth {
-            val user = checkNotNull(firebaseAuth.currentUser) { "Sin sesión" }
-            user.reload().await()
-            // El token nuevo trae el correo actualizado (lo usan las reglas de Firestore).
-            user.getIdToken(true).await()
-            Unit
+            checkNotNull(firebaseAuth.signInWithCustomToken(token).await().user).toUser()
         }
 
     override suspend fun updateDisplayName(name: String): AppResult<Unit, AuthError> =
