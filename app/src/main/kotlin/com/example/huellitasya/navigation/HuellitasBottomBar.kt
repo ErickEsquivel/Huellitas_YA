@@ -30,6 +30,8 @@ internal fun HuellitasBottomBar(
 
             NavigationBarItem(
                 selected = isSelected,
+                // Home y Calendario están inhabilitados por ahora (ver TopLevelDestination).
+                enabled = item.isEnabled,
                 onClick = {
                     if (!isSelected) {
                         navController.navigate(item.route) {
@@ -56,6 +58,7 @@ internal fun HuellitasBottomBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = GreenPrimary,     // Color cuando está en la vista actual
                     unselectedIconColor = GreenBackground, // Color para los demás íconos
+                    disabledIconColor = GreenBackground.copy(alpha = 0.35f),
                     // Ocultamos el "globo" por defecto de Material 3 detrás del ícono seleccionado
                     indicatorColor = Color.Transparent
                 )

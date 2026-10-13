@@ -1,0 +1,54 @@
+<resources>
+    <!-- Perfil (Figma "PERFIL" 99:723, spec 004) -->
+    <string name="profile_title">Perfil</string>
+    <string name="profile_subtitle">Gestiona tu información personal</string>
+    <string name="profile_notifications">Notificaciones</string>
+    <string name="profile_photo_description">Foto de perfil</string>
+    <string name="profile_change_photo">Cambiar foto de perfil</string>
+    <string name="profile_edit">Editar información</string>
+    <string name="profile_not_registered">Sin registrar</string>
+
+    <!-- Campos del perfil -->
+    <string name="profile_field_name">Nombre completo</string>
+    <string name="profile_field_email">Correo electrónico</string>
+    <string name="profile_field_phone">Teléfono</string>
+    <string name="profile_field_address">Dirección</string>
+    <string name="profile_field_birth_date">Fecha de nacimiento</string>
+
+    <!-- Datos Personales (Figma "CONFIGURACION" 3254:1023) -->
+    <string name="personal_data_title">Datos Personales</string>
+    <string name="personal_data_card_title">Datos Dueño</string>
+    <string name="personal_data_edit">Editar datos</string>
+    <string name="personal_data_cancel_edit">Descartar cambios</string>
+    <string name="personal_data_back">Volver</string>
+    <string name="personal_data_save">Actualizar información</string>
+    <string name="personal_data_saved">Datos actualizados</string>
+    <string name="personal_data_email_changed">Tu correo ahora es %1$s</string>
+
+    <!-- Reautenticación antes de cambiar el correo -->
+    <string name="personal_data_reauth_title">Confirma tu contraseña</string>
+    <string name="personal_data_reauth_message">Por seguridad, ingresa tu contraseña para cambiar el correo.</string>
+    <string name="personal_data_reauth_password">Contraseña</string>
+    <string name="personal_data_reauth_show_password">Mostrar contraseña</string>
+    <string name="personal_data_reauth_hide_password">Ocultar contraseña</string>
+    <string name="personal_data_reauth_confirm">Confirmar</string>
+    <string name="personal_data_reauth_cancel">Cancelar</string>
+
+    <!-- Selector de fecha de nacimiento -->
+    <string name="personal_data_date_accept">Aceptar</string>
+    <string name="personal_data_date_cancel">Cancelar</string>
+    <string name="personal_data_date_clear">Borrar</string>
+
+    <!-- Verifica tu correo (cambio de correo con código, spec 004) -->
+    <string name="verify_email_title">Verifica tu correo</string>
+    <string name="verify_email_subtitle">Enviamos un código de 4 dígitos a %1$s</string>
+    <string name="verify_email_code_label">Ingresa código</string>
+    <string name="verify_email_code_description">Código de 4 dígitos</string>
+    <string name="verify_email_button">Verificar código</string>
+    <string name="verify_email_not_received">¿No recibiste el código?</string>
+    <string name="verify_email_resend">Reenviar código</string>
+    <string name="verify_email_resend_in">Reenviar en %1$d s</string>
+    <string name="verify_email_resent">Te enviamos un código nuevo</string>
+    <string name="verify_email_reauth_needed">Por seguridad, vuelve a guardar el correo para recibir otro código</string>
+    <string name="verify_email_back">Volver</string>
+</resources>

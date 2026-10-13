@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Foto de perfil (spec 004): solo su dueño la lee y la reemplaza.
+    // Borrarla solo puede la Cloud Function deleteAccount (Admin SDK).
+    match /users/{uid}/profile.jpg {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null
+                            && request.auth.uid == uid
+                            && request.resource.contentType.matches('image/.*')
+                            && request.resource.size < 5 * 1024 * 1024;
+      allow delete: if false;
+    }
+
+    // Todo lo demás queda denegado hasta que una spec lo defina.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

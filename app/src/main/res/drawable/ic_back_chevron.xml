@@ -1,10 +1,19 @@
+<!--
+  Flecha "<" de volver (Figma "Line 19", trazo de 3 dp; se dibuja girada 90°). El SVG de Figma
+  usa overflow visible: las puntas del trazo se salen 0.7 dp. Android recorta todo lo que sale
+  del viewport, así que el viewport tiene 1 dp de margen y el trazo se desplaza con un grupo.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="18.6045dp"
-    android:height="17.7958dp"
-    android:viewportWidth="18.6045"
-    android:viewportHeight="17.7958">
-    <path
-        android:pathData="M1.28624 0.771744L9.68624 14.7717L17.2862 0.771744"
-        android:strokeColor="#FF000000"
-        android:strokeWidth="3" />
+    android:width="20.6045dp"
+    android:height="19.7958dp"
+    android:viewportWidth="20.6045"
+    android:viewportHeight="19.7958">
+    <group
+        android:translateX="1"
+        android:translateY="1">
+        <path
+            android:pathData="M1.28624 0.771744L9.68624 14.7717L17.2862 0.771744"
+            android:strokeColor="#FF000000"
+            android:strokeWidth="3" />
+    </group>
 </vector>

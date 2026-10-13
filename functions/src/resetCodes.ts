@@ -12,14 +12,18 @@ export const RESEND_COOLDOWN_MS = 60 * 1000;
 export const MAX_SENDS_PER_HOUR = 5;
 const HOUR_MS = 60 * 60 * 1000;
 
-/** Documento `passwordResetCodes/{emailKey}`. Solo lo lee y escribe el backend. */
-export interface ResetRecord {
-  uid: string;
+/** Lo común a todo registro con un código por correo (recuperar contraseña, cambiar correo). */
+export interface CodeRecord {
   codeHash: string | null;
   expiresAt: number;
   attempts: number;
   /** Momentos (ms) de los envíos de la última hora, para limitar reenvíos. */
   sends: number[];
+}
+
+/** Documento `passwordResetCodes/{emailKey}`. Solo lo lee y escribe el backend. */
+export interface ResetRecord extends CodeRecord {
+  uid: string;
   tokenHash?: string | null;
   tokenExpiresAt?: number | null;
 }
@@ -77,7 +81,7 @@ export function canSendCode(previousSends: number[], now: number): SendDecision 
 
 export type CodeCheck = "ok" | "invalid" | "expired" | "too_many_attempts" | "no_code";
 
-export function checkCode(record: ResetRecord | undefined, code: string, pepper: string, now: number): CodeCheck {
+export function checkCode(record: CodeRecord | undefined, code: string, pepper: string, now: number): CodeCheck {
   if (!record || !record.codeHash) return "no_code";
   if (record.attempts >= MAX_ATTEMPTS) return "too_many_attempts";
   if (now > record.expiresAt) return "expired";

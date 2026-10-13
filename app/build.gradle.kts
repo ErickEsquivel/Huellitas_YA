@@ -31,6 +31,8 @@ android {
         }
     }
     compileOptions {
+        // java.time (fechas del perfil, spec 004) en minSdk 24.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -54,6 +56,12 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.exifinterface)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    // Carga de imágenes remotas (foto de perfil)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // Inyección de dependencias
     implementation(libs.hilt.android)
@@ -65,6 +73,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.functions)
+    implementation(libs.firebase.storage)
     implementation(libs.kotlinx.coroutines.play.services)
 
     // Google Sign-In con Credential Manager

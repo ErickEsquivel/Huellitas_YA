@@ -13,9 +13,16 @@ import com.example.huellitasya.core.model.SessionState
 import com.example.huellitasya.feature.auth.navigation.AuthGraph
 import com.example.huellitasya.feature.auth.navigation.authGraph
 import com.example.huellitasya.feature.calendar.navigation.calendarScreen
-import com.example.huellitasya.feature.home.navigation.HomeDestination
 import com.example.huellitasya.feature.home.navigation.homeScreen
+import com.example.huellitasya.feature.profile.navigation.PersonalDataDestination
+import com.example.huellitasya.feature.profile.navigation.VerifyEmailChangeDestination
+import com.example.huellitasya.feature.profile.navigation.ProfileDestination
+import com.example.huellitasya.feature.profile.navigation.personalDataScreen
+import com.example.huellitasya.feature.profile.navigation.popBackToPersonalData
 import com.example.huellitasya.feature.profile.navigation.profileScreen
+import com.example.huellitasya.feature.profile.navigation.verifyEmailChangeScreen
+import com.example.huellitasya.feature.settings.navigation.SecurityDestination
+import com.example.huellitasya.feature.settings.navigation.securityScreen
 import com.example.huellitasya.feature.settings.navigation.settingsScreen
 
 /**
@@ -32,7 +39,7 @@ fun HuellitasApp(
         // El splash del sistema cubre este estado (ver MainActivity).
         SessionState.Loading -> Unit
         SessionState.SignedOut -> AuthNavHost(googleServerClientId)
-        is SessionState.SignedIn -> MainNavHost()
+        is SessionState.SignedIn -> MainNavHost(googleServerClientId)
     }
 }
 
@@ -45,7 +52,7 @@ private fun AuthNavHost(googleServerClientId: String?) {
 }
 
 @Composable
-private fun MainNavHost() {
+private fun MainNavHost(googleServerClientId: String?) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -65,13 +72,28 @@ private fun MainNavHost() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = HomeDestination,
+            // Por ahora la app abre en Perfil: Home y Calendario están inhabilitados hasta tener su spec.
+            // Cuando Home esté listo, volver a `HomeDestination` y habilitarlo en TopLevelDestination.
+            startDestination = ProfileDestination,
             modifier = Modifier.padding(innerPadding), // Evita que el contenido quede debajo de la barra
         ) {
             homeScreen()
             calendarScreen()
-            profileScreen()
-            settingsScreen()
+            profileScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
+            settingsScreen(
+                googleServerClientId = googleServerClientId,
+                onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) },
+                onNavigateToSecurity = { navController.navigate(SecurityDestination) },
+            )
+            securityScreen(onBack = { navController.popBackStack() })
+            personalDataScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToVerifyEmail = { navController.navigate(VerifyEmailChangeDestination(it)) },
+            )
+            verifyEmailChangeScreen(
+                onBack = { navController.popBackStack() },
+                onEmailChanged = { navController.popBackToPersonalData(it) },
+            )
         }
     }
 }

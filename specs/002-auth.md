@@ -79,6 +79,7 @@ Login, Registro y Recuperar contraseña comparten `AuthFormScaffold` y se ajusta
   - espacios reducidos;
   - margen inferior del botón de 12 dp.
 - **Barra de navegación del sistema.** Sin teclado, el botón queda por encima de ella (la app dibuja edge-to-edge).
+- **Presentación y Bienvenido** también dejan el botón y el pie encima de la barra de navegación. En Presentación, la foto mide 386 dp como en Figma y se encoge si no cabe; en Bienvenido, si el contenido no cabe, se desplaza.
 - **Respaldo.** Si el contenido no cabe ni así (p. ej. un teléfono de 640 dp de alto con el teclado abierto, o una fuente del sistema muy grande), el formulario se puede desplazar. Nunca se corta contenido.
 
 Verificado en un Vivo V2436 (384×857 dp, Android 16):
@@ -97,7 +98,7 @@ Inicio de sesión + "Tu contraseña se actualizó. Inicia sesión."
 - **Backend:** Firebase Auth no tiene códigos de recuperación, así que el flujo lo resuelven 3 Cloud Functions en `southamerica-east1` (`functions/src/index.ts`). Cambiar la contraseña de un usuario sin sesión solo es posible con el Admin SDK.
   - `requestPasswordResetCode({email})` genera el código y lo envía.
   - `verifyPasswordResetCode({email, code})` valida el código y devuelve un `resetToken` de un solo uso.
-  - `resetPasswordWithToken({email, resetToken, newPassword})` cambia la contraseña y cierra las sesiones abiertas (`revokeRefreshTokens`).
+  - `resetPasswordWithToken({email, resetToken, newPassword})` cambia la contraseña y cierra las sesiones abiertas (`revokeRefreshTokens`). Después envía el aviso "Tu contraseña cambió" (spec 004).
 - **Correo:** sale de un Gmail dedicado *noreply* (`"Huellitas YA" <SMTP_USER>`, ver spec 001), en español. Lleva el código grande, la vigencia, "Si no lo pediste, ignora este correo" y "No respondas a este mensaje".
 - **Código:** 4 dígitos (`crypto.randomInt`).
   - Vence a los **10 min** y admite **5 intentos**; después hay que pedir uno nuevo.
@@ -171,17 +172,18 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 
 - El documento se crea **solo si no existe** (`createIfMissing`) en registro, login con correo y login con Google. No se pisa `createdAt`, y si una creación falló, el siguiente login la reintenta.
 - Esa escritura corre en `@ApplicationScope`, porque la pantalla que la inicia se destruye en cuanto la sesión cambia.
+- Los campos del perfil (`phone`, `address`, `birthDate`, `updatedAt`) y las reglas de edición los define la spec 004.
 
 ### Domain (`core.domain`)
 
-- `AuthRepository`: `currentUser: Flow<User?>`, `signInWithEmail`, `registerWithEmail`, `signInWithGoogle(idToken)`, `signOut`.
+- `AuthRepository`: `currentUser: Flow<User?>`, `signInWithEmail`, `registerWithEmail`, `signInWithGoogle(idToken)`, `signOut`. La spec 004 agrega la reautenticación, el cambio de correo y `updateDisplayName`.
 - `PasswordResetRepository` (implementado sobre Cloud Functions): `requestCode`, `verifyCode` → `resetToken`, `resetPassword`. Errores en `PasswordResetError`.
-- `UserRepository`: `createIfMissing(user)`.
+- `UserRepository`: `createIfMissing(user)`. Después del login también se llama a `syncEmail` (spec 004). Lectura y edición del perfil: spec 004.
 - Use cases: `ObserveSessionUseCase`, `SignInWithEmailUseCase`, `RegisterUseCase`, `SignInWithGoogleUseCase`, `RequestPasswordResetCodeUseCase`, `VerifyPasswordResetCodeUseCase`, `ResetPasswordUseCase`, `SignOutUseCase`, `ValidateNameUseCase`, `ValidateEmailUseCase`, `ValidatePasswordUseCase`.
 
 ### Google Sign-In
 
-- `GoogleIdTokenRequester` (en `feature.auth.google`) abre el selector de cuentas con Credential Manager (`GetSignInWithGoogleOption`) y devuelve el ID token. Vive en la capa de UI porque necesita el `Context` de un Activity.
+- `GoogleIdTokenRequester` (en `core.ui.google`, porque Configuración también lo usa para reautenticar) abre el selector de cuentas con Credential Manager (`GetSignInWithGoogleOption`) y devuelve el ID token. Vive en la capa de UI porque necesita el `Context` de un Activity.
 - El `serverClientId` es `R.string.default_web_client_id`. Lo genera el plugin de Google Services a partir de `google-services.json` y `MainActivity` lo busca por nombre y lo pasa a `authGraph(...)`. Si no existe (Google sin configurar), el botón de Google responde "No se pudo iniciar sesión con Google".
 
 ### Rutas (`feature.auth.navigation`)
@@ -220,4 +222,4 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 - Verificación de correo obligatoria.
 - Login con Facebook, Apple o teléfono.
 - Edición de perfil y eliminación de cuenta: ver la [spec 004](004-perfil-usuario.md).
-- Cambio de contraseña (Configuración → Seguridad): spec futura.
+- Cambio de contraseña (Configuración → Seguridad): ver la [spec 004](004-perfil-usuario.md).

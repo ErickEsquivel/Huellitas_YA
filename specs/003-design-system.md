@@ -43,8 +43,11 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `HuellitasPasswordField` | `HuellitasTextField` con mostrar/ocultar contraseña. |
 | `FieldMessage` | Ícono (alerta o X) + mensaje bajo un campo o un formulario. |
 | `CurvedBackground` | Fondo con ola verde. |
-| `ScreenHeader` | Título + subtítulo opcional + campana de notificaciones. |
+| `ScreenHeader` | Título + subtítulo opcional + campana de notificaciones (`ic_bell`, la de Figma 99:731). |
 | `LoadingOverlay` | Capa semitransparente con indicador de progreso. |
+| `HuellitasBackButton` | Flecha "<" de 16×14 dp de los formularios y de Datos Personales. |
+| `PasswordConfirmDialog` | Diálogo "Confirma tu contraseña" antes de una operación sensible (cambiar el correo, eliminar la cuenta). |
+| `PasswordRequirementRow` | Fila de la checklist de contraseña (✗ naranja / ✓ verde), en "Crear nueva contraseña" y Seguridad. |
 | `AddPlaceholderCard` | Tarjeta gris con ícono "+" (agregar mascota/evento). |
 
 En `core.ui`, `FieldFeedback(status, message: UiText?)` es lo que los ViewModels asignan a cada campo. Los mapeos `ValidationError.toFieldFeedback()` y `AuthError.toFieldFeedback()` aplican las reglas de la spec 002.
@@ -55,6 +58,12 @@ En `core.ui`, `FieldFeedback(status, message: UiText?)` es lo que los ViewModels
   - Fotos y PNG se convierten a WebP y van en `drawable-nodpi/`.
   - Los SVG se convierten a vector drawable.
 - Todos los recursos van en `app/src/main/res`. Los que solo usa una feature llevan su prefijo (p. ej. `img_auth_*`, `ic_settings_*`).
+- **Ícono de la app:** XML en capas vectoriales, sin imágenes. El logo de Figma (`PRESENTACION`, nodo 46:60) es un PNG; se vectorizó (contornos con huecos, degradado verde de Figma) y vive en `drawable/ic_launcher_foreground.xml`.
+  - `mipmap-anydpi-v26/ic_launcher*.xml`: ícono adaptativo con `drawable/ic_launcher_background` (fondo blanco), `ic_launcher_foreground` (logo de 60 dp dentro del círculo seguro de 66 dp) e `ic_launcher_monochrome` (silueta para los íconos temáticos).
+  - `mipmap-anydpi/ic_launcher*.xml`: versión legacy para API 24-25, también vectorial (cuadrado redondeado o círculo blanco + logo).
+  - El splash usa el mismo `ic_launcher_foreground`.
+  - El path del logo es largo, así que esos vectores llevan `tools:ignore="VectorPath"`: el sistema cachea el ícono y lo dibuja una sola vez.
+- **Vectores con trazo:** Figma exporta los SVG con `overflow="visible"`, pero Android recorta lo que sale del viewport. Si el trazo llega al borde, se agrega margen al viewport (ver `ic_back_chevron`).
 
 ## Reglas
 

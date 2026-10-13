@@ -63,7 +63,7 @@ fun ScreenHeader(
         }
 
         Image(
-            painter = painterResource(id = R.drawable.ic_bell_placeholder),
+            painter = painterResource(id = R.drawable.ic_bell),
             contentDescription = notificationsDescription,
             modifier = Modifier
                 .size(36.dp)

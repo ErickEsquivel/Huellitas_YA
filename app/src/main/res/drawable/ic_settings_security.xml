@@ -1,6 +1,27 @@
+<!-- Seguridad (Figma 3452:1018, nodo 3452:1073). -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp" android:height="24dp"
-    android:viewportWidth="24" android:viewportHeight="24">
-    <!-- Placeholder temporal para el ícono de seguridad (escudo) -->
-    <path android:fillColor="#588157" android:pathData="M12,1L3,5v6c0,5.55 3.84,10.74 9,12c5.16,-1.26 9,-6.45 9,-12V5l-9,-4zm0,10.99h7c-0.53,4.12 -3.28,7.79 -7,8.94V12H5V6.3l7,-3.11v8.8z"/>
+    android:width="34.9313dp"
+    android:height="38.9812dp"
+    android:viewportWidth="34.9313"
+    android:viewportHeight="38.9812">
+    <path
+        android:pathData="M34.1626 17.8359C34.1626 27.0047 27.5063 35.5922 18.4126 38.1047C17.7938 38.2734 17.1188 38.2734 16.5001 38.1047C7.40623 35.5922 0.75 27.0047 0.75 17.8359V9.60461C0.75 8.06711 1.91252 6.32338 3.35627 5.74213L13.8001 1.46719C16.1438 0.510937 18.7876 0.510937 21.1313 1.46719L31.5751 5.74213C33.0001 6.32338 34.1813 8.06711 34.1813 9.60461L34.1626 17.8359Z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FF588157"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M17.4563 20.4234C19.5274 20.4234 21.2063 18.7445 21.2063 16.6734C21.2063 14.6023 19.5274 12.9234 17.4563 12.9234C15.3852 12.9234 13.7063 14.6023 13.7063 16.6734C13.7063 18.7445 15.3852 20.4234 17.4563 20.4234Z"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FF588157"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="10" />
+    <path
+        android:pathData="M17.4563 20.4234V26.0484"
+        android:strokeWidth="1.5"
+        android:strokeColor="#FF588157"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:strokeMiterLimit="10" />
 </vector>

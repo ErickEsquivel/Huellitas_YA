@@ -2,10 +2,11 @@ package com.example.huellitasya.core.domain.error
 
 import com.example.huellitasya.core.common.AppError
 
-/** Errores de validación en cliente (spec 002, tabla "Reglas de validación"). */
+/** Errores de validación en cliente (tablas "Reglas de validación" de las specs 002 y 004). */
 enum class ValidationError : AppError {
     EmptyName,
     NameTooShort,
+    NameTooLong,
     EmptyEmail,
     InvalidEmail,
     EmptyPassword,
@@ -14,6 +15,9 @@ enum class ValidationError : AppError {
     PasswordNeedsDigitOrSymbol,
     PasswordsDoNotMatch,
     TermsNotAccepted,
+    InvalidPhone,
+    AddressTooLong,
+    InvalidBirthDate,
 }
 
 /** `true` si el error se debe a un campo vacío (la UI lo agrupa en "Rellene todos los datos"). */

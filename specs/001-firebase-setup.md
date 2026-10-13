@@ -66,6 +66,16 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
 
    Si el deploy falla por permisos (IAM), la cuenta necesita los roles *Cloud Functions Admin* y *Service Account User*, o el Owner hace el primer deploy.
 
+   La función `deleteAccount` (spec 004) no usa secretos.
+
+9. **Storage** (fotos de perfil, spec 004; lo hace el Owner):
+   - En la consola, Storage → **Comenzar** → bucket predeterminado en **`southamerica-east1`** (la misma región que Firestore y Functions), modo producción. Requiere el plan Blaze (paso 6).
+   - Publicar [`firebase/storage.rules`](../firebase/storage.rules), que `firebase.json` ya referencia:
+
+     ```bash
+     firebase deploy --only storage
+     ```
+
 ### Por CLI (alternativa a la consola para los pasos 1 y 2)
 
 ```bash
@@ -78,9 +88,9 @@ El `APP_ID` de la app Android es `1:498312883676:android:15060b8cb85e28d2b3b319`
 ## Contratos
 
 - Plugin `com.google.gms.google-services` aplicado en `:app`.
-- Dependencias Firebase mediante BoM (`firebase-auth`, `firebase-firestore`).
+- Dependencias Firebase mediante BoM (`firebase-auth`, `firebase-firestore`, `firebase-functions`, `firebase-storage`).
 - Solo el paquete `core.data` importa clases `com.google.firebase.*` (incluido `firebase-functions`).
-- Las Cloud Functions y Firestore están en `southamerica-east1`; la app llama a las funciones en esa región.
+- Las Cloud Functions, Firestore y Storage están en `southamerica-east1`; la app llama a las funciones en esa región.
 
 ## Criterios de aceptación
 
@@ -89,10 +99,11 @@ El `APP_ID` de la app Android es `1:498312883676:android:15060b8cb85e28d2b3b319`
 - [x] Authentication tiene habilitados Correo/contraseña y Google, con plantillas en español.
 - [x] `google-services.json` incluye el cliente OAuth web (`client_type` 3) y el de Android con la SHA-1 registrada.
 - [ ] Las reglas de Firestore impiden leer o escribir `users/{uid}` de otro usuario.
+- [ ] Las reglas de Storage impiden leer o escribir la foto de otro usuario.
 
 ## Fuera de alcance
 
 - Entornos separados (dev/prod) con flavors.
 - Firebase Emulator Suite.
-- Storage, Messaging.
+- Messaging.
 - Firebase Emulator Suite para probar las Cloud Functions en local.

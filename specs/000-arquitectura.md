@@ -39,7 +39,7 @@ Al ser un solo módulo, el compilador no impone estas reglas. Se revisan en code
 - Un paquete `feature.*` **nunca** importa `core.data` ni otra feature. Solo conoce interfaces de `core.domain`, y Hilt inyecta las implementaciones.
 - `core.model`, `core.common` y `core.domain` son Kotlin puro: nada de `android.*`, `androidx.*` ni Firebase. Así se pueden mover a módulos JVM si el proyecto crece.
 - `core.designsystem` no conoce modelos de dominio ni ViewModels.
-- Firebase solo se importa desde `core.data`. Credential Manager solo desde `feature.auth.google`.
+- Firebase solo se importa desde `core.data`. Credential Manager solo desde `core.ui.google` (lo usan Auth y Configuración, spec 004).
 
 Comprobación rápida (debe salir vacío):
 
@@ -73,7 +73,7 @@ Reglas:
 - El sufijo `Destination` se usa para los objetos de ruta, porque `XRoute` es el nombre del composable stateful.
 - `navigation/HuellitasApp.kt` decide el NavHost según `SessionState`:
   - `SignedOut` → NavHost de auth (`authGraph`).
-  - `SignedIn` → NavHost principal con barra inferior (`TopLevelDestination`).
+  - `SignedIn` → NavHost principal con barra inferior (`TopLevelDestination`). Por ahora empieza en Perfil y Home/Calendario están inhabilitados (spec 004).
 - Iniciar o cerrar sesión **no** navega: reemplaza el NavHost completo, y con él el historial.
 
 ## Inyección de dependencias
