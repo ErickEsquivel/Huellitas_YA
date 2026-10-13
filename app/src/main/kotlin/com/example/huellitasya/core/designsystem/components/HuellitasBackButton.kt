@@ -1,6 +1,5 @@
 package com.example.huellitasya.core.designsystem.components
 
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -9,11 +8,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 
-/** Flecha "<" de Figma (16×14 dp) arriba a la izquierda de los formularios y de Datos Personales. */
+/** Flecha "<" de Figma ("Line 19", trazo de 3 dp) arriba a la izquierda de los formularios y de Datos Personales. */
 @Composable
 fun HuellitasBackButton(
     onClick: () -> Unit,
@@ -26,9 +24,8 @@ fun HuellitasBackButton(
             painter = painterResource(R.drawable.ic_back_chevron),
             contentDescription = contentDescription,
             tint = tint,
-            modifier = Modifier
-                .requiredSize(width = 16.dp, height = 14.dp)
-                .rotate(90f),
+            // Tamaño propio del vector (1 dp = 1 unidad de Figma, con margen para las puntas del trazo).
+            modifier = Modifier.rotate(90f),
         )
     }
 }

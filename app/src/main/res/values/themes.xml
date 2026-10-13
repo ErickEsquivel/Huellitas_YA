@@ -6,7 +6,8 @@
     <!-- Splash mientras se resuelve la sesión (MainActivity mantiene la condición). -->
     <style name="Theme.HuellitasYA.Starting" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@android:color/white</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <!-- Mismo logo que el launcher: cabe en el círculo de 192 dp del splash (ícono sin fondo). -->
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
         <item name="postSplashScreenTheme">@style/Theme.HuellitasYA</item>
     </style>
 </resources>

@@ -58,6 +58,11 @@ En `core.ui`, `FieldFeedback(status, message: UiText?)` es lo que los ViewModels
   - Fotos y PNG se convierten a WebP y van en `drawable-nodpi/`.
   - Los SVG se convierten a vector drawable.
 - Todos los recursos van en `app/src/main/res`. Los que solo usa una feature llevan su prefijo (p. ej. `img_auth_*`, `ic_settings_*`).
+- **Ícono de la app** (`mipmap-*`): sale del logo de Figma (`PRESENTACION`, nodo 46:60).
+  - El adaptativo tiene fondo blanco (`@color/ic_launcher_background`), el logo como `ic_launcher_foreground`, dentro del círculo seguro de 66 dp, y su silueta como `ic_launcher_monochrome`, para los íconos temáticos.
+  - `ic_launcher` e `ic_launcher_round` son las versiones legacy para API 24-25.
+  - El splash usa el mismo `ic_launcher_foreground`.
+- **Vectores con trazo:** Figma exporta los SVG con `overflow="visible"`, pero Android recorta lo que sale del viewport. Si el trazo llega al borde, se agrega margen al viewport (ver `ic_back_chevron`).
 
 ## Reglas
 
