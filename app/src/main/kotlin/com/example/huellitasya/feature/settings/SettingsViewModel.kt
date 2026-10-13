@@ -2,6 +2,7 @@ package com.example.huellitasya.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.huellitasya.R
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
@@ -40,6 +41,7 @@ data class SettingsUiState(
 
 sealed interface SettingsAction {
     data object Logout : SettingsAction
+    data object SecurityClick : SettingsAction
     data object DeleteAccountClick : SettingsAction
     data object ConfirmDelete : SettingsAction
     data object DismissDelete : SettingsAction
@@ -49,6 +51,9 @@ sealed interface SettingsAction {
 }
 
 sealed interface SettingsEvent {
+    /** Cuenta de correo: abre Seguridad (cambio de contraseña). */
+    data object NavigateToSecurity : SettingsEvent
+
     /** La Route debe abrir el selector de cuentas y devolver el resultado con [SettingsViewModel.onGoogleIdTokenResult]. */
     data object LaunchGoogleReauth : SettingsEvent
     data class ShowMessage(val message: UiText) : SettingsEvent
@@ -87,6 +92,14 @@ class SettingsViewModel @Inject constructor(
     fun onAction(action: SettingsAction) {
         when (action) {
             SettingsAction.Logout -> logout()
+            SettingsAction.SecurityClick -> viewModelScope.launch {
+                // Las cuentas Google no tienen contraseña en Huellitas: se gestiona en Google.
+                if (_uiState.value.provider == AuthProvider.GOOGLE) {
+                    _events.send(SettingsEvent.ShowMessage(UiText.Resource(R.string.settings_security_google)))
+                } else {
+                    _events.send(SettingsEvent.NavigateToSecurity)
+                }
+            }
             SettingsAction.DeleteAccountClick -> _uiState.update {
                 if (it.isBusy) it else it.copy(showDeleteConfirmation = true)
             }

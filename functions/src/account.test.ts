@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { isRecentLogin, RECENT_LOGIN_MAX_AGE_MS, userStoragePrefix } from "./account";
+import { isRecentLogin, maskEmail, RECENT_LOGIN_MAX_AGE_MS, userStoragePrefix } from "./account";
 
 const NOW = 1_800_000_000_000;
 const seconds = (ms: number) => ms / 1000;
@@ -34,5 +34,19 @@ describe("isRecentLogin", () => {
 describe("userStoragePrefix", () => {
   it("limita el borrado a la carpeta del usuario", () => {
     assert.equal(userStoragePrefix("uid-1"), "users/uid-1/");
+  });
+});
+
+describe("maskEmail", () => {
+  it("deja ver solo la primera letra del usuario y el dominio", () => {
+    assert.equal(maskEmail("nuevo@correo.com"), "n****@correo.com");
+  });
+
+  it("usa al menos tres asteriscos aunque el usuario sea corto", () => {
+    assert.equal(maskEmail("ab@x.co"), "a***@x.co");
+  });
+
+  it("no revela nada si el correo no tiene formato", () => {
+    assert.equal(maskEmail("sin-arroba"), "****");
   });
 });

@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,6 +79,9 @@ import java.time.ZoneOffset
 @Composable
 internal fun PersonalDataRoute(
     onBackClick: () -> Unit,
+    onNavigateToVerifyEmail: (newEmail: String) -> Unit,
+    changedEmail: String?,
+    onChangedEmailShown: () -> Unit,
     viewModel: PersonalDataViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -90,6 +94,16 @@ internal fun PersonalDataRoute(
             is PersonalDataEvent.ShowMessage -> scope.launch {
                 snackbarHostState.showSnackbar(event.message.asString(context))
             }
+            is PersonalDataEvent.NavigateToVerifyEmail -> onNavigateToVerifyEmail(event.newEmail)
+        }
+    }
+
+    // Resultado de "Verifica tu correo": el correo ya cambió en Auth y en Firestore.
+    val emailChangedMessage = changedEmail?.let { stringResource(R.string.personal_data_email_changed, it) }
+    LaunchedEffect(emailChangedMessage) {
+        if (emailChangedMessage != null) {
+            onChangedEmailShown()
+            snackbarHostState.showSnackbar(emailChangedMessage)
         }
     }
 

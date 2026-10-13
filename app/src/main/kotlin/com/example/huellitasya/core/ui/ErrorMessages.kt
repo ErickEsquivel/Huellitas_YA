@@ -4,6 +4,7 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
+import com.example.huellitasya.core.domain.error.EmailChangeError
 import com.example.huellitasya.core.domain.error.PasswordResetError
 import com.example.huellitasya.core.domain.error.ValidationError
 import com.example.huellitasya.core.domain.error.isMissingValue
@@ -89,3 +90,16 @@ fun DataError.toUiText(): UiText = UiText.Resource(
         DataError.PermissionDenied, DataError.Unknown -> R.string.error_unknown
     },
 )
+
+/** Mensajes del cambio de correo con código (spec 004). `RequiresRecentLogin` abre la reautenticación: sin mensaje. */
+fun EmailChangeError.toUiText(): UiText? = when (this) {
+    EmailChangeError.RequiresRecentLogin -> null
+    EmailChangeError.EmailAlreadyInUse -> UiText.Resource(R.string.error_email_in_use)
+    EmailChangeError.InvalidEmail -> UiText.Resource(R.string.error_new_email_invalid)
+    EmailChangeError.InvalidCode -> UiText.Resource(R.string.error_reset_code_invalid)
+    EmailChangeError.ExpiredCode -> UiText.Resource(R.string.error_reset_code_expired)
+    EmailChangeError.TooManyAttempts -> UiText.Resource(R.string.error_reset_code_attempts)
+    is EmailChangeError.TooManyRequests -> UiText.Resource(R.string.error_reset_too_many_requests, retryAfterSeconds)
+    EmailChangeError.Network -> UiText.Resource(R.string.error_network)
+    EmailChangeError.Unknown -> UiText.Resource(R.string.error_unknown)
+}

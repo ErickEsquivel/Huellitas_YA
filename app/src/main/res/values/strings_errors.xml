@@ -19,6 +19,9 @@
     <string name="error_invalid_birth_date">Fecha no válida</string>
     <string name="error_profile_not_found">No encontramos tu perfil</string>
     <string name="error_photo_too_large">La imagen es demasiado grande</string>
+    <string name="error_new_email_invalid">Ingresa un correo distinto al actual</string>
+    <string name="error_current_password_incorrect">La contraseña ingresada no es correcta</string>
+    <string name="error_password_same">La nueva contraseña debe ser distinta a la actual</string>
 
     <!-- Errores remotos (spec 002) -->
     <string name="error_invalid_credentials">Correo o contraseña incorrectos</string>

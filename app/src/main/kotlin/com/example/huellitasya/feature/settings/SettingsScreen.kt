@@ -59,6 +59,7 @@ import kotlinx.coroutines.launch
 internal fun SettingsRoute(
     googleServerClientId: String?,
     onPersonalDataClick: () -> Unit,
+    onSecurityClick: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -69,6 +70,7 @@ internal fun SettingsRoute(
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
+            SettingsEvent.NavigateToSecurity -> onSecurityClick()
             SettingsEvent.LaunchGoogleReauth -> scope.launch {
                 viewModel.onGoogleIdTokenResult(googleRequester.requestIdToken())
             }
@@ -130,12 +132,11 @@ internal fun SettingsScreen(
                     iconRes = R.drawable.ic_settings_personal,
                     onClick = onPersonalDataClick,
                 )
-                // Cambio de contraseña: spec futura (spec 004, "Fuera de alcance").
                 SettingsRow(
                     title = stringResource(R.string.settings_security),
                     subtitle = stringResource(R.string.settings_security_subtitle),
                     iconRes = R.drawable.ic_settings_security,
-                    onClick = {},
+                    onClick = { onAction(SettingsAction.SecurityClick) },
                 )
                 SettingsRow(
                     title = stringResource(R.string.settings_delete_account),

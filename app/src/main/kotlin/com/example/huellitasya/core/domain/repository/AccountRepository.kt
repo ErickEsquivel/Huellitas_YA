@@ -13,4 +13,7 @@ interface AccountRepository {
      * [AuthError.RequiresRecentLogin] si el inicio de sesión no es reciente.
      */
     suspend fun deleteAccount(): AppResult<Unit, AuthError>
+
+    /** Envía el correo "Tu contraseña cambió" (Cloud Function `notifyPasswordChanged`). */
+    suspend fun notifyPasswordChanged(): AppResult<Unit, AuthError>
 }

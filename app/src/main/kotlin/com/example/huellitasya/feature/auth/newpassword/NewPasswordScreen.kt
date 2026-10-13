@@ -32,12 +32,12 @@ import com.example.huellitasya.core.designsystem.components.FieldMessage
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.designsystem.components.HuellitasPasswordField
+import com.example.huellitasya.core.designsystem.components.PasswordRequirementRow
 import com.example.huellitasya.core.domain.validation.PasswordRequirements
 import com.example.huellitasya.core.ui.ObserveAsEvents
 import com.example.huellitasya.feature.auth.components.AuthBadgeSpec
 import com.example.huellitasya.feature.auth.components.AuthFormScaffold
 import com.example.huellitasya.feature.auth.components.AuthHeroSpec
-import com.example.huellitasya.feature.auth.components.PasswordRequirementRow
 import kotlinx.coroutines.launch
 
 // Figma "CREAR CONTRASEÑA" (141:996)
@@ -152,10 +152,28 @@ internal fun NewPasswordScreen(
 @Composable
 private fun PasswordChecklist(requirements: PasswordRequirements) {
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-        PasswordRequirementRow(stringResource(R.string.auth_newpassword_rule_length), requirements.hasMinLength)
-        PasswordRequirementRow(stringResource(R.string.auth_newpassword_rule_uppercase), requirements.hasUppercase)
-        PasswordRequirementRow(stringResource(R.string.auth_newpassword_rule_digit), requirements.hasDigitOrSymbol)
-        PasswordRequirementRow(stringResource(R.string.auth_newpassword_rule_match), requirements.matchesConfirmation)
+        val met = stringResource(R.string.auth_newpassword_rule_met)
+        val unmet = stringResource(R.string.auth_newpassword_rule_unmet)
+        PasswordRequirementRow(
+            stringResource(R.string.auth_newpassword_rule_length),
+            requirements.hasMinLength,
+            if (requirements.hasMinLength) met else unmet,
+        )
+        PasswordRequirementRow(
+            stringResource(R.string.auth_newpassword_rule_uppercase),
+            requirements.hasUppercase,
+            if (requirements.hasUppercase) met else unmet,
+        )
+        PasswordRequirementRow(
+            stringResource(R.string.auth_newpassword_rule_digit),
+            requirements.hasDigitOrSymbol,
+            if (requirements.hasDigitOrSymbol) met else unmet,
+        )
+        PasswordRequirementRow(
+            stringResource(R.string.auth_newpassword_rule_match),
+            requirements.matchesConfirmation,
+            if (requirements.matchesConfirmation) met else unmet,
+        )
     }
 }
 

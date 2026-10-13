@@ -97,7 +97,7 @@ Inicio de sesión + "Tu contraseña se actualizó. Inicia sesión."
 - **Backend:** Firebase Auth no tiene códigos de recuperación, así que el flujo lo resuelven 3 Cloud Functions en `southamerica-east1` (`functions/src/index.ts`). Cambiar la contraseña de un usuario sin sesión solo es posible con el Admin SDK.
   - `requestPasswordResetCode({email})` genera el código y lo envía.
   - `verifyPasswordResetCode({email, code})` valida el código y devuelve un `resetToken` de un solo uso.
-  - `resetPasswordWithToken({email, resetToken, newPassword})` cambia la contraseña y cierra las sesiones abiertas (`revokeRefreshTokens`).
+  - `resetPasswordWithToken({email, resetToken, newPassword})` cambia la contraseña y cierra las sesiones abiertas (`revokeRefreshTokens`). Después envía el aviso "Tu contraseña cambió" (spec 004).
 - **Correo:** sale de un Gmail dedicado *noreply* (`"Huellitas YA" <SMTP_USER>`, ver spec 001), en español. Lleva el código grande, la vigencia, "Si no lo pediste, ignora este correo" y "No respondas a este mensaje".
 - **Código:** 4 dígitos (`crypto.randomInt`).
   - Vence a los **10 min** y admite **5 intentos**; después hay que pedir uno nuevo.
@@ -221,4 +221,4 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 - Verificación de correo obligatoria.
 - Login con Facebook, Apple o teléfono.
 - Edición de perfil y eliminación de cuenta: ver la [spec 004](004-perfil-usuario.md).
-- Cambio de contraseña (Configuración → Seguridad): spec futura.
+- Cambio de contraseña (Configuración → Seguridad): ver la [spec 004](004-perfil-usuario.md).

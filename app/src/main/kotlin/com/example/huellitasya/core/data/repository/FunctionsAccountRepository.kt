@@ -13,16 +13,21 @@ import java.io.IOException
 import javax.inject.Inject
 
 /**
- * [AccountRepository] sobre la Cloud Function `deleteAccount` (`functions/src/index.ts`).
+ * [AccountRepository] sobre las Cloud Functions `deleteAccount` y `notifyPasswordChanged`
+ * (`functions/src/index.ts`).
  * El código de error y `details.reason` son el contrato con el backend.
  */
 internal class FunctionsAccountRepository @Inject constructor(
     private val functions: FirebaseFunctions,
 ) : AccountRepository {
 
-    override suspend fun deleteAccount(): AppResult<Unit, AuthError> =
+    override suspend fun deleteAccount(): AppResult<Unit, AuthError> = call("deleteAccount")
+
+    override suspend fun notifyPasswordChanged(): AppResult<Unit, AuthError> = call("notifyPasswordChanged")
+
+    private suspend fun call(name: String): AppResult<Unit, AuthError> =
         try {
-            functions.getHttpsCallable("deleteAccount").call().await()
+            functions.getHttpsCallable(name).call().await()
             AppResult.Success(Unit)
         } catch (e: CancellationException) {
             throw e

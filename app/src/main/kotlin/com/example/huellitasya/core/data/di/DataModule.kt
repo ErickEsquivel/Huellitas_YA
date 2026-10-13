@@ -4,11 +4,13 @@ import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
 import com.example.huellitasya.core.data.repository.FunctionsAccountRepository
+import com.example.huellitasya.core.data.repository.FunctionsEmailChangeRepository
 import com.example.huellitasya.core.data.repository.FirebaseStorageProfilePhotoRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
 import com.example.huellitasya.core.data.repository.FunctionsPasswordResetRepository
 import com.example.huellitasya.core.domain.repository.AccountRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
+import com.example.huellitasya.core.domain.repository.EmailChangeRepository
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.repository.PasswordResetRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
@@ -85,6 +87,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindAccountRepository(impl: FunctionsAccountRepository): AccountRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindEmailChangeRepository(impl: FunctionsEmailChangeRepository): EmailChangeRepository
 }
 
 private const val FUNCTIONS_REGION = "southamerica-east1"

@@ -1,6 +1,7 @@
 package com.example.huellitasya.feature.settings
 
 import app.cash.turbine.test
+import com.example.huellitasya.R
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.domain.error.AuthError
@@ -15,6 +16,7 @@ import com.example.huellitasya.core.testing.FakeAuthRepository
 import com.example.huellitasya.core.testing.FakeNetworkMonitor
 import com.example.huellitasya.core.testing.MainDispatcherRule
 import com.example.huellitasya.core.testing.TestUser
+import com.example.huellitasya.core.ui.UiText
 import com.example.huellitasya.core.ui.toUiText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -173,5 +175,29 @@ class SettingsViewModelTest {
         }
         assertFalse(viewModel.uiState.value.isDeleting)
         assertNotNull(authRepository.currentUser.value)
+    }
+
+    @Test
+    fun `Seguridad abre la pantalla en cuentas de correo`() = runTest {
+        val viewModel = viewModel(appScope = this)
+
+        viewModel.events.test {
+            viewModel.onAction(SettingsAction.SecurityClick)
+            assertEquals(SettingsEvent.NavigateToSecurity, awaitItem())
+        }
+    }
+
+    @Test
+    fun `Seguridad en una cuenta Google solo avisa`() = runTest {
+        authRepository.currentUser.value = TestUser.copy(provider = AuthProvider.GOOGLE)
+        val viewModel = viewModel(appScope = this)
+
+        viewModel.events.test {
+            viewModel.onAction(SettingsAction.SecurityClick)
+            assertEquals(
+                SettingsEvent.ShowMessage(UiText.Resource(R.string.settings_security_google)),
+                awaitItem(),
+            )
+        }
     }
 }

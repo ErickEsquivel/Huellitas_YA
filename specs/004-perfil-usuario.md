@@ -3,18 +3,19 @@
 - **Estado:** Implemented (pendiente de QA en dispositivo y de desplegar reglas, Storage y `deleteAccount`)
   - Revisada contra `master` después del PR #2 (auth con código OTP, overlay "Sin conexión" y Cloud Functions).
   - Las [desviaciones de Figma](#desviaciones-de-figma) quedaron decididas con el equipo.
-  - Antes de probar en dispositivo, el Owner debe crear el bucket de Storage y desplegar: `firebase deploy --only firestore:rules,storage,functions` (spec 001, pasos 8 y 9).
+  - Antes de probar en dispositivo, el Owner debe crear el bucket de Storage y desplegar: `firebase deploy --only firestore:rules,storage,functions` (spec 001, pasos 8 y 9). El cambio de correo con código y el aviso de contraseña necesitan volver a desplegar `functions`.
 - **Paquetes:** `feature.profile`, `feature.settings`, `core.domain`, `core.model`, `core.data`, `core.ui`, `core.designsystem`, `navigation`, y el backend en `functions/`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-)
   - Perfil (ver): `PERFIL` (99:723)
   - Datos Personales (editar): `CONFIGURACION` (3254:1023). Tarjeta "Datos Dueño" con lápiz y botón "Actualizar información".
   - Configuración (punto de entrada): `CONFIGURACION` (3452:1018) y la versión completa (144:621), sección "Mi cuenta".
   - Diálogo de confirmación para eliminar: se reutiliza el de mascotas, `EDIT PERRO 2` (3050:1515), "¿Seguro deseas eliminarlo?".
-  - Solo como referencia (fuera de alcance): `Seguridad`, cambio de contraseña (3263:1086).
+  - Seguridad, cambio de contraseña: `CONFIGURACION` (3263:1086); con la contraseña actual incorrecta, 3278:1170.
+  - "Verifica tu correo" del cambio de correo: mismos textos y casillas que `VERIFICACION CORREO` (139:822), sin la foto de cabecera.
 
 ## Objetivo
 
-Que el dueño de mascotas pueda ver su perfil, completar y editar sus datos personales (nombre, correo, teléfono, dirección y fecha de nacimiento), cambiar su foto y eliminar su cuenta. Los datos se guardan en Firestore (`users/{uid}`) y la foto en Firebase Storage.
+Que el dueño de mascotas pueda ver su perfil, completar y editar sus datos personales (nombre, correo, teléfono, dirección y fecha de nacimiento), cambiar su foto, cambiar su contraseña y eliminar su cuenta. Los datos se guardan en Firestore (`users/{uid}`) y la foto en Firebase Storage. Los correos del cambio de correo y de contraseña salen del Gmail *noreply* con la plantilla de Huellitas (Cloud Functions), como la recuperación de contraseña de la spec 002.
 
 Hoy `feature/profile/ProfileScreen.kt` es una maqueta con datos fijos, sin ViewModel, y `users/{uid}` solo se crea (`createIfMissing`, spec 002).
 
@@ -22,7 +23,9 @@ Hoy `feature/profile/ProfileScreen.kt` es una maqueta con datos fijos, sin ViewM
 
 - Como usuario, quiero ver mis datos en la pestaña Perfil.
 - Como usuario, quiero editar mis datos desde "Editar información" (Perfil) o desde Configuración → Datos personales.
-- Como usuario, quiero cambiar mi correo de forma segura, confirmándolo desde el correo nuevo.
+- Como usuario, quiero cambiar mi correo de forma segura, confirmándolo con un código que llega al correo nuevo.
+- Como usuario, quiero cambiar mi contraseña desde Configuración → Seguridad.
+- Como usuario, quiero recibir un aviso por correo si cambian el correo o la contraseña de mi cuenta.
 - Como usuario, quiero cambiar mi foto de perfil.
 - Como usuario, quiero eliminar mi cuenta y todos mis datos desde Configuración.
 
@@ -30,13 +33,14 @@ Hoy `feature/profile/ProfileScreen.kt` es una maqueta con datos fijos, sin ViewM
 
 ```
 Perfil (pestaña) ──"Editar información"──► Datos Personales ──"<"──► atrás
-Configuración ──"Datos personales"──────► Datos Personales
+Configuración ──"Datos personales"──────► Datos Personales ──correo nuevo──► Verifica tu correo ──código──► Datos Personales
+Configuración ──"Seguridad"─────────────► Seguridad (cuentas Google: aviso, no abre)
 Configuración ──"Eliminar cuenta"──► Diálogo de confirmación ──► Reautenticación ──► (sesión cerrada) Presentación
 Perfil ──tocar la foto──► Photo Picker del sistema ──► subida ──► foto actualizada
 ```
 
 - **Temporal:** al iniciar sesión, la app abre en Perfil (`startDestination` de `MainNavHost`). Home y Calendario se ven atenuados en la barra inferior y no se pueden abrir (`TopLevelDestination.isEnabled = false`) hasta que tengan su spec; entonces Home vuelve a ser la pestaña inicial.
-- Datos Personales vive en `feature.profile`, que expone `NavGraphBuilder.personalDataScreen(onBack)`.
+- Datos Personales y "Verifica tu correo" viven en `feature.profile`; Seguridad, en `feature.settings`.
 - Configuración no importa `feature.profile`: recibe la lambda `onNavigateToPersonalData`, y `MainNavHost` (`navigation/HuellitasApp.kt`) la resuelve.
 - Eliminar la cuenta **no navega**. Al terminar, la app cierra la sesión local, `SessionState` pasa a `SignedOut` y se reemplaza el NavHost, como en el logout de la spec 002.
 
@@ -48,7 +52,8 @@ Perfil ──tocar la foto──► Photo Picker del sistema ──► subida �
 | **Leer** | Perfil y Datos Personales | Se escucha `users/{uid}` en tiempo real (snapshot listener → `Flow`). Funciona offline con la caché de Firestore. Los campos opcionales vacíos muestran "Sin registrar" en `LightGrayText`. Si el documento todavía no existe (el login lo está creando), se muestran el nombre, el correo y la foto de la sesión. |
 | **Actualizar datos** | Datos Personales | Ver [Datos Personales](#datos-personales). |
 | **Actualizar foto** | Perfil, al tocar el avatar | Ver [Foto de perfil](#foto-de-perfil). |
-| **Actualizar correo** | Datos Personales | Ver [Cambio de correo](#cambio-de-correo). |
+| **Actualizar correo** | Datos Personales → Verifica tu correo | Ver [Cambio de correo](#cambio-de-correo). |
+| **Cambiar contraseña** | Configuración → Seguridad | Ver [Seguridad](#seguridad). |
 | **Eliminar** | Configuración → "Eliminar cuenta" | Ver [Eliminar cuenta](#eliminar-cuenta). La hace una Cloud Function. |
 
 ### Datos Personales
@@ -71,13 +76,19 @@ Perfil ──tocar la foto──► Photo Picker del sistema ──► subida �
 
 ### Cambio de correo
 
+Con un código de 4 dígitos, igual que la recuperación de contraseña (spec 002). Así el correo sale de Huellitas y no de Firebase, y no hace falta volver a iniciar sesión.
+
 - Solo cuentas de correo. En cuentas Google, el correo es de solo lectura (pertenece a la cuenta de Google).
-- Si el correo cambió al guardar, se llama a `verifyBeforeUpdateEmail(nuevo)` y se muestra "Te enviamos un enlace a <correo> para confirmar el cambio". El resto de cambios se guarda normalmente.
-- El correo de verificación sale en español: la app ya llama a `setLanguageCode("es")` y las plantillas de Auth están en español (spec 001, paso 3).
-- Si Firebase pide un inicio de sesión reciente, primero se reautentica (ver abajo) y se reintenta.
-- Mientras el usuario no abra el enlace, el correo mostrado sigue siendo el anterior. Firestore no cambia hasta que Auth confirme el correo nuevo.
-- Cambiar el correo es un cambio sensible: Firebase invalida las sesiones abiertas, así que la app vuelve a Presentación cuando se le vence el token. Al iniciar sesión con el correo nuevo, la copia de Firestore se sincroniza (ver [Contratos](#contratos)).
-- `verifyBeforeUpdateEmail` funciona con la protección contra enumeración de correos activa; `updateEmail` no.
+- Al guardar con el correo cambiado, primero se guardan los demás cambios y después se llama a `requestEmailChangeCode(nuevo)`:
+  - el backend exige un inicio de sesión de hace ≤ 5 min; si no, la app pide la contraseña ([Reautenticación](#reautenticación)) y reintenta;
+  - si el correo ya es de otra cuenta, o es igual al actual, se marca en rojo bajo el campo;
+  - si sale bien, Datos Personales vuelve a modo lectura y se abre "Verifica tu correo".
+- **Verifica tu correo:** "Enviamos un código de 4 dígitos a <correo>", las cuatro casillas (`OtpCodeField`) y "Verificar código". Igual que en la spec 002:
+  - el código vence a los 10 min y admite 5 intentos;
+  - "Reenviar código" se habilita a los 60 s, con cuenta regresiva, y como máximo 5 envíos por hora;
+  - si reenviar pasa de los 5 min de sesión, se pide volver a guardar el correo desde Datos Personales.
+- Con el código correcto, `confirmEmailChange` cambia el correo en Auth (`emailVerified = true`) y en `users/{uid}` a la vez. La app recarga la sesión, vuelve a Datos Personales y muestra "Tu correo ahora es <correo>". La sesión sigue abierta.
+- Después, el backend avisa al correo anterior: "El correo de tu cuenta ahora es n****@…", con el contacto de soporte por si no fue el usuario.
 
 ### Eliminar cuenta
 
@@ -95,9 +106,24 @@ Perfil ──tocar la foto──► Photo Picker del sistema ──► subida �
 
 Se hace en el backend porque el cliente no puede borrar de forma confiable el documento, la foto y el usuario de Auth juntos. Además, así las reglas pueden seguir negando el `delete` a los clientes.
 
+### Seguridad
+
+Configuración → Seguridad (Figma 3263:1086). Solo cuentas de correo: en una cuenta Google, la fila muestra "Tu contraseña la gestiona tu cuenta de Google" y no abre la pantalla.
+
+- Campos: "Contraseña actual", "Nueva contraseña" y "Confirmar contraseña" (`HuellitasPasswordField`), y la checklist en vivo de la spec 002 (`PasswordRequirementRow`): 8 caracteres, una mayúscula, un número o símbolo, y que coincidan.
+- "Actualizar información" se ve verde cuando hay contraseña actual y la checklist está completa.
+- Validación en cliente:
+  - campos vacíos: aviso agrupado "Rellene todos los datos para continuar";
+  - checklist incompleta: se resaltan los campos;
+  - nueva igual a la actual: "La nueva contraseña debe ser distinta a la actual".
+- Al enviar: sin red, Snackbar. Si no, se reautentica con la contraseña actual y se llama a `updatePassword`. La sesión sigue abierta.
+  - Contraseña actual incorrecta: "La contraseña ingresada no es correcta" bajo el campo, en rojo (Figma 3278:1170).
+- Si sale bien, se limpia el formulario, se muestra "Contraseña actualizada. Te enviamos un aviso a tu correo" y la callable `notifyPasswordChanged` envía el aviso "Tu contraseña cambió". Si el aviso no sale, el cambio sigue siendo válido.
+- El mismo aviso se envía al restablecer la contraseña con el código de la spec 002.
+
 ### Reautenticación
 
-Se usa al cambiar el correo (solo si Firebase la pide) y siempre al eliminar la cuenta.
+Se usa al cambiar el correo (si el backend la pide) y siempre al eliminar la cuenta. Seguridad reautentica directamente con la contraseña actual.
 
 - **Cuenta de correo:** diálogo "Confirma tu contraseña" con `HuellitasPasswordField`. Si la contraseña es incorrecta, se muestra "Correo o contraseña incorrectos" bajo el campo.
 - **Cuenta de Google:** se abre el selector de cuentas con `GoogleIdTokenRequester`.
@@ -138,7 +164,12 @@ Los avisos usan `FieldFeedback` (`Warning`/`Error`) y se limpian al editar el ca
 |--------|-------|-------|---------|
 | `FirebaseAuthRecentLoginRequiredException`, o `deleteAccount` con `reason: "requires_recent_login"` | `AuthError.RequiresRecentLogin` (nuevo) | — | (sin mensaje: abre la reautenticación) |
 | Contraseña incorrecta al reautenticar | `AuthError.InvalidCredentials` | Bajo la contraseña | "Correo o contraseña incorrectos" |
-| Correo nuevo ya en uso | `AuthError.EmailAlreadyInUse` | Bajo el correo | "Este correo ya está registrado" |
+| Correo nuevo ya en uso | `EmailChangeError.EmailAlreadyInUse` | Bajo el correo | "Este correo ya está registrado" |
+| Correo nuevo igual al actual o inválido | `EmailChangeError.InvalidEmail` | Bajo el correo | "Ingresa un correo distinto al actual" |
+| `requestEmailChangeCode` con sesión vieja | `EmailChangeError.RequiresRecentLogin` | — | (sin mensaje: abre la reautenticación) |
+| Código incorrecto / vencido / 5 intentos | `EmailChangeError.InvalidCode` / `ExpiredCode` / `TooManyAttempts` | Bajo las casillas, en rojo | Mismos textos que la spec 002 |
+| Reenvío antes de tiempo | `EmailChangeError.TooManyRequests` | Snackbar + cuenta regresiva | "Espera N s para pedir otro código" |
+| Contraseña actual incorrecta (Seguridad) | `AuthError.InvalidCredentials` | Bajo "Contraseña actual" | "La contraseña ingresada no es correcta" |
 | Imagen > 5 MB tras comprimir | `DataError.FileTooLarge` (nuevo) | Snackbar | "La imagen es demasiado grande" |
 | `users/{uid}` no existe al guardar | `DataError.NotFound` (nuevo) | Snackbar | "No encontramos tu perfil" |
 | Sin red (`NetworkMonitor` o `Network`) | `AuthError.Network` / `DataError.Network` | Snackbar | "Sin conexión. Revisa tu internet" |
@@ -211,12 +242,27 @@ Se agregan estos campos a la tabla de la spec 002:
 
 ### Backend (`functions/`)
 
-- La callable `deleteAccount()` se agrega a `functions/src/index.ts` y usa las `setGlobalOptions` existentes (región `southamerica-east1`).
-  - **Sin sesión:** `unauthenticated`.
-  - **Sesión vieja:** `failed-precondition`, `details.reason = "requires_recent_login"`.
-  - **Éxito:** `{ deleted: true }`.
-- La lógica pura (p. ej. `isRecentLogin(authTime, now)`) va en `functions/src/account.ts`, con tests de `node --test`, igual que `resetCodes.ts`.
-- Como con la recuperación de contraseña (CLAUDE.md), el contrato con la app son los códigos `HttpsError` y `details.reason`: si cambias uno, cambia el otro.
+Callables en `functions/src/index.ts`, con las `setGlobalOptions` existentes (región `southamerica-east1`). Como con la recuperación de contraseña (CLAUDE.md), el contrato con la app son los códigos `HttpsError` y `details.reason`: si cambias uno, cambia el otro.
+
+- **`deleteAccount()`**
+  - Sin sesión: `unauthenticated`.
+  - Sesión vieja (> 5 min): `failed-precondition`, `reason: "requires_recent_login"`.
+  - Éxito: `{ deleted: true }`.
+- **`requestEmailChangeCode({ newEmail })`** (secretos `SMTP_USER`, `SMTP_PASSWORD`, `RESET_CODE_PEPPER`)
+  - Sesión vieja: `failed-precondition`, `requires_recent_login`.
+  - Correo inválido o igual al actual: `invalid-argument`, `invalid_email`.
+  - Correo de otra cuenta: `already-exists`, `email_in_use`.
+  - Reenvío antes de tiempo: `resource-exhausted`, `resend_cooldown` + `retryAfterSeconds`.
+  - El correo no salió: `unavailable`, `email_failed` (el envío no cuenta para la espera).
+  - Guarda el código hasheado en `emailChangeCodes/{uid}` (`newEmail`, `codeHash`, `expiresAt`, `attempts`, `sends`). Las reglas de Firestore niegan esa colección a los clientes.
+- **`confirmEmailChange({ code })`**
+  - Mismos errores del código que `verifyPasswordResetCode`: `invalid_code`, `too_many_attempts`, `expired`. También `email_in_use`, si otra cuenta tomó el correo mientras tanto.
+  - Éxito: `{ email }`. Cambia Auth y `users/{uid}`, borra el registro y avisa al correo anterior (best-effort).
+- **`notifyPasswordChanged()`**
+  - Exige sesión reciente; como máximo un aviso por minuto (`passwordChangeNotices/{uid}`).
+  - Éxito: `{ sent }`.
+- `resetPasswordWithToken` (spec 002) también envía el aviso "Tu contraseña cambió".
+- Lógica pura con tests de `node --test`: `account.ts` (`isRecentLogin`, `maskEmail`, `EmailChangeRecord`), `resetCodes.ts` (códigos, reutilizados con `CodeRecord`) y `email.ts` (plantillas con la marca, texto escapado).
 
 ### Domain (`core.domain`)
 
@@ -227,38 +273,47 @@ Se agregan estos campos a la tabla de la spec 002:
   - `syncEmail(uid, email): AppResult<Unit, DataError>`
 - `ProfilePhotoRepository` (nuevo; implementación `FirebaseStorageProfilePhotoRepository` en `core.data`):
   - `upload(uid, localUri: String): AppResult<String, DataError>`. Devuelve la URL de descarga. `core.data` resuelve el `Uri` con el `ContentResolver` y comprime, así el dominio no conoce `android.net.Uri`.
-- `AccountRepository` (nuevo; implementación `FunctionsAccountRepository` sobre la callable, como `FunctionsPasswordResetRepository`):
+- `AccountRepository` (nuevo; implementación `FunctionsAccountRepository` sobre las callables, como `FunctionsPasswordResetRepository`):
   - `deleteAccount(): AppResult<Unit, AuthError>`
+  - `notifyPasswordChanged(): AppResult<Unit, AuthError>`
+- `EmailChangeRepository` (nuevo; implementación `FunctionsEmailChangeRepository`), con errores en `EmailChangeError`:
+  - `requestCode(newEmail): AppResult<Unit, EmailChangeError>`
+  - `confirm(code): AppResult<String, EmailChangeError>`: devuelve el correo nuevo.
 - `AuthRepository`, se agregan:
   - `reauthenticateWithPassword(password): AppResult<Unit, AuthError>`
   - `reauthenticateWithGoogle(idToken): AppResult<Unit, AuthError>`
-  - `requestEmailChange(newEmail): AppResult<Unit, AuthError>` (`verifyBeforeUpdateEmail`)
+  - `updatePassword(newPassword): AppResult<Unit, AuthError>`
+  - `reload(): AppResult<Unit, AuthError>`: recarga el usuario y el token tras cambiar el correo.
   - `updateDisplayName(name): AppResult<Unit, AuthError>`. Se hace sin bloquear el guardado y mantiene al día el `User.name` de la sesión.
 - Use cases:
   - `ObserveUserProfileUseCase`: si `users/{uid}` aún no existe, emite un perfil con los datos de la sesión.
   - `UpdateUserProfileUseCase`: guarda los cambios ya validados y, si cambió el nombre, llama a `updateDisplayName`. La validación por campo y el cambio de correo los coordina `PersonalDataViewModel`, para mostrar cada aviso bajo su campo.
-  - `RequestEmailChangeUseCase`
+  - `RequestEmailChangeCodeUseCase` y `ConfirmEmailChangeUseCase` (al confirmar, recarga la sesión)
+  - `ChangePasswordUseCase`: reautentica con la actual, cambia la contraseña y pide el aviso (best-effort)
   - `ChangeProfilePhotoUseCase`: sube la foto y actualiza `photoUrl`.
   - `ReauthenticateUseCase`
   - `DeleteAccountUseCase` (`@ApplicationScope`): llama a `AccountRepository.deleteAccount()` y, si sale bien, a `AuthRepository.signOut()`.
   - `ValidatePhoneUseCase`, `ValidateAddressUseCase`, `ValidateBirthDateUseCase`
 - Se reutiliza `NetworkMonitor` (spec 002) para no intentar escrituras sin red.
-- Sincronización del correo: después de `createIfMissing`, los use cases de inicio de sesión llaman a `syncEmail` si el correo de Auth es distinto al de Firestore. También corre en `@ApplicationScope`.
+- Sincronización del correo: después de `createIfMissing`, los use cases de inicio de sesión llaman a `syncEmail` si el correo de Auth es distinto al de Firestore. También corre en `@ApplicationScope`. Con el cambio por código ya no es necesaria para ese flujo (el backend actualiza ambos), pero se mantiene por si el correo cambia por otra vía.
 
 ### UI (patrón MVVM, spec 000)
 
 - `feature/profile`: `ProfileUiState`, `ProfileAction`, `ProfileEvent`, `ProfileViewModel`, `ProfileRoute` y `ProfileScreen`. Reemplaza la `ProfileScreen` estática actual.
 - `feature/profile/personaldata`: `PersonalData*` con el mismo patrón. El estado incluye `isEditing`, `hasChanges` y un `FieldFeedback` por campo.
+- `feature/profile/verifyemail`: `VerifyEmailChange*` ("Verifica tu correo"), con la cuenta regresiva para reenviar.
+- `feature/settings/security`: `Security*` (cambio de contraseña).
 - `feature/settings`: `SettingsViewModel` pasa al patrón `UiState`/`Action`/`Event` y agrega eliminar la cuenta (confirmación, reautenticación y `LaunchGoogleReauth`). Las filas de "Mi cuenta" se rehacen según 3452:1018; el diálogo es `components/DeleteAccountDialog.kt`, con la tarjeta de Figma como imagen (`img_settings_delete_dialog`).
-- `core.designsystem`: `HuellitasBackButton` (antes `AuthBackButton`) y `PasswordConfirmDialog`, compartidos por Auth, Perfil y Configuración. Su estado vive en `core.ui.PasswordPromptState`.
+- `core.designsystem`: `HuellitasBackButton` (antes `AuthBackButton`), `PasswordConfirmDialog` y `PasswordRequirementRow` (antes en `feature.auth.components`), compartidos por Auth, Perfil y Configuración. El estado del diálogo vive en `core.ui.PasswordPromptState`.
 - `GoogleIdTokenRequester` sale de `feature.auth.google` y pasa a `core.ui.google`, porque Configuración también lo necesita para reautenticar y una feature no importa otra.
 - Strings en `res/values/strings_profile.xml` y `strings_settings.xml`; los errores nuevos, en `strings_errors.xml`. Recursos con prefijo `img_profile_*` / `ic_profile_*` e `ic_settings_*`.
 
 ### Rutas
 
-- `feature.profile.navigation`: `ProfileDestination` (ya existe) y `PersonalDataDestination`.
-- `profileScreen(onNavigateToPersonalData)` y `personalDataScreen(onBack)`.
-- `settingsScreen(onNavigateToPersonalData)`.
+- `feature.profile.navigation`: `ProfileDestination`, `PersonalDataDestination` y `VerifyEmailChangeDestination(newEmail)`.
+  - `profileScreen(onNavigateToPersonalData)`, `personalDataScreen(onBack, onNavigateToVerifyEmail)` y `verifyEmailChangeScreen(onBack, onEmailChanged)`.
+  - `NavController.popBackToPersonalData(email)` devuelve el correo nuevo a Datos Personales por el `SavedStateHandle` de su entrada.
+- `feature.settings.navigation`: `SettingsDestination` y `SecurityDestination`; `settingsScreen(googleServerClientId, onNavigateToPersonalData, onNavigateToSecurity)` y `securityScreen(onBack)`.
 
 ### Dependencias nuevas (`gradle/libs.versions.toml`)
 
@@ -273,13 +328,14 @@ Hechos en el PR de implementación:
 - **000 — Arquitectura:** Credential Manager solo desde `core.ui.google`.
 - **001 — Firebase setup:** paso 9 "Storage", `firebase-storage` en Contratos y criterio de las reglas de Storage.
 - **002 — Autenticación:** enlaces a esta spec en `users/{uid}`, `AuthRepository`, `UserRepository` y Google Sign-In.
-- **003 — Design system:** `HuellitasBackButton` y `PasswordConfirmDialog` en el catálogo.
+- **002 — Autenticación:** `PasswordRequirementRow` pasa al design system y restablecer la contraseña envía el aviso "Tu contraseña cambió".
+- **003 — Design system:** `HuellitasBackButton`, `PasswordConfirmDialog` y `PasswordRequirementRow` en el catálogo.
 - **CLAUDE.md:** sección "Perfil (spec 004)", nueva ubicación de `GoogleIdTokenRequester` y `firebase deploy --only storage`.
 
 ## Riesgos
 
-- **Correo de verificación desde Firebase.** El cambio de correo usa el remitente de Firebase Auth, no el Gmail *noreply* de la recuperación con código. Si se quiere el mismo remitente, hace falta otra Cloud Function; queda fuera de alcance.
-- **App Check.** Igual que las funciones de la spec 002, `deleteAccount` queda sin App Check hasta que se active para todo el backend.
+- **Gmail *noreply*.** Todos los correos salen de la misma cuenta, con un límite de ~500 por día (spec 001). Si la app crece, se cambia a un servicio con dominio propio sin tocar la app.
+- **App Check.** Igual que las funciones de la spec 002, las callables de esta spec quedan sin App Check hasta que se active para todo el backend.
 
 ## Criterios de aceptación
 
@@ -293,9 +349,16 @@ Hechos en el PR de implementación:
 - [x] Un cambio válido se guarda, muestra "Datos actualizados" y la pantalla sale del modo edición.
 - [x] Datos inválidos muestran su aviso bajo el campo y no se escribe nada en Firestore.
 - [ ] Vaciar el teléfono, la dirección o la fecha los borra del documento.
-- [ ] Cambiar el correo pide la contraseña si Firebase lo exige, envía el enlace de verificación (en español) y el correo mostrado no cambia hasta confirmarlo.
-- [ ] Tras confirmar el correo nuevo y volver a iniciar sesión, `users/{uid}.email` tiene el correo nuevo.
-- [ ] En una cuenta Google, el correo no se puede editar.
+- [ ] Cambiar el correo pide la contraseña si el backend lo exige y abre "Verifica tu correo"; llega un código de 4 dígitos al correo nuevo, desde el Gmail *noreply*.
+- [ ] Con el código correcto, Datos Personales muestra el correo nuevo sin cerrar la sesión, y `users/{uid}.email` y Auth tienen el correo nuevo.
+- [ ] Un código incorrecto se marca en rojo; tras 5 intentos o 10 minutos hay que pedir otro; "Reenviar código" solo se activa después de 60 s.
+- [ ] Al correo anterior llega el aviso "Tu correo cambió" con el correo nuevo enmascarado.
+- [ ] Un correo que ya es de otra cuenta se marca en rojo bajo el campo y no se envía código.
+- [x] En una cuenta Google, el correo no se puede editar.
+- [ ] Seguridad cambia la contraseña con la actual correcta, limpia el formulario y llega el aviso "Tu contraseña cambió"; la sesión sigue abierta y la contraseña anterior deja de funcionar.
+- [ ] Con la contraseña actual incorrecta, Seguridad muestra "La contraseña ingresada no es correcta" en rojo y no cambia nada.
+- [x] En una cuenta Google, la fila Seguridad solo muestra el aviso.
+- [ ] Restablecer la contraseña con el código (spec 002) también envía el aviso "Tu contraseña cambió".
 - [ ] Elegir una foto la sube a Storage y el avatar la muestra; cancelar el selector no hace nada.
 - [ ] "Eliminar cuenta" pide confirmación y reautenticación; luego desaparecen la foto, el documento y el usuario de Auth, y la app vuelve a Presentación con el historial limpio.
 - [ ] Llamar a `deleteAccount` con un inicio de sesión de hace más de 5 min responde `requires_recent_login` y no borra nada.
@@ -308,17 +371,15 @@ Hechos en el PR de implementación:
 Unit tests en la JVM, con los fakes de `core/testing`:
 
 - Validadores: `ValidatePhoneUseCaseTest`, `ValidateAddressUseCaseTest`, `ValidateBirthDateUseCaseTest`.
-- Use cases: `ProfileUseCasesTest` (actualizar, cambio de correo, foto, eliminar + `signOut`).
-- ViewModels: `ProfileViewModelTest`, `PersonalDataViewModelTest`, `SettingsViewModelTest`. Eliminar la cuenta se prueba con `appScope = this`, y el caso sin red con `FakeNetworkMonitor(initiallyOnline = false)`.
-- Fakes: ampliar `FakeUserRepository` y `FakeAuthRepository` (`FakeRepositories.kt`), y agregar `FakeProfilePhotoRepository` y `FakeAccountRepository`.
+- Use cases: `ProfileUseCasesTest` (actualizar, cambio de correo con código, cambio de contraseña con aviso, foto, eliminar + `signOut`).
+- ViewModels: `ProfileViewModelTest`, `PersonalDataViewModelTest`, `VerifyEmailChangeViewModelTest`, `SecurityViewModelTest`, `SettingsViewModelTest`. Eliminar la cuenta se prueba con `appScope = this`, y el caso sin red con `FakeNetworkMonitor(initiallyOnline = false)`.
+- Fakes: ampliar `FakeUserRepository` y `FakeAuthRepository` (`FakeRepositories.kt`), y agregar `FakeProfilePhotoRepository`, `FakeAccountRepository` y `FakeEmailChangeRepository`.
 - Las reglas de Firestore y Storage no tienen tests automáticos (no se usa el Emulator Suite, spec 001): se verifican con los criterios de aceptación.
-- Backend: `functions/src/account.test.ts` (`npm --prefix functions test`).
+- Backend: `functions/src/account.test.ts` y `email.test.ts` (`npm --prefix functions test`).
 
 ## Fuera de alcance
 
-- Cambio de contraseña (Configuración → Seguridad, 3263:1086): spec futura.
 - Preferencias de la app, Ayuda y soporte, Términos y condiciones, Acerca de.
 - Overlay "Sin conexión" en el grafo principal. Vive en `feature.auth.connectivity`; para reutilizarlo, habría que moverlo a `core.ui`.
 - Recortar o editar la imagen antes de subirla.
-- Correo de cambio de dirección desde el Gmail *noreply*.
 - Confirmación al salir de Datos Personales con cambios sin guardar.

@@ -3,8 +3,10 @@ package com.example.huellitasya.core.testing
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
+import com.example.huellitasya.core.domain.error.EmailChangeError
 import com.example.huellitasya.core.domain.repository.AccountRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
+import com.example.huellitasya.core.domain.repository.EmailChangeRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.example.huellitasya.core.model.AuthProvider
@@ -55,9 +57,6 @@ class FakeAuthRepository : AuthRepository {
         return googleResult.alsoSignIn()
     }
 
-    /** Resultados en orden para cada llamada; el último se repite. */
-    var emailChangeResults: List<AppResult<Unit, AuthError>> = listOf(AppResult.Success(Unit))
-    val emailChanges = mutableListOf<String>()
     var reauthResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
     val reauthPasswords = mutableListOf<String>()
     val reauthGoogleTokens = mutableListOf<String>()
@@ -72,9 +71,19 @@ class FakeAuthRepository : AuthRepository {
         return reauthResult
     }
 
-    override suspend fun requestEmailChange(newEmail: String): AppResult<Unit, AuthError> {
-        emailChanges += newEmail
-        return emailChangeResults[minOf(emailChanges.size, emailChangeResults.size) - 1]
+    var updatePasswordResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
+    val updatedPasswords = mutableListOf<String>()
+    var reloadCount = 0
+        private set
+
+    override suspend fun updatePassword(newPassword: String): AppResult<Unit, AuthError> {
+        updatedPasswords += newPassword
+        return updatePasswordResult
+    }
+
+    override suspend fun reload(): AppResult<Unit, AuthError> {
+        reloadCount++
+        return AppResult.Success(Unit)
     }
 
     var updateDisplayNameResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
@@ -184,5 +193,32 @@ class FakeAccountRepository : AccountRepository {
     override suspend fun deleteAccount(): AppResult<Unit, AuthError> {
         deleteCount++
         return result
+    }
+
+    var notifyResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
+    var passwordNoticeCount = 0
+        private set
+
+    override suspend fun notifyPasswordChanged(): AppResult<Unit, AuthError> {
+        passwordNoticeCount++
+        return notifyResult
+    }
+}
+
+class FakeEmailChangeRepository : EmailChangeRepository {
+    /** Resultados en orden para cada pedido de código; el último se repite. */
+    var requestResults: List<AppResult<Unit, EmailChangeError>> = listOf(AppResult.Success(Unit))
+    val requestedEmails = mutableListOf<String>()
+    var confirmResult: AppResult<String, EmailChangeError> = AppResult.Success("nuevo@correo.com")
+    val confirmedCodes = mutableListOf<String>()
+
+    override suspend fun requestCode(newEmail: String): AppResult<Unit, EmailChangeError> {
+        requestedEmails += newEmail
+        return requestResults[minOf(requestedEmails.size, requestResults.size) - 1]
+    }
+
+    override suspend fun confirm(code: String): AppResult<String, EmailChangeError> {
+        confirmedCodes += code
+        return confirmResult
     }
 }

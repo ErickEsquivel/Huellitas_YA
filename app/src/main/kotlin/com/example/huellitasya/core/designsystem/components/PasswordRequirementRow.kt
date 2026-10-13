@@ -1,4 +1,4 @@
-package com.example.huellitasya.feature.auth.components
+package com.example.huellitasya.core.designsystem.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
@@ -24,16 +23,21 @@ import androidx.compose.ui.unit.sp
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 
-/** Fila de la checklist de "Crear nueva contraseña": ✗ naranja si falta, ✓ verde si se cumple. */
+/**
+ * Fila de la checklist de contraseña ("Crear nueva contraseña" y Seguridad): ✗ naranja si falta,
+ * ✓ verde si se cumple.
+ *
+ * @param stateDescription lo que lee TalkBack ("Cumplido" / "Pendiente").
+ */
 @Composable
-internal fun PasswordRequirementRow(
+fun PasswordRequirementRow(
     text: String,
     isMet: Boolean,
+    stateDescription: String,
     modifier: Modifier = Modifier,
 ) {
-    val state = stringResource(if (isMet) R.string.auth_newpassword_rule_met else R.string.auth_newpassword_rule_unmet)
     Row(
-        modifier = modifier.semantics { stateDescription = state },
+        modifier = modifier.semantics { this.stateDescription = stateDescription },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         // Ambos íconos ocupan la misma columna (24 dp) para que los textos queden alineados.
@@ -59,8 +63,8 @@ internal fun PasswordRequirementRow(
 private fun PasswordRequirementRowPreview() {
     HuellitasYATheme {
         Column(modifier = Modifier.padding(16.dp)) {
-            PasswordRequirementRow(text = "Mínimo 8 caracteres", isMet = true)
-            PasswordRequirementRow(text = "Una letra mayúscula", isMet = false)
+            PasswordRequirementRow(text = "Mínimo 8 caracteres", isMet = true, stateDescription = "Cumplido")
+            PasswordRequirementRow(text = "Una letra mayúscula", isMet = false, stateDescription = "Pendiente")
         }
     }
 }

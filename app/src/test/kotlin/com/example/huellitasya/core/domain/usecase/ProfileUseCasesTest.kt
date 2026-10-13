@@ -6,8 +6,10 @@ import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.model.Field
 import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.domain.error.AuthError
+import com.example.huellitasya.core.domain.error.EmailChangeError
 import com.example.huellitasya.core.testing.FakeAccountRepository
 import com.example.huellitasya.core.testing.FakeAuthRepository
+import com.example.huellitasya.core.testing.FakeEmailChangeRepository
 import com.example.huellitasya.core.testing.FakeProfilePhotoRepository
 import com.example.huellitasya.core.testing.FakeUserRepository
 import com.example.huellitasya.core.testing.TestProfile
@@ -143,5 +145,70 @@ class ProfileUseCasesTest {
         assertEquals(AppResult.Failure(AuthError.Network), result)
         assertEquals(0, authRepository.signOutCount)
         assertEquals(TestUser, authRepository.currentUser.value)
+    }
+
+    @Test
+    fun `confirmar el correo recarga la sesion para tener el correo nuevo`() = runTest {
+        val emailChangeRepository = FakeEmailChangeRepository()
+
+        val result = ConfirmEmailChangeUseCase(emailChangeRepository, authRepository)("4821")
+
+        assertEquals(AppResult.Success("nuevo@correo.com"), result)
+        assertEquals(listOf("4821"), emailChangeRepository.confirmedCodes)
+        assertEquals(1, authRepository.reloadCount)
+    }
+
+    @Test
+    fun `un codigo incorrecto no recarga la sesion`() = runTest {
+        val emailChangeRepository = FakeEmailChangeRepository().apply {
+            confirmResult = AppResult.Failure(EmailChangeError.InvalidCode)
+        }
+
+        val result = ConfirmEmailChangeUseCase(emailChangeRepository, authRepository)("0000")
+
+        assertEquals(AppResult.Failure(EmailChangeError.InvalidCode), result)
+        assertEquals(0, authRepository.reloadCount)
+    }
+
+    @Test
+    fun `pedir el codigo recorta el correo`() = runTest {
+        val emailChangeRepository = FakeEmailChangeRepository()
+
+        RequestEmailChangeCodeUseCase(emailChangeRepository)("  nuevo@correo.com ")
+
+        assertEquals(listOf("nuevo@correo.com"), emailChangeRepository.requestedEmails)
+    }
+
+    @Test
+    fun `cambiar la contrasena reautentica, la cambia y envia el aviso`() = runTest {
+        val accountRepository = FakeAccountRepository()
+
+        val result = ChangePasswordUseCase(authRepository, accountRepository)("Actual1", "Nueva2025")
+
+        assertEquals(AppResult.Success(Unit), result)
+        assertEquals(listOf("Actual1"), authRepository.reauthPasswords)
+        assertEquals(listOf("Nueva2025"), authRepository.updatedPasswords)
+        assertEquals(1, accountRepository.passwordNoticeCount)
+    }
+
+    @Test
+    fun `con la contrasena actual incorrecta no se cambia nada`() = runTest {
+        authRepository.reauthResult = AppResult.Failure(AuthError.InvalidCredentials)
+        val accountRepository = FakeAccountRepository()
+
+        val result = ChangePasswordUseCase(authRepository, accountRepository)("Mala", "Nueva2025")
+
+        assertEquals(AppResult.Failure(AuthError.InvalidCredentials), result)
+        assertTrue(authRepository.updatedPasswords.isEmpty())
+        assertEquals(0, accountRepository.passwordNoticeCount)
+    }
+
+    @Test
+    fun `si el aviso no sale el cambio de contrasena sigue siendo valido`() = runTest {
+        val accountRepository = FakeAccountRepository().apply { notifyResult = AppResult.Failure(AuthError.Network) }
+
+        val result = ChangePasswordUseCase(authRepository, accountRepository)("Actual1", "Nueva2025")
+
+        assertEquals(AppResult.Success(Unit), result)
     }
 }

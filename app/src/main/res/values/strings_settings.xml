@@ -26,4 +26,23 @@
     <string name="settings_reauth_hide_password">Ocultar contraseña</string>
     <string name="settings_reauth_confirm">Eliminar</string>
     <string name="settings_reauth_cancel">Cancelar</string>
+
+    <!-- Seguridad: cambio de contraseña (Figma 3263:1086 y 3278:1170, spec 004) -->
+    <string name="settings_security_google">Tu contraseña la gestiona tu cuenta de Google</string>
+    <string name="security_title">Seguridad</string>
+    <string name="security_subtitle">Cambio de contraseña</string>
+    <string name="security_current_password">Contraseña actual</string>
+    <string name="security_new_password">Nueva contraseña</string>
+    <string name="security_confirm_password">Confirmar contraseña</string>
+    <string name="security_show_password">Mostrar contraseña</string>
+    <string name="security_hide_password">Ocultar contraseña</string>
+    <string name="security_rule_length">Mínimo 8 caracteres</string>
+    <string name="security_rule_uppercase">Una letra mayúscula</string>
+    <string name="security_rule_digit">Un número o carácter especial</string>
+    <string name="security_rule_match">¿Concuerdan las contraseñas?</string>
+    <string name="security_rule_met">Cumplido</string>
+    <string name="security_rule_unmet">Pendiente</string>
+    <string name="security_button">Actualizar información</string>
+    <string name="security_success">Contraseña actualizada. Te enviamos un aviso a tu correo</string>
+    <string name="security_back">Volver</string>
 </resources>

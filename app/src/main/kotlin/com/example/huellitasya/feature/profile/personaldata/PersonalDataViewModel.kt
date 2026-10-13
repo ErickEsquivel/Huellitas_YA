@@ -6,10 +6,11 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
+import com.example.huellitasya.core.domain.error.EmailChangeError
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.usecase.ObserveUserProfileUseCase
 import com.example.huellitasya.core.domain.usecase.ReauthenticateUseCase
-import com.example.huellitasya.core.domain.usecase.RequestEmailChangeUseCase
+import com.example.huellitasya.core.domain.usecase.RequestEmailChangeCodeUseCase
 import com.example.huellitasya.core.domain.usecase.UpdateUserProfileUseCase
 import com.example.huellitasya.core.domain.validation.ValidateAddressUseCase
 import com.example.huellitasya.core.domain.validation.ValidateBirthDateUseCase
@@ -21,6 +22,7 @@ import com.example.huellitasya.core.model.AuthProvider
 import com.example.huellitasya.core.model.Field
 import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.model.UserProfile
+import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.ui.FieldFeedback
 import com.example.huellitasya.core.ui.PasswordPromptState
 import com.example.huellitasya.core.ui.UiText
@@ -82,17 +84,20 @@ sealed interface PersonalDataAction {
 
 sealed interface PersonalDataEvent {
     data class ShowMessage(val message: UiText) : PersonalDataEvent
+
+    /** Se envió el código al correo nuevo: la Route abre "Verifica tu correo". */
+    data class NavigateToVerifyEmail(val newEmail: String) : PersonalDataEvent
 }
 
 /**
  * Datos Personales (spec 004): lectura en vivo de `users/{uid}`, edición campo por campo y
- * cambio de correo con verificación.
+ * cambio de correo con un código enviado al correo nuevo.
  */
 @HiltViewModel
 class PersonalDataViewModel @Inject constructor(
     observeUserProfile: ObserveUserProfileUseCase,
     private val updateUserProfile: UpdateUserProfileUseCase,
-    private val requestEmailChange: RequestEmailChangeUseCase,
+    private val requestEmailChangeCode: RequestEmailChangeCodeUseCase,
     private val reauthenticate: ReauthenticateUseCase,
     private val networkMonitor: NetworkMonitor,
     private val validateName: ValidateNameUseCase,
@@ -213,18 +218,24 @@ class PersonalDataViewModel @Inject constructor(
         }
     }
 
-    /** `verifyBeforeUpdateEmail`: el correo mostrado no cambia hasta que el usuario abre el enlace. */
+    /**
+     * Pide el código para el correo nuevo. El correo no cambia hasta validar el código en
+     * "Verifica tu correo"; mientras tanto se sale del modo edición con lo ya guardado.
+     */
     private suspend fun changeEmail(newEmail: String) {
-        when (val result = requestEmailChange(newEmail)) {
-            is AppResult.Success -> finishSaving(UiText.Resource(R.string.personal_data_email_sent, newEmail))
+        when (val result = requestEmailChangeCode(newEmail)) {
+            is AppResult.Success -> {
+                finishSaving(message = null)
+                _events.send(PersonalDataEvent.NavigateToVerifyEmail(newEmail))
+            }
             is AppResult.Failure -> {
                 _uiState.update { it.copy(isSaving = false) }
-                when (result.error) {
-                    AuthError.RequiresRecentLogin -> _uiState.update { it.copy(reauth = PasswordPromptState()) }
-                    AuthError.EmailAlreadyInUse -> _uiState.update {
-                        it.copy(emailFeedback = result.error.toFieldFeedback())
+                when (val error = result.error) {
+                    EmailChangeError.RequiresRecentLogin -> _uiState.update { it.copy(reauth = PasswordPromptState()) }
+                    EmailChangeError.EmailAlreadyInUse, EmailChangeError.InvalidEmail -> _uiState.update {
+                        it.copy(emailFeedback = FieldFeedback(FieldStatus.Error, error.toUiText()))
                     }
-                    else -> result.error.toUiText()?.let(::showMessage)
+                    else -> error.toUiText()?.let(::showMessage)
                 }
             }
         }
@@ -258,12 +269,12 @@ class PersonalDataViewModel @Inject constructor(
     }
 
     /** Sale del modo edición mostrando lo guardado (p. ej. el teléfono normalizado). */
-    private fun finishSaving(message: UiText) {
+    private fun finishSaving(message: UiText?) {
         updateState { current ->
             val latest = current.copy(isSaving = false, reauth = null)
             latest.saved?.let { latest.withFieldsFrom(it) } ?: latest.copy(isEditing = false)
         }
-        showMessage(message)
+        message?.let(::showMessage)
     }
 
     private fun PersonalDataUiState.withFieldsFrom(profile: UserProfile) = PersonalDataUiState(
