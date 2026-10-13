@@ -12,6 +12,8 @@ enum class AuthError : AppError {
     /** El usuario cerró el selector de cuentas de Google: no se muestra mensaje. */
     Cancelled,
     GoogleSignInFailed,
+    /** Firebase exige un inicio de sesión reciente (cambio de correo, eliminar cuenta): no se muestra mensaje, se pide reautenticar. */
+    RequiresRecentLogin,
     Unknown,
 }
 

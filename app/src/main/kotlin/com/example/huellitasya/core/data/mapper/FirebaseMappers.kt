@@ -9,6 +9,7 @@ import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
@@ -30,8 +31,9 @@ internal fun FirebaseUser.toUser(): User = User(
     },
 )
 
-/** Tabla "Errores remotos" de la spec 002. El orden importa: WeakPassword hereda de InvalidCredentials. */
+/** Tabla "Errores remotos" de las specs 002 y 004. El orden importa: WeakPassword hereda de InvalidCredentials. */
 internal fun Throwable.toAuthError(): AuthError = when (this) {
+    is FirebaseAuthRecentLoginRequiredException -> AuthError.RequiresRecentLogin
     is FirebaseAuthWeakPasswordException -> AuthError.WeakPassword
     is FirebaseAuthUserCollisionException -> AuthError.EmailAlreadyInUse
     is FirebaseAuthInvalidCredentialsException,

@@ -54,6 +54,28 @@ class FakeAuthRepository : AuthRepository {
         return googleResult.alsoSignIn()
     }
 
+    /** Resultados en orden para cada llamada; el último se repite. */
+    var emailChangeResults: List<AppResult<Unit, AuthError>> = listOf(AppResult.Success(Unit))
+    val emailChanges = mutableListOf<String>()
+    var reauthResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
+    val reauthPasswords = mutableListOf<String>()
+    val reauthGoogleTokens = mutableListOf<String>()
+
+    override suspend fun reauthenticateWithPassword(password: String): AppResult<Unit, AuthError> {
+        reauthPasswords += password
+        return reauthResult
+    }
+
+    override suspend fun reauthenticateWithGoogle(idToken: String): AppResult<Unit, AuthError> {
+        reauthGoogleTokens += idToken
+        return reauthResult
+    }
+
+    override suspend fun requestEmailChange(newEmail: String): AppResult<Unit, AuthError> {
+        emailChanges += newEmail
+        return emailChangeResults[minOf(emailChanges.size, emailChangeResults.size) - 1]
+    }
+
     var updateDisplayNameResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
     val displayNames = mutableListOf<String>()
 

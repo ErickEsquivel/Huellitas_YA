@@ -6,13 +6,18 @@ import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.error.ValidationError
+import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.usecase.ObserveUserProfileUseCase
+import com.example.huellitasya.core.domain.usecase.ReauthenticateUseCase
+import com.example.huellitasya.core.domain.usecase.RequestEmailChangeUseCase
 import com.example.huellitasya.core.domain.usecase.UpdateUserProfileUseCase
 import com.example.huellitasya.core.domain.validation.ValidateAddressUseCase
 import com.example.huellitasya.core.domain.validation.ValidateBirthDateUseCase
 import com.example.huellitasya.core.domain.validation.ValidateEmailUseCase
 import com.example.huellitasya.core.domain.validation.ValidateNameUseCase
+import com.example.huellitasya.core.domain.validation.ValidatePasswordUseCase
 import com.example.huellitasya.core.domain.validation.ValidatePhoneUseCase
+import com.example.huellitasya.core.model.AuthProvider
 import com.example.huellitasya.core.model.Field
 import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.testing.FakeAuthRepository
@@ -28,6 +33,8 @@ import com.example.huellitasya.core.ui.toUiText
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -47,12 +54,15 @@ class PersonalDataViewModelTest {
     private fun viewModel() = PersonalDataViewModel(
         observeUserProfile = ObserveUserProfileUseCase(authRepository, userRepository),
         updateUserProfile = UpdateUserProfileUseCase(authRepository, userRepository),
+        requestEmailChange = RequestEmailChangeUseCase(authRepository),
+        reauthenticate = ReauthenticateUseCase(authRepository),
         networkMonitor = networkMonitor,
         validateName = ValidateNameUseCase(),
         validateEmail = ValidateEmailUseCase(),
         validatePhone = ValidatePhoneUseCase(),
         validateAddress = ValidateAddressUseCase(),
         validateBirthDate = ValidateBirthDateUseCase(),
+        validatePassword = ValidatePasswordUseCase(),
     )
 
     private fun PersonalDataViewModel.startEditing() = onAction(PersonalDataAction.ToggleEditing)
@@ -216,5 +226,131 @@ class PersonalDataViewModelTest {
         assertEquals("Calle 1", state.address)
         assertEquals(TestProfile.name, state.name)
         assertEquals("Cambiado en otro equipo", state.saved?.name)
+    }
+
+    @Test
+    fun `en una cuenta Google el correo no se puede editar`() {
+        userRepository.profile.value = AppResult.Success(TestProfile.copy(provider = AuthProvider.GOOGLE))
+        val viewModel = viewModel()
+        viewModel.startEditing()
+
+        viewModel.onAction(PersonalDataAction.EmailChanged("otro@correo.com"))
+
+        assertFalse(viewModel.uiState.value.canEditEmail)
+        assertEquals(TestProfile.email, viewModel.uiState.value.email)
+        assertFalse(viewModel.uiState.value.hasChanges)
+    }
+
+    @Test
+    fun `cambiar el correo envia el enlace y sigue mostrando el anterior`() = runTest {
+        val viewModel = viewModel()
+        viewModel.startEditing()
+        viewModel.onAction(PersonalDataAction.EmailChanged(" nuevo@correo.com "))
+        assertTrue(viewModel.uiState.value.hasChanges)
+
+        viewModel.events.test {
+            viewModel.onAction(PersonalDataAction.Save)
+
+            assertEquals(
+                PersonalDataEvent.ShowMessage(UiText.Resource(R.string.personal_data_email_sent, "nuevo@correo.com")),
+                awaitItem(),
+            )
+        }
+
+        assertEquals(listOf("nuevo@correo.com"), authRepository.emailChanges)
+        assertTrue(userRepository.updates.isEmpty())
+        val state = viewModel.uiState.value
+        assertEquals(TestProfile.email, state.email)
+        assertFalse(state.isEditing)
+    }
+
+    @Test
+    fun `correo invalido no se envia`() {
+        val viewModel = viewModel()
+        viewModel.startEditing()
+        viewModel.onAction(PersonalDataAction.EmailChanged("nuevo@"))
+
+        viewModel.onAction(PersonalDataAction.Save)
+
+        assertEquals(
+            FieldFeedback(FieldStatus.Warning, ValidationError.InvalidEmail.toUiText()),
+            viewModel.uiState.value.emailFeedback,
+        )
+        assertTrue(authRepository.emailChanges.isEmpty())
+    }
+
+    @Test
+    fun `correo ya registrado se marca bajo el campo`() {
+        authRepository.emailChangeResults = listOf(AppResult.Failure(AuthError.EmailAlreadyInUse))
+        val viewModel = viewModel()
+        viewModel.startEditing()
+        viewModel.onAction(PersonalDataAction.EmailChanged("ocupado@correo.com"))
+
+        viewModel.onAction(PersonalDataAction.Save)
+
+        assertEquals(FieldStatus.Error, viewModel.uiState.value.emailFeedback?.status)
+        assertTrue(viewModel.uiState.value.isEditing)
+    }
+
+    @Test
+    fun `si Firebase pide sesion reciente se pide la contrasena y se reintenta`() = runTest {
+        authRepository.emailChangeResults = listOf(
+            AppResult.Failure(AuthError.RequiresRecentLogin),
+            AppResult.Success(Unit),
+        )
+        val viewModel = viewModel()
+        viewModel.startEditing()
+        viewModel.onAction(PersonalDataAction.EmailChanged("nuevo@correo.com"))
+
+        viewModel.onAction(PersonalDataAction.Save)
+        assertNotNull(viewModel.uiState.value.reauth)
+        assertFalse(viewModel.uiState.value.isSaving)
+
+        viewModel.events.test {
+            viewModel.onAction(PersonalDataAction.ReauthPasswordChanged("Huellitas1"))
+            viewModel.onAction(PersonalDataAction.ConfirmReauth)
+
+            assertEquals(
+                PersonalDataEvent.ShowMessage(UiText.Resource(R.string.personal_data_email_sent, "nuevo@correo.com")),
+                awaitItem(),
+            )
+        }
+        assertEquals(listOf("Huellitas1"), authRepository.reauthPasswords)
+        assertEquals(listOf("nuevo@correo.com", "nuevo@correo.com"), authRepository.emailChanges)
+        assertNull(viewModel.uiState.value.reauth)
+    }
+
+    @Test
+    fun `contrasena incorrecta al reautenticar se marca en el dialogo`() {
+        authRepository.emailChangeResults = listOf(AppResult.Failure(AuthError.RequiresRecentLogin))
+        authRepository.reauthResult = AppResult.Failure(AuthError.InvalidCredentials)
+        val viewModel = viewModel()
+        viewModel.startEditing()
+        viewModel.onAction(PersonalDataAction.EmailChanged("nuevo@correo.com"))
+        viewModel.onAction(PersonalDataAction.Save)
+
+        viewModel.onAction(PersonalDataAction.ReauthPasswordChanged("mala"))
+        viewModel.onAction(PersonalDataAction.ConfirmReauth)
+
+        val reauth = viewModel.uiState.value.reauth
+        assertEquals(FieldStatus.Error, reauth?.feedback?.status)
+        assertEquals(false, reauth?.isLoading)
+        assertEquals(1, authRepository.emailChanges.size)
+    }
+
+    @Test
+    fun `cerrar el dialogo deja la edicion abierta`() {
+        authRepository.emailChangeResults = listOf(AppResult.Failure(AuthError.RequiresRecentLogin))
+        val viewModel = viewModel()
+        viewModel.startEditing()
+        viewModel.onAction(PersonalDataAction.EmailChanged("nuevo@correo.com"))
+        viewModel.onAction(PersonalDataAction.Save)
+
+        viewModel.onAction(PersonalDataAction.DismissReauth)
+
+        val state = viewModel.uiState.value
+        assertNull(state.reauth)
+        assertTrue(state.isEditing)
+        assertEquals("nuevo@correo.com", state.email)
     }
 }

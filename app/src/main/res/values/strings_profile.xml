@@ -23,6 +23,16 @@
     <string name="personal_data_back">Volver</string>
     <string name="personal_data_save">Actualizar información</string>
     <string name="personal_data_saved">Datos actualizados</string>
+    <string name="personal_data_email_sent">Te enviamos un enlace a %1$s para confirmar el cambio</string>
+
+    <!-- Reautenticación antes de cambiar el correo -->
+    <string name="personal_data_reauth_title">Confirma tu contraseña</string>
+    <string name="personal_data_reauth_message">Por seguridad, ingresa tu contraseña para cambiar el correo.</string>
+    <string name="personal_data_reauth_password">Contraseña</string>
+    <string name="personal_data_reauth_show_password">Mostrar contraseña</string>
+    <string name="personal_data_reauth_hide_password">Ocultar contraseña</string>
+    <string name="personal_data_reauth_confirm">Confirmar</string>
+    <string name="personal_data_reauth_cancel">Cancelar</string>
 
     <!-- Selector de fecha de nacimiento -->
     <string name="personal_data_date_accept">Aceptar</string>

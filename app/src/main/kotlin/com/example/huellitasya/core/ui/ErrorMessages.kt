@@ -54,9 +54,12 @@ fun ValidationError.toUiText(): UiText = UiText.Resource(
     },
 )
 
-/** Mensajes de la spec 002 para errores remotos. `Cancelled` no tiene mensaje: devuelve `null`. */
+/**
+ * Mensajes de las specs 002 y 004 para errores remotos. `Cancelled` y `RequiresRecentLogin`
+ * no tienen mensaje: devuelven `null`.
+ */
 fun AuthError.toUiText(): UiText? = when (this) {
-    AuthError.Cancelled -> null
+    AuthError.Cancelled, AuthError.RequiresRecentLogin -> null
     AuthError.InvalidCredentials -> UiText.Resource(R.string.error_invalid_credentials)
     AuthError.EmailAlreadyInUse -> UiText.Resource(R.string.error_email_in_use)
     AuthError.WeakPassword -> UiText.Resource(R.string.error_weak_password)

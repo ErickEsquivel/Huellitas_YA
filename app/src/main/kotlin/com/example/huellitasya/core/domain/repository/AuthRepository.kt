@@ -16,6 +16,18 @@ interface AuthRepository {
     /** Autentica con el ID token obtenido del selector de cuentas de Google. */
     suspend fun signInWithGoogle(idToken: String): AppResult<User, AuthError>
 
+    /** Confirma la identidad con la contraseña antes de una operación sensible (spec 004). */
+    suspend fun reauthenticateWithPassword(password: String): AppResult<Unit, AuthError>
+
+    /** Confirma la identidad con el ID token de Google antes de una operación sensible (spec 004). */
+    suspend fun reauthenticateWithGoogle(idToken: String): AppResult<Unit, AuthError>
+
+    /**
+     * Envía un enlace de verificación a [newEmail]. El correo de la cuenta cambia solo cuando
+     * el usuario lo abre (`verifyBeforeUpdateEmail`).
+     */
+    suspend fun requestEmailChange(newEmail: String): AppResult<Unit, AuthError>
+
     /** Mantiene el nombre de Auth igual al del perfil, para que `User.name` de la sesión no quede desfasado. */
     suspend fun updateDisplayName(name: String): AppResult<Unit, AuthError>
 

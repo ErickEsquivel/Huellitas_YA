@@ -62,6 +62,7 @@ import com.example.huellitasya.core.designsystem.components.FieldMessage
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
+import com.example.huellitasya.core.designsystem.components.PasswordConfirmDialog
 import com.example.huellitasya.core.model.AuthProvider
 import com.example.huellitasya.core.model.UserProfile
 import com.example.huellitasya.core.ui.FieldFeedback
@@ -161,6 +162,25 @@ internal fun PersonalDataScreen(
         SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
     }
 
+    state.reauth?.let { reauth ->
+        PasswordConfirmDialog(
+            title = stringResource(R.string.personal_data_reauth_title),
+            message = stringResource(R.string.personal_data_reauth_message),
+            password = reauth.password,
+            onPasswordChange = { onAction(PersonalDataAction.ReauthPasswordChanged(it)) },
+            passwordLabel = stringResource(R.string.personal_data_reauth_password),
+            showPasswordDescription = stringResource(R.string.personal_data_reauth_show_password),
+            hidePasswordDescription = stringResource(R.string.personal_data_reauth_hide_password),
+            confirmText = stringResource(R.string.personal_data_reauth_confirm),
+            dismissText = stringResource(R.string.personal_data_reauth_cancel),
+            onConfirm = { onAction(PersonalDataAction.ConfirmReauth) },
+            onDismiss = { onAction(PersonalDataAction.DismissReauth) },
+            status = reauth.feedback.statusOrDefault,
+            statusMessage = reauth.feedback?.message?.asString(),
+            isLoading = reauth.isLoading,
+        )
+    }
+
     if (showDatePicker) {
         BirthDatePickerDialog(
             initialDate = state.birthDate,
@@ -221,8 +241,10 @@ private fun OwnerDataCard(
             PersonalDataField(
                 label = stringResource(R.string.profile_field_email),
                 value = state.email,
-                onValueChange = {},
-                editable = false,
+                onValueChange = { onAction(PersonalDataAction.EmailChanged(it)) },
+                // En cuentas Google el correo pertenece a Google: solo lectura (spec 004).
+                editable = state.isEditing && state.canEditEmail,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 status = state.emailFeedback.statusOrDefault,
                 message = state.emailFeedback?.message?.asString(),
             )

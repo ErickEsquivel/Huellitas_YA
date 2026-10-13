@@ -4,15 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.huellitasya.R
 import com.example.huellitasya.core.common.AppResult
+import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.usecase.ObserveUserProfileUseCase
+import com.example.huellitasya.core.domain.usecase.ReauthenticateUseCase
+import com.example.huellitasya.core.domain.usecase.RequestEmailChangeUseCase
 import com.example.huellitasya.core.domain.usecase.UpdateUserProfileUseCase
 import com.example.huellitasya.core.domain.validation.ValidateAddressUseCase
 import com.example.huellitasya.core.domain.validation.ValidateBirthDateUseCase
 import com.example.huellitasya.core.domain.validation.ValidateEmailUseCase
 import com.example.huellitasya.core.domain.validation.ValidateNameUseCase
+import com.example.huellitasya.core.domain.validation.ValidatePasswordUseCase
 import com.example.huellitasya.core.domain.validation.ValidatePhoneUseCase
+import com.example.huellitasya.core.model.AuthProvider
 import com.example.huellitasya.core.model.Field
 import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.model.UserProfile
@@ -53,33 +58,54 @@ data class PersonalDataUiState(
     /** Figma pinta "Actualizar información" en gris sin cambios y en verde con cambios. */
     val hasChanges: Boolean = false,
     val isSaving: Boolean = false,
+    /** Diálogo "Confirma tu contraseña" antes de cambiar el correo; `null` si está cerrado. */
+    val reauth: ReauthState? = null,
+) {
+    /** El correo de una cuenta Google pertenece a Google: no se puede cambiar aquí (spec 004). */
+    val canEditEmail: Boolean get() = saved?.provider == AuthProvider.EMAIL
+}
+
+data class ReauthState(
+    val password: String = "",
+    val feedback: FieldFeedback? = null,
+    val isLoading: Boolean = false,
 )
 
 sealed interface PersonalDataAction {
     /** Lápiz de "Datos Dueño": activa la edición o, si ya está activa, descarta los cambios. */
     data object ToggleEditing : PersonalDataAction
     data class NameChanged(val value: String) : PersonalDataAction
+    data class EmailChanged(val value: String) : PersonalDataAction
     data class PhoneChanged(val value: String) : PersonalDataAction
     data class AddressChanged(val value: String) : PersonalDataAction
     data class BirthDateChanged(val value: LocalDate?) : PersonalDataAction
     data object Save : PersonalDataAction
+    data class ReauthPasswordChanged(val value: String) : PersonalDataAction
+    data object ConfirmReauth : PersonalDataAction
+    data object DismissReauth : PersonalDataAction
 }
 
 sealed interface PersonalDataEvent {
     data class ShowMessage(val message: UiText) : PersonalDataEvent
 }
 
-/** Datos Personales (spec 004): lectura en vivo de `users/{uid}` y edición campo por campo. */
+/**
+ * Datos Personales (spec 004): lectura en vivo de `users/{uid}`, edición campo por campo y
+ * cambio de correo con verificación.
+ */
 @HiltViewModel
 class PersonalDataViewModel @Inject constructor(
     observeUserProfile: ObserveUserProfileUseCase,
     private val updateUserProfile: UpdateUserProfileUseCase,
+    private val requestEmailChange: RequestEmailChangeUseCase,
+    private val reauthenticate: ReauthenticateUseCase,
     private val networkMonitor: NetworkMonitor,
     private val validateName: ValidateNameUseCase,
     private val validateEmail: ValidateEmailUseCase,
     private val validatePhone: ValidatePhoneUseCase,
     private val validateAddress: ValidateAddressUseCase,
     private val validateBirthDate: ValidateBirthDateUseCase,
+    private val validatePassword: ValidatePasswordUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PersonalDataUiState())
@@ -108,12 +134,22 @@ class PersonalDataViewModel @Inject constructor(
             is PersonalDataAction.NameChanged -> updateState {
                 it.copy(name = action.value, nameFeedback = null, formFeedback = null)
             }
+            is PersonalDataAction.EmailChanged -> updateState {
+                if (it.canEditEmail) it.copy(email = action.value, emailFeedback = null, formFeedback = null) else it
+            }
             is PersonalDataAction.PhoneChanged -> updateState { it.copy(phone = action.value, phoneFeedback = null) }
             is PersonalDataAction.AddressChanged -> updateState { it.copy(address = action.value, addressFeedback = null) }
             is PersonalDataAction.BirthDateChanged -> updateState {
                 it.copy(birthDate = action.value, birthDateFeedback = null)
             }
             PersonalDataAction.Save -> save()
+            is PersonalDataAction.ReauthPasswordChanged -> _uiState.update {
+                it.copy(reauth = it.reauth?.copy(password = action.value, feedback = null))
+            }
+            PersonalDataAction.ConfirmReauth -> confirmReauth()
+            PersonalDataAction.DismissReauth -> _uiState.update {
+                if (it.reauth?.isLoading == true) it else it.copy(reauth = null)
+            }
         }
     }
 
@@ -164,22 +200,77 @@ class PersonalDataViewModel @Inject constructor(
                 showMessage(DataError.Network.toUiText())
                 return@launch
             }
-            when (val result = updateUserProfile(saved.uid, state.toChanges(saved))) {
-                is AppResult.Success -> {
-                    // Firestore ya emitió el perfil con la escritura local: se muestran los datos guardados
-                    // (p. ej. el teléfono normalizado) en lugar de lo que se escribió.
-                    updateState { current ->
-                        val latest = current.copy(isSaving = false)
-                        latest.saved?.let { latest.withFieldsFrom(it) } ?: latest.copy(isEditing = false)
-                    }
-                    showMessage(UiText.Resource(R.string.personal_data_saved))
-                }
-                is AppResult.Failure -> {
+
+            val changes = state.toChanges(saved)
+            if (!changes.isEmpty) {
+                val result = updateUserProfile(saved.uid, changes)
+                if (result is AppResult.Failure) {
                     _uiState.update { it.copy(isSaving = false) }
                     showMessage(result.error.toUiText())
+                    return@launch
+                }
+            }
+
+            val newEmail = state.email.trim()
+            if (state.canEditEmail && newEmail != saved.email) {
+                changeEmail(newEmail)
+            } else {
+                finishSaving(UiText.Resource(R.string.personal_data_saved))
+            }
+        }
+    }
+
+    /** `verifyBeforeUpdateEmail`: el correo mostrado no cambia hasta que el usuario abre el enlace. */
+    private suspend fun changeEmail(newEmail: String) {
+        when (val result = requestEmailChange(newEmail)) {
+            is AppResult.Success -> finishSaving(UiText.Resource(R.string.personal_data_email_sent, newEmail))
+            is AppResult.Failure -> {
+                _uiState.update { it.copy(isSaving = false) }
+                when (result.error) {
+                    AuthError.RequiresRecentLogin -> _uiState.update { it.copy(reauth = ReauthState()) }
+                    AuthError.EmailAlreadyInUse -> _uiState.update {
+                        it.copy(emailFeedback = result.error.toFieldFeedback())
+                    }
+                    else -> result.error.toUiText()?.let(::showMessage)
                 }
             }
         }
+    }
+
+    private fun confirmReauth() {
+        val state = _uiState.value
+        val reauth = state.reauth ?: return
+        if (reauth.isLoading) return
+
+        validatePassword.forLogin(reauth.password)?.let { error ->
+            _uiState.update { it.copy(reauth = reauth.copy(feedback = error.toFieldFeedback())) }
+            return
+        }
+
+        _uiState.update { it.copy(reauth = reauth.copy(isLoading = true)) }
+        viewModelScope.launch {
+            when (val result = reauthenticate.withPassword(reauth.password)) {
+                is AppResult.Success -> {
+                    _uiState.update { it.copy(reauth = null, isSaving = true) }
+                    changeEmail(_uiState.value.email.trim())
+                }
+                is AppResult.Failure -> {
+                    // Figma muestra el rechazo bajo el campo de contraseña, como en Login.
+                    val feedback = result.error.takeIf { it == AuthError.InvalidCredentials }?.toFieldFeedback()
+                    _uiState.update { it.copy(reauth = it.reauth?.copy(isLoading = false, feedback = feedback)) }
+                    if (feedback == null) result.error.toUiText()?.let(::showMessage)
+                }
+            }
+        }
+    }
+
+    /** Sale del modo edición mostrando lo guardado (p. ej. el teléfono normalizado). */
+    private fun finishSaving(message: UiText) {
+        updateState { current ->
+            val latest = current.copy(isSaving = false, reauth = null)
+            latest.saved?.let { latest.withFieldsFrom(it) } ?: latest.copy(isEditing = false)
+        }
+        showMessage(message)
     }
 
     private fun PersonalDataUiState.withFieldsFrom(profile: UserProfile) = PersonalDataUiState(
@@ -190,9 +281,10 @@ class PersonalDataViewModel @Inject constructor(
         address = profile.address.orEmpty(),
         birthDate = profile.birthDate,
         isSaving = isSaving,
+        reauth = reauth,
     )
 
-    /** Solo lo que difiere de [saved]. Vaciar un campo opcional lo borra. */
+    /** Solo lo que difiere de [saved]. Vaciar un campo opcional lo borra. El correo va aparte. */
     private fun PersonalDataUiState.toChanges(saved: UserProfile) = ProfileChanges(
         name = name.trim().takeIf { it != saved.name },
         phone = optionalChange(validatePhone.normalize(phone.trim()), saved.phone),
@@ -215,7 +307,9 @@ class PersonalDataViewModel @Inject constructor(
         _uiState.update { current ->
             val next = transform(current)
             val saved = next.saved
-            next.copy(hasChanges = saved != null && next.isEditing && !next.toChanges(saved).isEmpty)
+            val hasChanges = saved != null && next.isEditing &&
+                (!next.toChanges(saved).isEmpty || (next.canEditEmail && next.email.trim() != saved.email))
+            next.copy(hasChanges = hasChanges)
         }
     }
 

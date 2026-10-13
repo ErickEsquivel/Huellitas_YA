@@ -6,6 +6,7 @@ import com.example.huellitasya.core.data.mapper.toUser
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.model.User
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.userProfileChangeRequest
@@ -44,6 +45,28 @@ internal class FirebaseAuthRepository @Inject constructor(
         runAuth {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             checkNotNull(firebaseAuth.signInWithCredential(credential).await().user).toUser()
+        }
+
+    override suspend fun reauthenticateWithPassword(password: String): AppResult<Unit, AuthError> =
+        runAuth {
+            val user = checkNotNull(firebaseAuth.currentUser) { "Sin sesión" }
+            val credential = EmailAuthProvider.getCredential(checkNotNull(user.email), password)
+            user.reauthenticate(credential).await()
+            Unit
+        }
+
+    override suspend fun reauthenticateWithGoogle(idToken: String): AppResult<Unit, AuthError> =
+        runAuth {
+            val user = checkNotNull(firebaseAuth.currentUser) { "Sin sesión" }
+            user.reauthenticate(GoogleAuthProvider.getCredential(idToken, null)).await()
+            Unit
+        }
+
+    override suspend fun requestEmailChange(newEmail: String): AppResult<Unit, AuthError> =
+        runAuth {
+            val user = checkNotNull(firebaseAuth.currentUser) { "Sin sesión" }
+            user.verifyBeforeUpdateEmail(newEmail).await()
+            Unit
         }
 
     override suspend fun updateDisplayName(name: String): AppResult<Unit, AuthError> =
