@@ -82,6 +82,7 @@ fun DataError.toUiText(): UiText = UiText.Resource(
     when (this) {
         DataError.Network -> R.string.error_network
         DataError.NotFound -> R.string.error_profile_not_found
+        DataError.FileTooLarge -> R.string.error_photo_too_large
         DataError.PermissionDenied, DataError.Unknown -> R.string.error_unknown
     },
 )

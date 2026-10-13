@@ -1,5 +1,8 @@
 package com.example.huellitasya.feature.profile
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,6 +59,11 @@ internal fun ProfileRoute(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        // `null` = el usuario cerró el selector sin elegir: no pasa nada.
+        uri?.let { viewModel.onAction(ProfileAction.PhotoPicked(it.toString())) }
+    }
+
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
             is ProfileEvent.ShowMessage -> scope.launch {
@@ -68,6 +76,9 @@ internal fun ProfileRoute(
         state = uiState,
         snackbarHostState = snackbarHostState,
         onEditClick = onEditClick,
+        onPhotoClick = {
+            photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        },
     )
 }
 
@@ -77,6 +88,7 @@ internal fun ProfileScreen(
     state: ProfileUiState,
     snackbarHostState: SnackbarHostState,
     onEditClick: () -> Unit,
+    onPhotoClick: () -> Unit,
 ) {
     val profile = state.profile
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -101,6 +113,9 @@ internal fun ProfileScreen(
             ProfileAvatar(
                 photoUrl = profile?.photoUrl,
                 contentDescription = stringResource(R.string.profile_photo_description),
+                changePhotoDescription = stringResource(R.string.profile_change_photo),
+                isUploading = state.isUploadingPhoto,
+                onClick = onPhotoClick,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -190,6 +205,7 @@ private fun ProfileScreenPreview() {
             state = ProfileUiState(profile = PreviewProfile),
             snackbarHostState = SnackbarHostState(),
             onEditClick = {},
+            onPhotoClick = {},
         )
     }
 }
@@ -202,6 +218,7 @@ private fun ProfileScreenEmptyFieldsPreview() {
             state = ProfileUiState(profile = PreviewProfile.copy(phone = null, address = null, birthDate = null)),
             snackbarHostState = SnackbarHostState(),
             onEditClick = {},
+            onPhotoClick = {},
         )
     }
 }

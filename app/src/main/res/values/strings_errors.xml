@@ -18,6 +18,7 @@
     <string name="error_address_too_long">Máximo 100 caracteres</string>
     <string name="error_invalid_birth_date">Fecha no válida</string>
     <string name="error_profile_not_found">No encontramos tu perfil</string>
+    <string name="error_photo_too_large">La imagen es demasiado grande</string>
 
     <!-- Errores remotos (spec 002) -->
     <string name="error_invalid_credentials">Correo o contraseña incorrectos</string>

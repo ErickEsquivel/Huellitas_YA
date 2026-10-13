@@ -6,6 +6,7 @@ import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.model.Field
 import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.testing.FakeAuthRepository
+import com.example.huellitasya.core.testing.FakeProfilePhotoRepository
 import com.example.huellitasya.core.testing.FakeUserRepository
 import com.example.huellitasya.core.testing.TestProfile
 import com.example.huellitasya.core.testing.TestUser
@@ -93,5 +94,28 @@ class ProfileUseCasesTest {
 
         assertEquals(AppResult.Failure(DataError.Network), result)
         assertTrue(authRepository.displayNames.isEmpty())
+    }
+
+    @Test
+    fun `cambiar la foto la sube y guarda la URL en el perfil`() = runTest {
+        val photoRepository = FakeProfilePhotoRepository()
+        val changePhoto = ChangeProfilePhotoUseCase(photoRepository, userRepository, backgroundScope)
+
+        val result = changePhoto(TestProfile.uid, "content://media/1")
+
+        assertEquals(AppResult.Success(Unit), result)
+        assertEquals(TestProfile.uid to "content://media/1", photoRepository.uploads.single())
+        assertEquals(listOf("https://storage.test/users/uid-123/profile.jpg"), userRepository.photoUrls)
+    }
+
+    @Test
+    fun `si la subida falla no se toca el perfil`() = runTest {
+        val photoRepository = FakeProfilePhotoRepository().apply { result = AppResult.Failure(DataError.FileTooLarge) }
+        val changePhoto = ChangeProfilePhotoUseCase(photoRepository, userRepository, backgroundScope)
+
+        val result = changePhoto(TestProfile.uid, "content://media/1")
+
+        assertEquals(AppResult.Failure(DataError.FileTooLarge), result)
+        assertTrue(userRepository.photoUrls.isEmpty())
     }
 }

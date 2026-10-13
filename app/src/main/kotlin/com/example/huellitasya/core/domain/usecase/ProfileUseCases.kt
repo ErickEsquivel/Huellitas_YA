@@ -1,14 +1,18 @@
 package com.example.huellitasya.core.domain.usecase
 
 import com.example.huellitasya.core.common.AppResult
+import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.common.onSuccess
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.repository.AuthRepository
+import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.model.User
 import com.example.huellitasya.core.model.UserProfile
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
@@ -68,4 +72,22 @@ class UpdateUserProfileUseCase @Inject constructor(
             changes.name?.let { authRepository.updateDisplayName(it) }
         }
     }
+}
+
+/**
+ * Sube la foto elegida y guarda su URL en el perfil. Corre en [ApplicationScope] para que la
+ * subida termine aunque el usuario cambie de pestaña mientras tanto.
+ */
+class ChangeProfilePhotoUseCase @Inject constructor(
+    private val photoRepository: ProfilePhotoRepository,
+    private val userRepository: UserRepository,
+    @param:ApplicationScope private val appScope: CoroutineScope,
+) {
+    suspend operator fun invoke(uid: String, localUri: String): AppResult<Unit, DataError> =
+        appScope.async {
+            when (val upload = photoRepository.upload(uid, localUri)) {
+                is AppResult.Success -> userRepository.updatePhotoUrl(uid, upload.data)
+                is AppResult.Failure -> upload
+            }
+        }.await()
 }

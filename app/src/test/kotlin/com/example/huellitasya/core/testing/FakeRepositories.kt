@@ -4,6 +4,7 @@ import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.repository.AuthRepository
+import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.example.huellitasya.core.model.AuthProvider
 import com.example.huellitasya.core.model.Field
@@ -112,6 +113,17 @@ class FakeUserRepository : UserRepository {
         return updateResult
     }
 
+    val photoUrls = mutableListOf<String>()
+
+    override suspend fun updatePhotoUrl(uid: String, url: String): AppResult<Unit, DataError> {
+        photoUrls += url
+        val current = (profile.value as? AppResult.Success)?.data
+        if (updateResult is AppResult.Success && current != null) {
+            profile.value = AppResult.Success(current.copy(photoUrl = url))
+        }
+        return updateResult
+    }
+
     override suspend fun syncEmail(uid: String, email: String): AppResult<Unit, DataError> {
         syncedEmails += uid to email
         return AppResult.Success(Unit)
@@ -128,5 +140,15 @@ class FakeUserRepository : UserRepository {
         null -> current
         is Field.Set -> value
         Field.Clear -> null
+    }
+}
+
+class FakeProfilePhotoRepository : ProfilePhotoRepository {
+    var result: AppResult<String, DataError> = AppResult.Success("https://storage.test/users/uid-123/profile.jpg")
+    val uploads = mutableListOf<Pair<String, String>>()
+
+    override suspend fun upload(uid: String, localUri: String): AppResult<String, DataError> {
+        uploads += uid to localUri
+        return result
     }
 }

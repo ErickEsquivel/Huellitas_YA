@@ -17,6 +17,9 @@ interface UserRepository {
     /** Guarda solo los campos de [changes] y actualiza `updatedAt`. */
     suspend fun updateProfile(uid: String, changes: ProfileChanges): AppResult<Unit, DataError>
 
+    /** Guarda la URL de la foto nueva (spec 004, "Foto de perfil"). */
+    suspend fun updatePhotoUrl(uid: String, url: String): AppResult<Unit, DataError>
+
     /** Copia en el perfil el correo de Auth si cambió (tras confirmar un cambio de correo, spec 004). */
     suspend fun syncEmail(uid: String, email: String): AppResult<Unit, DataError>
 }

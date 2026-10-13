@@ -56,6 +56,10 @@ internal class FirestoreUserRepository @Inject constructor(
         userDocument(uid).update(updates).await()
     }
 
+    override suspend fun updatePhotoUrl(uid: String, url: String): AppResult<Unit, DataError> = runData {
+        userDocument(uid).update(mapOf(PHOTO_URL to url, UPDATED_AT to FieldValue.serverTimestamp())).await()
+    }
+
     override suspend fun syncEmail(uid: String, email: String): AppResult<Unit, DataError> = runData {
         val document = userDocument(uid)
         val snapshot = document.get().await()
@@ -69,7 +73,7 @@ internal class FirestoreUserRepository @Inject constructor(
         "uid" to uid,
         NAME to name,
         EMAIL to email,
-        "photoUrl" to photoUrl,
+        PHOTO_URL to photoUrl,
         "provider" to provider.name.lowercase(Locale.ROOT),
         "createdAt" to FieldValue.serverTimestamp(),
     )
@@ -97,6 +101,7 @@ internal class FirestoreUserRepository @Inject constructor(
         const val PHONE = "phone"
         const val ADDRESS = "address"
         const val BIRTH_DATE = "birthDate"
+        const val PHOTO_URL = "photoUrl"
         const val UPDATED_AT = "updatedAt"
     }
 }

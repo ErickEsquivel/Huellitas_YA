@@ -15,6 +15,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.storage.StorageException
 import java.time.LocalDate
 
 internal fun FirebaseUser.toUser(): User = User(
@@ -45,6 +46,8 @@ internal fun Throwable.toDataError(): DataError = when {
     this is FirebaseFirestoreException && code == FirebaseFirestoreException.Code.UNAVAILABLE -> DataError.Network
     this is FirebaseFirestoreException && code == FirebaseFirestoreException.Code.PERMISSION_DENIED -> DataError.PermissionDenied
     this is FirebaseFirestoreException && code == FirebaseFirestoreException.Code.NOT_FOUND -> DataError.NotFound
+    this is StorageException && errorCode == StorageException.ERROR_RETRY_LIMIT_EXCEEDED -> DataError.Network
+    this is StorageException && errorCode == StorageException.ERROR_NOT_AUTHORIZED -> DataError.PermissionDenied
     else -> DataError.Unknown
 }
 

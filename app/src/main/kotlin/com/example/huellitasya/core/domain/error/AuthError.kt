@@ -21,5 +21,7 @@ enum class DataError : AppError {
     PermissionDenied,
     /** El documento `users/{uid}` no existe (spec 004). */
     NotFound,
+    /** La foto pesa más de 5 MB aun comprimida (límite de `storage.rules`). */
+    FileTooLarge,
     Unknown,
 }
