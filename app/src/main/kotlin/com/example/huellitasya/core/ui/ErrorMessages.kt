@@ -3,6 +3,7 @@ package com.example.huellitasya.core.ui
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.domain.error.AuthError
+import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.error.PasswordResetError
 import com.example.huellitasya.core.domain.error.ValidationError
 import com.example.huellitasya.core.domain.error.isMissingValue
@@ -33,11 +34,12 @@ fun ValidationError.toFieldFeedback(): FieldFeedback = when {
     else -> FieldFeedback(FieldStatus.Warning, toUiText())
 }
 
-/** Mensajes de la spec 002 para cada error de validación. */
+/** Mensajes de las specs 002 y 004 para cada error de validación. */
 fun ValidationError.toUiText(): UiText = UiText.Resource(
     when (this) {
         ValidationError.EmptyName -> R.string.error_empty_name
         ValidationError.NameTooShort -> R.string.error_name_too_short
+        ValidationError.NameTooLong -> R.string.error_name_too_long
         ValidationError.EmptyEmail -> R.string.error_empty_email
         ValidationError.InvalidEmail -> R.string.error_invalid_email
         ValidationError.EmptyPassword -> R.string.error_empty_password
@@ -46,6 +48,9 @@ fun ValidationError.toUiText(): UiText = UiText.Resource(
         ValidationError.PasswordNeedsDigitOrSymbol -> R.string.error_password_digit_or_symbol
         ValidationError.PasswordsDoNotMatch -> R.string.error_passwords_do_not_match
         ValidationError.TermsNotAccepted -> R.string.error_terms_not_accepted
+        ValidationError.InvalidPhone -> R.string.error_invalid_phone
+        ValidationError.AddressTooLong -> R.string.error_address_too_long
+        ValidationError.InvalidBirthDate -> R.string.error_invalid_birth_date
     },
 )
 
@@ -71,3 +76,12 @@ fun PasswordResetError.toUiText(): UiText? = when (this) {
     PasswordResetError.WeakPassword -> UiText.Resource(R.string.error_reset_weak_password)
     PasswordResetError.Unknown -> UiText.Resource(R.string.error_unknown)
 }
+
+/** Errores de lectura/escritura del perfil (spec 004). Se muestran en un Snackbar. */
+fun DataError.toUiText(): UiText = UiText.Resource(
+    when (this) {
+        DataError.Network -> R.string.error_network
+        DataError.NotFound -> R.string.error_profile_not_found
+        DataError.PermissionDenied, DataError.Unknown -> R.string.error_unknown
+    },
+)

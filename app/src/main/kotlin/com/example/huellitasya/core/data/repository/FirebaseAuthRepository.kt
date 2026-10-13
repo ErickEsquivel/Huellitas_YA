@@ -46,6 +46,13 @@ internal class FirebaseAuthRepository @Inject constructor(
             checkNotNull(firebaseAuth.signInWithCredential(credential).await().user).toUser()
         }
 
+    override suspend fun updateDisplayName(name: String): AppResult<Unit, AuthError> =
+        runAuth {
+            val user = checkNotNull(firebaseAuth.currentUser) { "Sin sesión" }
+            user.updateProfile(userProfileChangeRequest { displayName = name }).await()
+            Unit
+        }
+
     override suspend fun signOut() {
         firebaseAuth.signOut()
     }

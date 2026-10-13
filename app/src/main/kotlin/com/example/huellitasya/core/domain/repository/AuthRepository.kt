@@ -16,5 +16,8 @@ interface AuthRepository {
     /** Autentica con el ID token obtenido del selector de cuentas de Google. */
     suspend fun signInWithGoogle(idToken: String): AppResult<User, AuthError>
 
+    /** Mantiene el nombre de Auth igual al del perfil, para que `User.name` de la sesión no quede desfasado. */
+    suspend fun updateDisplayName(name: String): AppResult<Unit, AuthError>
+
     suspend fun signOut()
 }

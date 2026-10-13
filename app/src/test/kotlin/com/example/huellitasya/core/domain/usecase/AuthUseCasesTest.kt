@@ -27,6 +27,7 @@ class AuthUseCasesTest {
         assertEquals(AppResult.Success(TestUser), result)
         assertEquals("sa.company@hotmail.com" to "secreto", authRepository.signInCalls.single())
         assertEquals(listOf(TestUser), userRepository.createdUsers)
+        assertEquals(listOf(TestUser.uid to TestUser.email), userRepository.syncedEmails)
     }
 
     @Test

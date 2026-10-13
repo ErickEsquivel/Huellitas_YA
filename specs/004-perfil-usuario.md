@@ -1,8 +1,8 @@
 # 004 — Perfil de usuario
 
-- **Estado:** Draft
+- **Estado:** Approved (en implementación en la rama `feature/perfil-usuario`)
   - Revisada contra `master` después del PR #2 (auth con código OTP, overlay "Sin conexión" y Cloud Functions).
-  - Para pasar a `Approved`, falta que diseño valide las [desviaciones de Figma](#desviaciones-de-figma-validar-con-diseño).
+  - Las [desviaciones de Figma](#desviaciones-de-figma) quedaron decididas con el equipo.
 - **Paquetes:** `feature.profile`, `feature.settings`, `core.domain`, `core.model`, `core.data`, `core.ui`, `core.designsystem`, `navigation`, y el backend en `functions/`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-)
   - Perfil (ver): `PERFIL` (99:723)
@@ -43,7 +43,7 @@ Perfil ──tocar la foto──► Photo Picker del sistema ──► subida �
 | Operación | Dónde | Comportamiento |
 |-----------|-------|----------------|
 | **Crear** | Login y registro (ya existe) | `createIfMissing` no cambia. Los campos nuevos nacen ausentes. |
-| **Leer** | Perfil y Datos Personales | Se escucha `users/{uid}` en tiempo real (snapshot listener → `Flow`). Funciona offline con la caché de Firestore. Los campos opcionales vacíos muestran "Sin registrar" en `LightGrayText`. |
+| **Leer** | Perfil y Datos Personales | Se escucha `users/{uid}` en tiempo real (snapshot listener → `Flow`). Funciona offline con la caché de Firestore. Los campos opcionales vacíos muestran "Sin registrar" en `LightGrayText`. Si el documento todavía no existe (el login lo está creando), se muestran el nombre, el correo y la foto de la sesión. |
 | **Actualizar datos** | Datos Personales | Ver [Datos Personales](#datos-personales). |
 | **Actualizar foto** | Perfil, al tocar el avatar | Ver [Foto de perfil](#foto-de-perfil). |
 | **Actualizar correo** | Datos Personales | Ver [Cambio de correo](#cambio-de-correo). |
@@ -51,8 +51,11 @@ Perfil ──tocar la foto──► Photo Picker del sistema ──► subida �
 
 ### Datos Personales
 
-- Por defecto se muestra en modo lectura. El lápiz de la tarjeta "Datos Dueño" activa la edición.
+- Por defecto se muestra en modo lectura. El lápiz de la tarjeta "Datos Dueño" activa la edición; si se pulsa otra vez durante la edición, descarta los cambios.
 - "Actualizar información" se ve gris (`ButtonIncomplete`) mientras no hay cambios y verde (`GreenAction`) cuando los hay. Igual que en la spec 002, sigue siendo pulsable en gris y, con una petición en curso, muestra un indicador y no acepta otro clic.
+- Pulsar "Actualizar información" en modo lectura abre la edición, igual que el lápiz.
+- Escribir de nuevo el valor guardado (p. ej. el mismo teléfono con espacios) no cuenta como cambio.
+- Si el perfil cambia en otro dispositivo durante la edición, no se pisan los campos que se están editando.
 - Al pulsarlo se valida y se guardan **solo los campos modificados**, más `updatedAt`.
 - Si se guarda bien, la pantalla sale del modo edición y muestra el Snackbar "Datos actualizados".
 - Al salir con "<" en modo edición, los cambios sin guardar se descartan.
@@ -104,11 +107,13 @@ Se usa al cambiar el correo (solo si Firebase la pide) y siempre al eliminar la 
 - Firestore no falla al escribir sin red: encola la escritura y su `await()` no termina hasta que vuelve la conexión. Por eso, antes de guardar datos, subir la foto, cambiar el correo o eliminar la cuenta, el ViewModel consulta `NetworkMonitor.isOnline`. Si no hay red, muestra el Snackbar y no lo intenta.
 - Leer sí funciona sin red, desde la caché.
 
-## Desviaciones de Figma (validar con diseño)
+## Desviaciones de Figma
 
-- **Fila "Eliminar cuenta"** en "Mi cuenta" de Configuración. No existe en Figma; usa el mismo estilo de fila con ícono que "Datos personales" y "Seguridad". Lo ideal es que diseño agregue el frame.
-- **Insignia de cámara** sobre el avatar de Perfil, para indicar que se puede tocar.
-- **Subtítulo de Perfil:** Figma dice "Gestiona los eventos de tu mascota", que parece copiado de otra pantalla. Se mantiene hasta que diseño lo confirme.
+Decididas con el equipo (Figma no las cubre):
+
+- **Fila "Eliminar cuenta"** en "Mi cuenta" de Configuración. Usa la misma tarjeta que "Datos personales" y "Seguridad", con el título y un ícono de papelera en `AlertRed`, para que se distinga como acción destructiva.
+- **Insignia de cámara** sobre el avatar de Perfil: círculo verde abajo a la derecha, para indicar que la foto se puede tocar.
+- **Subtítulo de Perfil:** "Gestiona tu información personal". El de Figma ("Gestiona los eventos de tu mascota") estaba copiado de otra pantalla.
 - **Campos subrayados en Datos Personales**, no la caja de `HuellitasTextField`. Se crea `PersonalDataField` en `feature/profile/components`. Si la edición de mascotas ("EDIT PERRO") usa el mismo estilo, sube a `core.designsystem` (regla de ≥ 2 pantallas, spec 003).
 
 ## Reglas de validación (en cliente, `core.domain`)
@@ -133,7 +138,7 @@ Los avisos usan `FieldFeedback` (`Warning`/`Error`) y se limpian al editar el ca
 | Contraseña incorrecta al reautenticar | `AuthError.InvalidCredentials` | Bajo la contraseña | "Correo o contraseña incorrectos" |
 | Correo nuevo ya en uso | `AuthError.EmailAlreadyInUse` | Bajo el correo | "Este correo ya está registrado" |
 | Imagen > 5 MB tras comprimir | `DataError.FileTooLarge` (nuevo) | Snackbar | "La imagen es demasiado grande" |
-| `users/{uid}` no existe | `DataError.NotFound` (nuevo) | Snackbar | "No encontramos tu perfil" |
+| `users/{uid}` no existe al guardar | `DataError.NotFound` (nuevo) | Snackbar | "No encontramos tu perfil" |
 | Sin red (`NetworkMonitor` o `Network`) | `AuthError.Network` / `DataError.Network` | Snackbar | "Sin conexión. Revisa tu internet" |
 | Otro | `Unknown` | Snackbar | "Ocurrió un error inesperado" |
 
@@ -228,8 +233,8 @@ Se agregan estos campos a la tabla de la spec 002:
   - `requestEmailChange(newEmail): AppResult<Unit, AuthError>` (`verifyBeforeUpdateEmail`)
   - `updateDisplayName(name): AppResult<Unit, AuthError>`. Se hace sin bloquear el guardado y mantiene al día el `User.name` de la sesión.
 - Use cases:
-  - `ObserveUserProfileUseCase`
-  - `UpdateUserProfileUseCase`: valida, guarda los cambios y, si cambió el correo, llama a `RequestEmailChangeUseCase`.
+  - `ObserveUserProfileUseCase`: si `users/{uid}` aún no existe, emite un perfil con los datos de la sesión.
+  - `UpdateUserProfileUseCase`: guarda los cambios ya validados y, si cambió el nombre, llama a `updateDisplayName`. La validación por campo y el cambio de correo los coordina `PersonalDataViewModel`, para mostrar cada aviso bajo su campo.
   - `RequestEmailChangeUseCase`
   - `ChangeProfilePhotoUseCase`: sube la foto y actualiza `photoUrl`.
   - `ReauthenticateUseCase`

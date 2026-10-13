@@ -1,0 +1,20 @@
+<!-- Flecha ">" de las filas de Configuración (Figma 3452:1018, nodo 3452:1071; en Figma es una "V" girada -91°). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="13.1742dp"
+    android:height="13.9519dp"
+    android:viewportWidth="13.1742"
+    android:viewportHeight="13.9519">
+    <group
+        android:pivotX="6.97595"
+        android:pivotY="6.5871"
+        android:rotation="-90"
+        android:translateX="-0.38885"
+        android:translateY="0.38885">
+        <path
+            android:pathData="M1.00014 1.00018L7.27474 11.1961L12.9518 1.00018"
+            android:strokeAlpha="0.5"
+            android:strokeWidth="2"
+            android:strokeColor="#FF000000"
+            android:strokeLineCap="round" />
+    </group>
+</vector>

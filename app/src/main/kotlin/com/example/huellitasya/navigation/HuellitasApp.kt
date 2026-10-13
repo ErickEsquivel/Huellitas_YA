@@ -15,6 +15,8 @@ import com.example.huellitasya.feature.auth.navigation.authGraph
 import com.example.huellitasya.feature.calendar.navigation.calendarScreen
 import com.example.huellitasya.feature.home.navigation.HomeDestination
 import com.example.huellitasya.feature.home.navigation.homeScreen
+import com.example.huellitasya.feature.profile.navigation.PersonalDataDestination
+import com.example.huellitasya.feature.profile.navigation.personalDataScreen
 import com.example.huellitasya.feature.profile.navigation.profileScreen
 import com.example.huellitasya.feature.settings.navigation.settingsScreen
 
@@ -70,8 +72,9 @@ private fun MainNavHost() {
         ) {
             homeScreen()
             calendarScreen()
-            profileScreen()
-            settingsScreen()
+            profileScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
+            settingsScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
+            personalDataScreen(onBack = { navController.popBackStack() })
         }
     }
 }

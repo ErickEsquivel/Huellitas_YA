@@ -26,7 +26,7 @@ class SignInWithEmailUseCase @Inject constructor(
     suspend operator fun invoke(email: String, password: String): AppResult<User, AuthError> =
         appScope.async {
             authRepository.signInWithEmail(email.trim(), password)
-                .onSuccess { userRepository.createIfMissing(it) }
+                .onSuccess { userRepository.ensureProfile(it) }
         }.await()
 }
 
@@ -38,7 +38,7 @@ class RegisterUseCase @Inject constructor(
     suspend operator fun invoke(name: String, email: String, password: String): AppResult<User, AuthError> =
         appScope.async {
             authRepository.registerWithEmail(name.trim(), email.trim(), password)
-                .onSuccess { userRepository.createIfMissing(it) }
+                .onSuccess { userRepository.ensureProfile(it) }
         }.await()
 }
 
@@ -50,6 +50,12 @@ class SignInWithGoogleUseCase @Inject constructor(
     suspend operator fun invoke(idToken: String): AppResult<User, AuthError> =
         appScope.async {
             authRepository.signInWithGoogle(idToken)
-                .onSuccess { userRepository.createIfMissing(it) }
+                .onSuccess { userRepository.ensureProfile(it) }
         }.await()
+}
+
+/** Crea `users/{uid}` si falta y copia el correo de Auth si cambió (spec 004, cambio de correo). */
+private suspend fun UserRepository.ensureProfile(user: User) {
+    createIfMissing(user)
+    if (user.email.isNotBlank()) syncEmail(user.uid, user.email)
 }

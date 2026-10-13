@@ -8,8 +8,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object SettingsDestination
 
-fun NavGraphBuilder.settingsScreen() {
+fun NavGraphBuilder.settingsScreen(onNavigateToPersonalData: () -> Unit) {
     composable<SettingsDestination> {
-        SettingsRoute()
+        SettingsRoute(onPersonalDataClick = onNavigateToPersonalData)
     }
 }

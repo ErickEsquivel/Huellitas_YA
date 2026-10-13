@@ -19,5 +19,7 @@ enum class AuthError : AppError {
 enum class DataError : AppError {
     Network,
     PermissionDenied,
+    /** El documento `users/{uid}` no existe (spec 004). */
+    NotFound,
     Unknown,
 }

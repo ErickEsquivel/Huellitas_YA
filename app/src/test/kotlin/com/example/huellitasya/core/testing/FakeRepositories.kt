@@ -6,7 +6,11 @@ import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.example.huellitasya.core.model.AuthProvider
+import com.example.huellitasya.core.model.Field
+import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.model.User
+import com.example.huellitasya.core.model.UserProfile
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 val TestUser = User(
@@ -49,6 +53,14 @@ class FakeAuthRepository : AuthRepository {
         return googleResult.alsoSignIn()
     }
 
+    var updateDisplayNameResult: AppResult<Unit, AuthError> = AppResult.Success(Unit)
+    val displayNames = mutableListOf<String>()
+
+    override suspend fun updateDisplayName(name: String): AppResult<Unit, AuthError> {
+        displayNames += name
+        return updateDisplayNameResult
+    }
+
     override suspend fun signOut() {
         signOutCount++
         currentUser.value = null
@@ -60,12 +72,61 @@ class FakeAuthRepository : AuthRepository {
     }
 }
 
+val TestProfile = UserProfile(
+    uid = TestUser.uid,
+    name = TestUser.name,
+    email = TestUser.email,
+    phone = null,
+    address = null,
+    birthDate = null,
+    photoUrl = null,
+    provider = AuthProvider.EMAIL,
+)
+
+/**
+ * [UserRepository] en memoria. [profile] hace de documento `users/{uid}`: `updateProfile`
+ * lo modifica y lo emite, igual que el snapshot listener de Firestore.
+ */
 class FakeUserRepository : UserRepository {
     var result: AppResult<Unit, DataError> = AppResult.Success(Unit)
     val createdUsers = mutableListOf<User>()
 
+    val profile = MutableStateFlow<AppResult<UserProfile, DataError>>(AppResult.Success(TestProfile))
+    var updateResult: AppResult<Unit, DataError> = AppResult.Success(Unit)
+    val updates = mutableListOf<Pair<String, ProfileChanges>>()
+    val syncedEmails = mutableListOf<Pair<String, String>>()
+
     override suspend fun createIfMissing(user: User): AppResult<Unit, DataError> {
         createdUsers += user
         return result
+    }
+
+    override fun observeProfile(uid: String): Flow<AppResult<UserProfile, DataError>> = profile
+
+    override suspend fun updateProfile(uid: String, changes: ProfileChanges): AppResult<Unit, DataError> {
+        updates += uid to changes
+        val current = (profile.value as? AppResult.Success)?.data
+        if (updateResult is AppResult.Success && current != null) {
+            profile.value = AppResult.Success(current.applying(changes))
+        }
+        return updateResult
+    }
+
+    override suspend fun syncEmail(uid: String, email: String): AppResult<Unit, DataError> {
+        syncedEmails += uid to email
+        return AppResult.Success(Unit)
+    }
+
+    private fun UserProfile.applying(changes: ProfileChanges) = copy(
+        name = changes.name ?: name,
+        phone = changes.phone.applyTo(phone),
+        address = changes.address.applyTo(address),
+        birthDate = changes.birthDate.applyTo(birthDate),
+    )
+
+    private fun <T> Field<T>?.applyTo(current: T?): T? = when (this) {
+        null -> current
+        is Field.Set -> value
+        Field.Clear -> null
     }
 }

@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -38,8 +37,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -48,7 +45,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
@@ -71,6 +67,7 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.GrayText
 import com.example.huellitasya.core.designsystem.GreenHighlight
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
+import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
 import kotlin.math.roundToInt
 
 /** Ancho del frame de Figma ("Android Compact", 412 dp). Las medidas del encabezado escalan respecto a él. */
@@ -169,16 +166,12 @@ internal fun AuthBackButton(
     modifier: Modifier = Modifier,
     tint: Color = Color.Black,
 ) {
-    IconButton(onClick = onClick, modifier = modifier) {
-        Icon(
-            painter = painterResource(R.drawable.ic_back_chevron),
-            contentDescription = stringResource(R.string.auth_back),
-            tint = tint,
-            modifier = Modifier
-                .requiredSize(width = 16.dp, height = 14.dp)
-                .rotate(90f)
-        )
-    }
+    HuellitasBackButton(
+        onClick = onClick,
+        contentDescription = stringResource(R.string.auth_back),
+        modifier = modifier,
+        tint = tint,
+    )
 }
 
 /** Por debajo de este alto de viewport (sin teclado) el formulario usa tipografía y espacios compactos. */

@@ -1,0 +1,11 @@
+<resources>
+    <!-- Configuración (Figma "CONFIGURACION" 3452:1018) -->
+    <string name="settings_title">Configuración</string>
+    <string name="settings_notifications">Notificaciones</string>
+    <string name="settings_my_account">Mi cuenta</string>
+    <string name="settings_personal_data">Datos personales</string>
+    <string name="settings_personal_data_subtitle">Nombre, correo y más</string>
+    <string name="settings_security">Seguridad</string>
+    <string name="settings_security_subtitle">Cambiar contraseña</string>
+    <string name="settings_logout">Cerrar sesión</string>
+</resources>
