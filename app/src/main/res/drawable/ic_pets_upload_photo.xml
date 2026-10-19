@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma 3028:693: subir foto (registro sin foto) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="74dp"
+    android:height="74.0004dp"
+    android:viewportWidth="74"
+    android:viewportHeight="74.0004">
+    <path
+        android:pathData="M22.047 37.2951C25.7376 37.2951 28.7293 34.1876 28.7293 30.3541C28.7293 26.5207 25.7376 23.4131 22.047 23.4131C18.3565 23.4131 15.3647 26.5207 15.3647 30.3541C15.3647 34.1876 18.3565 37.2951 22.047 37.2951Z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M17.2375 72C35.8476 37.6421 51.3172 31.6031 68.8248 53.9184"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M39.6883 9.53104H15.3646C11.8201 9.53104 8.42078 10.9934 5.9144 13.5968C3.40803 16.2001 2 19.7313 2 23.413V58.1179C2 61.7998 3.40803 65.3303 5.9144 67.9339C8.42078 70.5371 11.8201 71.9999 15.3646 71.9999H55.4586C59.0032 71.9999 62.4025 70.5371 64.9087 67.9339C67.4153 65.3303 68.8232 61.7998 68.8232 58.1179V40.7655"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M61.3056 29.764V2"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M50.6166 13.1056L61.3083 2L72 13.1056"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

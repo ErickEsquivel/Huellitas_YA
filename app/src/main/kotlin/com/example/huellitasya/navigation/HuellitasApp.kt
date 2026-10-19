@@ -14,6 +14,8 @@ import com.example.huellitasya.feature.auth.navigation.AuthGraph
 import com.example.huellitasya.feature.auth.navigation.authGraph
 import com.example.huellitasya.feature.calendar.navigation.calendarScreen
 import com.example.huellitasya.feature.home.navigation.homeScreen
+import com.example.huellitasya.feature.pets.navigation.RegisterPetDestination
+import com.example.huellitasya.feature.pets.navigation.registerPetScreen
 import com.example.huellitasya.feature.profile.navigation.PersonalDataDestination
 import com.example.huellitasya.feature.profile.navigation.VerifyEmailChangeDestination
 import com.example.huellitasya.feature.profile.navigation.ProfileDestination
@@ -77,7 +79,11 @@ private fun MainNavHost(googleServerClientId: String?) {
             startDestination = ProfileDestination,
             modifier = Modifier.padding(innerPadding), // Evita que el contenido quede debajo de la barra
         ) {
-            homeScreen()
+            homeScreen(onAddPetClick = { navController.navigate(RegisterPetDestination()) })
+            registerPetScreen(
+                onBack = { navController.popBackStack() },
+                onPetSaved = { navController.popBackStack() },
+            )
             calendarScreen()
             profileScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
             settingsScreen(
