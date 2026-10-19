@@ -19,4 +19,10 @@ interface PetRepository {
 
     /** Crea `users/{uid}/pets/{petId}` con los datos del formulario. */
     suspend fun createPet(uid: String, petId: String, draft: PetDraft, photoUrl: String?): AppResult<Unit, DataError>
+
+    /** Reemplaza los datos del formulario y, si [photoUrl] no es `null`, la foto. No toca `createdAt`. */
+    suspend fun updatePet(uid: String, petId: String, draft: PetDraft, photoUrl: String?): AppResult<Unit, DataError>
+
+    /** Borra `users/{uid}/pets/{petId}`. */
+    suspend fun deletePet(uid: String, petId: String): AppResult<Unit, DataError>
 }

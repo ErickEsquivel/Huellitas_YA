@@ -88,3 +88,51 @@ class RegisterPetUseCase @Inject constructor(
             petRepository.createPet(uid, petId, draft, photoUrl)
         }.await()
 }
+
+/**
+ * Guarda los cambios de Editar mascota. Si eligió una foto nueva, la sube primero (reemplaza la
+ * anterior en la misma ruta); si falla, no se cambia nada. Corre en [ApplicationScope] por la
+ * misma razón que [RegisterPetUseCase].
+ */
+class UpdatePetUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val petRepository: PetRepository,
+    private val photoRepository: PetPhotoRepository,
+    @param:ApplicationScope private val appScope: CoroutineScope,
+) {
+    suspend operator fun invoke(petId: String, draft: PetDraft, newPhotoUri: String?): AppResult<Unit, DataError> =
+        appScope.async {
+            val uid = authRepository.currentUser.first()?.uid
+                ?: return@async AppResult.Failure(DataError.PermissionDenied)
+            val photoUrl = if (newPhotoUri == null) {
+                null
+            } else {
+                when (val upload = photoRepository.upload(uid, petId, newPhotoUri)) {
+                    is AppResult.Success -> upload.data
+                    is AppResult.Failure -> return@async upload
+                }
+            }
+            petRepository.updatePet(uid, petId, draft, photoUrl)
+        }.await()
+}
+
+/**
+ * Elimina una mascota: primero su foto (si no tenía, sigue) y luego el documento, para no dejar
+ * fotos huérfanas. Corre en [ApplicationScope]: Editar vuelve a Home al terminar.
+ */
+class DeletePetUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val petRepository: PetRepository,
+    private val photoRepository: PetPhotoRepository,
+    @param:ApplicationScope private val appScope: CoroutineScope,
+) {
+    suspend operator fun invoke(petId: String): AppResult<Unit, DataError> =
+        appScope.async {
+            val uid = authRepository.currentUser.first()?.uid
+                ?: return@async AppResult.Failure(DataError.PermissionDenied)
+            when (val photo = photoRepository.delete(uid, petId)) {
+                is AppResult.Success -> petRepository.deletePet(uid, petId)
+                is AppResult.Failure -> photo
+            }
+        }.await()
+}

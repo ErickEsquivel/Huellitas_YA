@@ -74,6 +74,24 @@ internal class FirestorePetRepository @Inject constructor(
         petsCollection(uid).document(petId).set(data).await()
     }
 
+    override suspend fun updatePet(
+        uid: String,
+        petId: String,
+        draft: PetDraft,
+        photoUrl: String?,
+    ): AppResult<Unit, DataError> = runData {
+        val data = buildMap<String, Any?> {
+            putAll(draft.toFirestoreMap())
+            photoUrl?.let { put(PHOTO_URL, it) }
+            put(UPDATED_AT, FieldValue.serverTimestamp())
+        }
+        petsCollection(uid).document(petId).update(data).await()
+    }
+
+    override suspend fun deletePet(uid: String, petId: String): AppResult<Unit, DataError> = runData {
+        petsCollection(uid).document(petId).delete().await()
+    }
+
     /** Esquema de la spec 005: enums en minúscula y la fecha como `yyyy-MM-dd`. */
     private fun PetDraft.toFirestoreMap(): Map<String, Any?> = mapOf(
         NAME to name,

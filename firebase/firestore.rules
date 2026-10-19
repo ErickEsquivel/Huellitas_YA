@@ -72,6 +72,11 @@ service cloud.firestore {
                       && isValidPet()
                       && request.resource.data.createdAt == request.time
                       && request.resource.data.updatedAt == request.time;
+        allow update: if isOwner()
+                      && isValidPet()
+                      && unchanged('createdAt')
+                      && request.resource.data.updatedAt == request.time;
+        allow delete: if isOwner();
       }
     }
 
