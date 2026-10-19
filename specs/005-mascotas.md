@@ -1,6 +1,6 @@
 # 005 — Mascotas
 
-- **Estado:** Approved
+- **Estado:** Implemented (criterios verificados en dispositivo; reglas desplegadas)
 - **Paquetes:** `feature.pets`, `feature.home`, `navigation`, `core.model`, `core.domain`, `core.data`, `core.designsystem`, `core.ui`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-) ("Momento 2"). Capturas de referencia en [`figma/005-mascotas/`](figma/005-mascotas/).
   - Presentación: `PRESENTACION` (19:80)
@@ -82,11 +82,12 @@ Configuración ─"Cerrar sesión"─► Bienvenido
 ### Editar mascota
 
 - "Actualiza la información de tu mascota": mismo formulario que Registrar, con los datos guardados.
-- "Actualizar información" se ve verde solo si hay cambios. Guarda con el overlay "Actualizando..." y vuelve al perfil.
-- "Eliminar mascota" (rojo) abre el diálogo del cachorro (el mismo de "Eliminar cuenta", spec 004): "¿Seguro deseas eliminarlo?", "No podrás recuperar los datos luego de confirmar la eliminación." y "Eliminar Información". Al confirmar, overlay "Eliminando..." y vuelve a Home.
+- "Actualizar información" se ve verde solo si hay cambios. Guarda con el overlay "Actualizando…" y vuelve al perfil.
+- "Eliminar mascota" (rojo) abre el diálogo del cachorro (el mismo de "Eliminar cuenta", spec 004): "¿Seguro deseas eliminarlo?", "No podrás recuperar los datos luego de confirmar la eliminación." y "Eliminar Información". Al confirmar, overlay "Eliminando…" y vuelve a Home.
 
 ## Desviaciones de Figma
 
+- **Botón "Eliminar mascota"** en `DestructiveRed` (#B50004), como en Figma.
 - **Campos vacíos en naranja** (`FieldStatus.Warning`), no en rojo al 50 %: es el mismo aviso de "campos vacíos" de auth y perfil (spec 002).
 - **Especie y Sexo son menús**, no texto libre: así el dato se puede filtrar y traducir. Figma solo muestra el valor elegido.
 - **La foto es opcional**: el error de campos vacíos de Figma no resalta la foto.
@@ -185,7 +186,7 @@ Mismas reglas que la foto de perfil (solo el dueño; `image/*`; < 5 MB), y adem�
 - `feature.home`: `HomeViewModel` + `HomeScreen` con la lista.
 - `core.designsystem` (lo usan ≥ 2 pantallas, spec 003):
   - `AppTitle` (antes en `feature.auth.components`): lo usan Bienvenido y Presentación.
-  - `ProgressOverlay(text)`: spinner de Figma + texto ("Conectando...", "Guardando...", "Actualizando...", "Eliminando...").
+  - `ProgressOverlay(text)`: spinner de Figma + texto ("Conectando...", "Guardando…", "Actualizando…", "Eliminando…").
   - `HuellitasDatePickerDialog` (antes privado en Datos Personales).
   - `DeleteConfirmDialog` (antes `DeleteAccountDialog`): el diálogo del cachorro con el texto del botón como parámetro.
 - Los strings van en `strings_pets.xml` y los recursos llevan el prefijo `img_pets_*` / `ic_pets_*`.
@@ -223,18 +224,18 @@ Cada parte va en su rama y su PR, en orden, con un commit por tarea.
 - [x] Una cuenta sin mascotas ve Presentación al iniciar sesión (y al reabrir la app); "Comenzar" abre Registrar mascota.
 - [x] Una cuenta con mascotas entra directo a Home.
 - [x] En Registrar, el botón se ve gris hasta llenar todos los campos; con campos vacíos se resaltan y aparece "Rellene todas las casillas indicadas".
-- [ ] Datos inválidos (raza de 1 letra, peso 0, fecha futura) muestran su aviso y no se escribe nada.
+- [x] Datos inválidos (raza de 1 letra, peso 0, fecha futura) muestran su aviso y no se escribe nada. (Los avisos, con los tests de validadores y ViewModels; en el teléfono el selector ya no deja elegir una fecha futura.)
 - [x] Guardar muestra "Guardando…" y lleva a Home con la mascota nueva; "atrás" desde Home sale de la app.
 - [x] La foto elegida se ve antes de guardar y queda en Storage en `users/{uid}/pets/{petId}.jpg`; sin foto, se guarda igual.
 - [x] Home muestra una tarjeta por mascota con "raza · edad", y "+" abre Registrar.
 - [x] El perfil de la mascota muestra sus datos y las tres tarjetas de registros con "0 Archivos".
-- [ ] Editar guarda solo los cambios con "Actualizando..." y el perfil se actualiza en vivo.
-- [ ] Eliminar pide confirmación, muestra "Eliminando..." y la mascota y su foto desaparecen.
-- [ ] Sin conexión, Home muestra la caché, y guardar, editar o eliminar muestran "Sin conexión. Revisa tu internet" sin quedarse cargando.
-- [ ] Las reglas impiden leer o escribir las mascotas de otro usuario y guardar campos fuera del esquema.
-- [ ] Eliminar la cuenta borra también sus mascotas y sus fotos.
+- [x] Editar guarda solo los cambios con "Actualizando…" y el perfil se actualiza en vivo.
+- [x] Eliminar pide confirmación, muestra "Eliminando…" y la mascota y su foto desaparecen.
+- [x] Sin conexión, Home muestra la caché, y guardar, editar o eliminar muestran "Sin conexión. Revisa tu internet" sin quedarse cargando.
+- [x] Las reglas impiden leer o escribir las mascotas de otro usuario y guardar campos fuera del esquema.
+- [ ] Eliminar la cuenta borra también sus mascotas y sus fotos. (Sin verificar en dispositivo: comprobarlo requiere el Admin SDK. `deleteAccount` ya usa `recursiveDelete` sobre `users/{uid}` y borra el prefijo `users/{uid}/` de Storage, spec 004.)
 
-> Verificados en un Vivo V2436 (Erick): Bienvenido sin sesión, Presentación sin mascotas, Home directo con mascotas, el formulario (avisos, menús, fecha, peso, foto) y el guardado con y sin foto. Reglas de creación y lectura probadas por REST (8 de 8): otra cuenta no lee ni crea, y se rechazan campos extra, especie inválida, peso 0 y faltantes. Mateo verificó Home (lista, edad en días/años, "+") y el perfil de la mascota (datos, registros con "0 Archivos", volver a Home). Quedan para Julian editar y eliminar.
+> Verificados en un Vivo V2436 (Erick): Bienvenido sin sesión, Presentación sin mascotas, Home directo con mascotas, el formulario (avisos, menús, fecha, peso, foto) y el guardado con y sin foto. Reglas de creación y lectura probadas por REST (8 de 8): otra cuenta no lee ni crea, y se rechazan campos extra, especie inválida, peso 0 y faltantes. Mateo verificó Home (lista, edad en días/años, "+") y el perfil de la mascota (datos, registros con "0 Archivos", volver a Home). Julian verificó editar (botón verde solo con cambios, "Actualizando…", perfil en vivo), eliminar (diálogo, "Eliminando…", documento y foto con 404) y el modo sin conexión; reglas de actualizar y borrar por REST (7 de 7).
 
 ## Plan de tests
 

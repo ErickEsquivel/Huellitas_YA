@@ -108,6 +108,10 @@ internal fun PetFormLayout(
             }
         }
 
-        SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+        // Sin barra inferior, el aviso debe quedar encima de la barra de navegación.
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
+        )
     }
 }

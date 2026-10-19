@@ -34,8 +34,7 @@
     <!-- Perfil de la mascota (spec 005, Figma 54:30) -->
     <string name="pets_detail_title">Perfil de %s</string>
     <string name="pets_detail_back">Volver</string>
-    <string name="pets_detail_birth_date">Fecha de
-nacimiento</string>
+    <string name="pets_detail_birth_date">Fecha de\nnacimiento</string>
     <string name="pets_detail_weight">Peso</string>
     <string name="pets_detail_sex">Sexo</string>
     <string name="pets_detail_records">Registros Medicos</string>
@@ -49,8 +48,7 @@ nacimiento</string>
     <string name="pets_detail_edit">Editar información</string>
 
     <!-- Editar mascota (spec 005, Figma 56:192) -->
-    <string name="pets_edit_title">Actualiza la información
-de tu mascota</string>
+    <string name="pets_edit_title">Actualiza la información\nde tu mascota</string>
     <string name="pets_edit_button">Actualizar información</string>
     <string name="pets_edit_delete">Eliminar mascota</string>
     <string name="pets_edit_updating">Actualizando…</string>
