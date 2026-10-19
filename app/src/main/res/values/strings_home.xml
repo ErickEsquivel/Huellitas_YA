@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Home (spec 005, Figma 145:1126 y 19:100) -->
+    <string name="home_title">Hola, cómo estás?!</string>
+    <string name="home_subtitle">Veamos como están tus mascotas</string>
+    <string name="home_notifications">Notificaciones</string>
+    <string name="home_add_pet">Agregar mascota</string>
+    <string name="home_open_pet">Ver el perfil de %s</string>
+    <string name="home_pet_photo">Foto de %s</string>
+</resources>

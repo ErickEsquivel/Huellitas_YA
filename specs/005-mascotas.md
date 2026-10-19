@@ -226,15 +226,15 @@ Cada parte va en su rama y su PR, en orden, con un commit por tarea.
 - [ ] Datos inválidos (raza de 1 letra, peso 0, fecha futura) muestran su aviso y no se escribe nada.
 - [x] Guardar muestra "Guardando…" y lleva a Home con la mascota nueva; "atrás" desde Home sale de la app.
 - [x] La foto elegida se ve antes de guardar y queda en Storage en `users/{uid}/pets/{petId}.jpg`; sin foto, se guarda igual.
-- [ ] Home muestra una tarjeta por mascota con "raza · edad", y "+" abre Registrar.
-- [ ] El perfil de la mascota muestra sus datos y las tres tarjetas de registros con "0 Archivos".
+- [x] Home muestra una tarjeta por mascota con "raza · edad", y "+" abre Registrar.
+- [x] El perfil de la mascota muestra sus datos y las tres tarjetas de registros con "0 Archivos".
 - [ ] Editar guarda solo los cambios con "Actualizando..." y el perfil se actualiza en vivo.
 - [ ] Eliminar pide confirmación, muestra "Eliminando..." y la mascota y su foto desaparecen.
 - [ ] Sin conexión, Home muestra la caché, y guardar, editar o eliminar muestran "Sin conexión. Revisa tu internet" sin quedarse cargando.
 - [ ] Las reglas impiden leer o escribir las mascotas de otro usuario y guardar campos fuera del esquema.
 - [ ] Eliminar la cuenta borra también sus mascotas y sus fotos.
 
-> Verificados en un Vivo V2436 (Erick): Bienvenido sin sesión, Presentación sin mascotas, Home directo con mascotas, el formulario (avisos, menús, fecha, peso, foto) y el guardado con y sin foto. Reglas de creación y lectura probadas por REST (8 de 8): otra cuenta no lee ni crea, y se rechazan campos extra, especie inválida, peso 0 y faltantes. Quedan para Mateo y Julian Home, perfil, editar y eliminar.
+> Verificados en un Vivo V2436 (Erick): Bienvenido sin sesión, Presentación sin mascotas, Home directo con mascotas, el formulario (avisos, menús, fecha, peso, foto) y el guardado con y sin foto. Reglas de creación y lectura probadas por REST (8 de 8): otra cuenta no lee ni crea, y se rechazan campos extra, especie inválida, peso 0 y faltantes. Mateo verificó Home (lista, edad en días/años, "+") y el perfil de la mascota (datos, registros con "0 Archivos", volver a Home). Quedan para Julian editar y eliminar.
 
 ## Plan de tests
 
