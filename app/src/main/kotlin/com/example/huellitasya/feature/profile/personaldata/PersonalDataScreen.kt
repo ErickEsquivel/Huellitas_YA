@@ -19,18 +19,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,6 +53,7 @@ import com.example.huellitasya.core.designsystem.ButtonIncomplete
 import com.example.huellitasya.core.designsystem.GreenAction
 import com.example.huellitasya.core.designsystem.GreenPrimary
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
+import com.example.huellitasya.core.designsystem.components.HuellitasDatePickerDialog
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.FieldMessage
 import com.example.huellitasya.core.designsystem.components.FieldStatus
@@ -73,9 +67,7 @@ import com.example.huellitasya.core.ui.ObserveAsEvents
 import com.example.huellitasya.feature.profile.components.BirthDateFormatter
 import com.example.huellitasya.feature.profile.components.PersonalDataField
 import kotlinx.coroutines.launch
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneOffset
 
 @Composable
 internal fun PersonalDataRoute(
@@ -200,10 +192,15 @@ internal fun PersonalDataScreen(
     }
 
     if (showDatePicker) {
-        BirthDatePickerDialog(
+        HuellitasDatePickerDialog(
             initialDate = state.birthDate,
+            minDate = MinBirthDate,
+            confirmText = stringResource(R.string.personal_data_date_accept),
+            cancelText = stringResource(R.string.personal_data_date_cancel),
             onDateSelected = { onAction(PersonalDataAction.BirthDateChanged(it)) },
             onDismiss = { showDatePicker = false },
+            clearText = stringResource(R.string.personal_data_date_clear),
+            onClear = { onAction(PersonalDataAction.BirthDateChanged(null)) },
         )
     }
 }
@@ -307,58 +304,8 @@ private fun OwnerDataCard(
 
 private val FieldFeedback?.statusOrDefault: FieldStatus get() = this?.status ?: FieldStatus.Default
 
-/**
- * Selector de Material 3. Trabaja en UTC (así lo define `DatePicker`) para que la fecha elegida
- * no se corra un día por la zona horaria. "Borrar" deja la fecha sin registrar.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BirthDatePickerDialog(
-    initialDate: LocalDate?,
-    onDateSelected: (LocalDate?) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
-        yearRange = MinBirthYear..LocalDate.now().year,
-        selectableDates = object : SelectableDates {
-            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
-                !utcTimeMillis.toLocalDate().isAfter(LocalDate.now())
-
-            override fun isSelectableYear(year: Int): Boolean = year in MinBirthYear..LocalDate.now().year
-        },
-    )
-    val colors = DatePickerDefaults.colors(containerColor = Color.White)
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        colors = colors,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    datePickerState.selectedDateMillis?.let { onDateSelected(it.toLocalDate()) }
-                    onDismiss()
-                },
-            ) { Text(stringResource(R.string.personal_data_date_accept)) }
-        },
-        dismissButton = {
-            Row {
-                TextButton(
-                    onClick = {
-                        onDateSelected(null)
-                        onDismiss()
-                    },
-                ) { Text(stringResource(R.string.personal_data_date_clear)) }
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.personal_data_date_cancel)) }
-            }
-        },
-    ) {
-        DatePicker(state = datePickerState, colors = colors)
-    }
-}
-
-private const val MinBirthYear = 1900
-
-private fun Long.toLocalDate(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
+/** Mismo límite que `ValidateBirthDateUseCase` (spec 004). */
+private val MinBirthDate: LocalDate = LocalDate.of(1900, 1, 1)
 
 private val PreviewProfile = UserProfile(
     uid = "uid-123",

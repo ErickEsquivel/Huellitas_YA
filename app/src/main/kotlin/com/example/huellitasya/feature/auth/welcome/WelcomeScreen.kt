@@ -27,9 +27,9 @@ import com.example.huellitasya.core.designsystem.GrayText
 import com.example.huellitasya.core.designsystem.HuellitasSpacing
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.LightGrayText
+import com.example.huellitasya.core.designsystem.components.AppTitle
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
-import com.example.huellitasya.feature.auth.components.AppTitle
 
 @Composable
 internal fun WelcomeScreen(onStartClick: () -> Unit) {
@@ -54,7 +54,7 @@ internal fun WelcomeScreen(onStartClick: () -> Unit) {
         ) {
             Spacer(modifier = Modifier.height(HuellitasSpacing.xxl))
 
-            AppTitle()
+            AppTitle(logoDescription = stringResource(R.string.auth_logo_description))
 
             Spacer(modifier = Modifier.height(HuellitasSpacing.sm))
 

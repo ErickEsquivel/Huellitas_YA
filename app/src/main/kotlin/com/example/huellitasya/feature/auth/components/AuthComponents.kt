@@ -100,30 +100,6 @@ internal fun highlightedTitle(text: String, highlight: String = ""): AnnotatedSt
         withStyle(SpanStyle(color = GreenHighlight)) { append(highlight) }
     }
 
-/** Logo + "Huellitas YA!" con el "YA!" en verde. Compartido por Presentación y Bienvenido. */
-@Composable
-internal fun AppTitle(
-    modifier: Modifier = Modifier,
-    logoSize: DpSize = DpSize(126.dp, 108.dp),
-    spacing: Dp = 16.dp,
-    fontSize: TextUnit = 48.sp,
-) {
-    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_logo_huellitas),
-            contentDescription = stringResource(R.string.auth_logo_description),
-            modifier = Modifier.size(logoSize)
-        )
-        Spacer(modifier = Modifier.height(spacing))
-        Text(
-            text = highlightedTitle("Huellitas ", "YA!"),
-            fontSize = fontSize,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.Black
-        )
-    }
-}
-
 /**
  * Foto de cabecera recortada según [spec], escalada al ancho real de la pantalla.
  *

@@ -2,19 +2,12 @@ package com.example.huellitasya.feature.auth.connectivity
 
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.keyframes
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -22,9 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,10 +39,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.AlertRed
 import com.example.huellitasya.core.designsystem.GreenAction
-import com.example.huellitasya.core.designsystem.GreenDeep
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.OverlayScrim
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
+import com.example.huellitasya.core.designsystem.components.SpinnerWithLabel
 
 /** Ancho y alto de la tarjeta ilustrada en Figma (frame de 412 dp). */
 private const val CARD_DESIGN_WIDTH = 412f
@@ -117,7 +107,10 @@ internal fun NoConnectionOverlay(
                 ),
         ) {
             when (shownState) {
-                ConnectionUiState.Reconnecting -> ConnectingIndicator(modifier = Modifier.align(Alignment.Center))
+                ConnectionUiState.Reconnecting -> SpinnerWithLabel(
+                    text = stringResource(R.string.auth_offline_connecting),
+                    modifier = Modifier.align(Alignment.Center),
+                )
                 else -> NoConnectionCard(onRetry = onRetry)
             }
         }
@@ -178,56 +171,6 @@ private fun NoConnectionCard(onRetry: () -> Unit) {
             )
         }
         Spacer(modifier = Modifier.weight(320f))
-    }
-}
-
-/** Estado "loading": spinner de Figma (3 vueltas lineales en 2.4 s y una pausa breve) + "Conectando...". */
-@Composable
-private fun ConnectingIndicator(modifier: Modifier = Modifier) {
-    val transition = rememberInfiniteTransition(label = "spinner")
-    val rotation by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1080f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 2500
-                0f at 0 using LinearEasing
-                360f at 800 using LinearEasing
-                720f at 1600 using LinearEasing
-                1080f at 2400 using LinearEasing
-                1080f at 2500
-            },
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "spinnerRotation",
-    )
-
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Box(modifier = Modifier.size(60.dp)) {
-            Image(
-                painter = painterResource(R.drawable.ic_spinner_track),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-            )
-            Image(
-                painter = painterResource(R.drawable.ic_spinner_arc),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { rotationZ = rotation }
-            )
-        }
-        Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            text = stringResource(R.string.auth_offline_connecting),
-            color = GreenDeep,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-        )
     }
 }
 
