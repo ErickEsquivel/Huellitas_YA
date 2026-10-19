@@ -30,4 +30,37 @@
     <string name="pets_photo_change">Elegir foto de la mascota</string>
     <string name="pets_date_accept">Aceptar</string>
     <string name="pets_date_cancel">Cancelar</string>
+
+    <!-- Perfil de la mascota (spec 005, Figma 54:30) -->
+    <string name="pets_detail_title">Perfil de %s</string>
+    <string name="pets_detail_back">Volver</string>
+    <string name="pets_detail_birth_date">Fecha de
+nacimiento</string>
+    <string name="pets_detail_weight">Peso</string>
+    <string name="pets_detail_sex">Sexo</string>
+    <string name="pets_detail_records">Registros Medicos</string>
+    <string name="pets_record_vaccines">Carné de vacunas</string>
+    <string name="pets_record_history">Historial clínico</string>
+    <string name="pets_record_files">Archivos adicionales</string>
+    <plurals name="pets_record_count">
+        <item quantity="one">%d Archivo</item>
+        <item quantity="other">%d Archivos</item>
+    </plurals>
+    <string name="pets_detail_edit">Editar información</string>
+
+    <!-- Edad y textos compartidos de una mascota (Home y perfil) -->
+    <string name="pets_breed_age">%1$s  -  %2$s</string>
+    <plurals name="pets_age_days">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+    <plurals name="pets_age_months">
+        <item quantity="one">%d mes</item>
+        <item quantity="other">%d meses</item>
+    </plurals>
+    <plurals name="pets_age_years">
+        <item quantity="one">%d año</item>
+        <item quantity="other">%d años</item>
+    </plurals>
+    <string name="pets_weight_value">%s kg</string>
 </resources>
