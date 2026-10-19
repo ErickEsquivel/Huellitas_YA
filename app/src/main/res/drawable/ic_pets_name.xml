@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Campo "Nombre" de la mascota: persona en un círculo, con el trazo de los demás íconos del formulario (spec 005). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="40dp"
+    android:viewportWidth="40"
+    android:viewportHeight="40">
+    <path
+        android:pathData="M20,1.5A18.5,18.5 0,1 1,20 38.5A18.5,18.5 0,1 1,20 1.5Z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.5" />
+    <path
+        android:pathData="M20,9.5A6,6 0,1 1,20 21.5A6,6 0,1 1,20 9.5Z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.5" />
+    <path
+        android:pathData="M9.5,32.5C10.8,27.3 15,24.5 20,24.5C25,24.5 29.2,27.3 30.5,32.5"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round" />
+</vector>

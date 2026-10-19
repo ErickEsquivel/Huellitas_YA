@@ -18,15 +18,11 @@ import com.example.huellitasya.feature.auth.login.LoginRoute
 import com.example.huellitasya.feature.auth.newpassword.NewPasswordRoute
 import com.example.huellitasya.feature.auth.register.RegisterRoute
 import com.example.huellitasya.feature.auth.verifycode.VerifyResetCodeRoute
-import com.example.huellitasya.feature.auth.welcome.WelcomeScreen
 import kotlinx.serialization.Serializable
 
 /** Grafo anidado de autenticación (spec 002). */
 @Serializable
 data object AuthGraph
-
-@Serializable
-internal data object WelcomeDestination
 
 @Serializable
 internal data object AuthChooserDestination
@@ -52,7 +48,8 @@ internal data class NewPasswordDestination(val email: String, val resetToken: St
 private const val PASSWORD_RESET_KEY = "password_reset"
 
 /**
- * Presentación → Bienvenido → (correo → Login → Recuperar contraseña | Regístrate | Google).
+ * Bienvenido → (correo → Login → Recuperar contraseña | Regístrate | Google). Presentación ya no
+ * está aquí: se ve después del login si no hay mascotas (spec 005).
  * Recuperar contraseña → Verifica tu correo (código) → Crear nueva contraseña → vuelve a Login.
  * Al autenticarse no se navega desde aquí: la app reemplaza este grafo al cambiar la sesión.
  *
@@ -65,13 +62,7 @@ fun NavGraphBuilder.authGraph(
     navController: NavController,
     googleServerClientId: String?,
 ) {
-    navigation<AuthGraph>(startDestination = WelcomeDestination) {
-        composable<WelcomeDestination> { entry ->
-            val connectivity = authConnectivityViewModel(navController, entry)
-            ConnectivityAware(connectivity) {
-                WelcomeScreen(onStartClick = { navController.navigate(AuthChooserDestination) })
-            }
-        }
+    navigation<AuthGraph>(startDestination = AuthChooserDestination) {
         composable<AuthChooserDestination> { entry ->
             val connectivity = authConnectivityViewModel(navController, entry)
             ConnectivityAware(connectivity) {

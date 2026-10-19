@@ -3,7 +3,7 @@
 - **Estado:** Implemented (pendiente de QA en dispositivo con el proyecto Firebase real)
 - **Paquetes:** `feature.auth`, `core.domain`, `core.data`, `core.model`, `core.ui`, `navigation`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-)
-  - Presentación: `PRESENTACION` (19:80)
+  - Presentación: `PRESENTACION` (19:80). Desde la spec 005 se muestra después del login, en el grafo principal.
   - Bienvenido (elegir acceso): `BIENVENIDO` (43:3)
   - Inicio de sesión: `INICIO SESION CORREO` (158:1303); con datos `INICIO SESION CORREO 2` (84:5); errores `Android Compact - 14/15/36`
   - Registro: `REGISTRO` (158:1329); errores `Android Compact - 6/7/35`
@@ -28,11 +28,11 @@ Permitir que el dueño de una mascota cree una cuenta e inicie sesión (correo/c
 ```
 [App abre] ──(sesión activa)──► Home (pestañas)
      │
-     └─(sin sesión)──► Presentación ──"Comenzar"──► Bienvenido
-                                                     ├─ "Continuar con correo" ─► Inicio de sesión ─ "¿Se te olvidó la contraseña?" ─► Recuperar
-                                                     ├─ "Continuar con Google" ─► selector de cuentas ─► Home
-                                                     └─ "Regístrate" ─────────► Registro ─► Home
-Configuración ──"Cerrar sesión"──► Presentación (historial limpio)
+     └─(sin sesión)──► Bienvenido
+                       ├─ "Continuar con correo" ─► Inicio de sesión ─ "¿Se te olvidó la contraseña?" ─► Recuperar
+                       ├─ "Continuar con Google" ─► selector de cuentas ─► Home
+                       └─ "Regístrate" ─────────► Registro ─► Home
+Configuración ──"Cerrar sesión"──► Bienvenido (historial limpio)
 ```
 
 - La navegación hacia Home **no** la hace la pantalla: la app observa `SessionState` y reemplaza el grafo de auth por el principal (y viceversa al cerrar sesión). Así el historial anterior desaparece siempre.
@@ -121,7 +121,7 @@ Inicio de sesión + "Tu contraseña se actualizó. Inicia sesión."
 ## Sin conexión
 
 - **Figma:** `ERROR INTERNET Overlay` (159:647).
-- **Dónde:** cubre todas las pantallas del flujo de autenticación: Presentación, Bienvenido, Inicio de sesión, Registro y Recuperar contraseña.
+- **Dónde:** cubre todas las pantallas del flujo de autenticación: Bienvenido, Inicio de sesión, Registro y Recuperar contraseña.
 - **Cuándo aparece:**
   - cuando el dispositivo no tiene una red con internet **validado** (`NetworkMonitor`);
   - cuando una operación de Firebase falla con `AuthError.Network`, aunque el sistema crea que hay red (p. ej. un wifi sin salida a internet).
@@ -194,7 +194,7 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 
 > Lógica cubierta por unit tests (`LoginViewModelTest`, `RegisterViewModelTest`, `ForgotPasswordViewModelTest`, `VerifyResetCodeViewModelTest`, `NewPasswordViewModelTest`, `AuthChooserViewModelTest`, `AuthUseCasesTest`, `MainViewModelTest`). Marcar cada casilla al verificarla en dispositivo.
 
-- [ ] Sin sesión, la app abre en Presentación; "Comenzar" lleva a Bienvenido.
+- [ ] Sin sesión, la app abre en Bienvenido (Presentación pasó al grafo principal, spec 005).
 - [ ] "Continuar con correo" abre Inicio de sesión; "Regístrate" abre Registro.
 - [ ] Login con correo y contraseña correctos lleva a Home; atrás desde Home no vuelve a Login.
 - [ ] Login con credenciales incorrectas muestra "Correo o contraseña incorrectos" bajo la contraseña.
@@ -208,8 +208,8 @@ sealed interface SessionState { Loading; SignedOut; SignedIn(user: User) }
 - [ ] Un código incorrecto se marca en rojo; tras 5 intentos o 10 minutos hay que pedir otro.
 - [ ] "Reenviar código" solo se activa después de 60 s.
 - [ ] Con el código correcto se crea la nueva contraseña (checklist en verde), se vuelve a Login con el mensaje de éxito, y la contraseña anterior deja de funcionar.
-- [ ] Con sesión activa, al reabrir la app se entra a Home sin ver Presentación (el splash se mantiene mientras se resuelve la sesión).
-- [ ] "Cerrar sesión" en Configuración regresa a Presentación con el historial limpio.
+- [ ] Con sesión activa, al reabrir la app se entra a Home (o a Presentación si no hay mascotas, spec 005) sin pasar por auth (el splash se mantiene mientras se resuelve la sesión).
+- [ ] "Cerrar sesión" en Configuración regresa a Bienvenido con el historial limpio.
 - [ ] Mientras una petición está en curso, el botón principal no se puede pulsar dos veces.
 - [x] Login, Registro y Recuperar no necesitan scroll, con o sin teclado, en pantallas de ≥ 800 dp de alto; sin teclado, tampoco desde 640 dp.
 - [x] Al abrir el teclado se ocultan con animación la foto, la insignia y el subtítulo, y el botón queda encima del teclado; al cerrarlo, reaparecen.

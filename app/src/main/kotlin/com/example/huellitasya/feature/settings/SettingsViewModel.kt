@@ -61,7 +61,7 @@ sealed interface SettingsEvent {
 
 /**
  * Configuración. Cerrar sesión o eliminar la cuenta no navega: la app reacciona al cambio de
- * `SessionState` y vuelve a Presentación con el historial limpio (specs 002 y 004).
+ * `SessionState` y vuelve a Bienvenido con el historial limpio (specs 002 y 005).
  *
  * Eliminar: confirmar → reautenticar (contraseña o Google) → Cloud Function `deleteAccount`.
  */

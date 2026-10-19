@@ -14,6 +14,9 @@ class ValidatorsTest {
     private val validatePhone = ValidatePhoneUseCase()
     private val validateAddress = ValidateAddressUseCase()
     private val validateBirthDate = ValidateBirthDateUseCase()
+    private val validatePetBreed = ValidatePetBreedUseCase()
+    private val validatePetBirthDate = ValidatePetBirthDateUseCase()
+    private val validatePetWeight = ValidatePetWeightUseCase()
 
     @Test
     fun `nombre vacio o con espacios es EmptyName`() {
@@ -133,5 +136,39 @@ class ValidatorsTest {
         assertNull(validateBirthDate(LocalDate.of(2005, 1, 15), today))
         assertNull(validateBirthDate(today, today))
         assertNull(validateBirthDate(null, today))
+    }
+
+    @Test
+    fun `raza vacia, corta o larga`() {
+        assertEquals(ValidationError.EmptyBreed, validatePetBreed("  "))
+        assertEquals(ValidationError.BreedTooShort, validatePetBreed("A"))
+        assertEquals(ValidationError.BreedTooLong, validatePetBreed("a".repeat(51)))
+        assertNull(validatePetBreed(" Golden Retriever "))
+    }
+
+    @Test
+    fun `fecha de la mascota obligatoria, no futura ni anterior a 1990`() {
+        val today = LocalDate.of(2026, 10, 19)
+        assertEquals(ValidationError.EmptyBirthDate, validatePetBirthDate(null, today))
+        assertEquals(ValidationError.InvalidBirthDate, validatePetBirthDate(today.plusDays(1), today))
+        assertEquals(ValidationError.InvalidBirthDate, validatePetBirthDate(LocalDate.of(1989, 12, 31), today))
+        assertNull(validatePetBirthDate(today, today))
+        assertNull(validatePetBirthDate(LocalDate.of(1990, 1, 1), today))
+    }
+
+    @Test
+    fun `peso vacio, no numerico o fuera de rango`() {
+        assertEquals(ValidationError.EmptyWeight, validatePetWeight(" "))
+        assertEquals(ValidationError.InvalidWeight, validatePetWeight("cinco"))
+        assertEquals(ValidationError.InvalidWeight, validatePetWeight("0"))
+        assertEquals(ValidationError.InvalidWeight, validatePetWeight("150.1"))
+        assertNull(validatePetWeight("150"))
+    }
+
+    @Test
+    fun `el peso acepta punto o coma decimal`() {
+        assertNull(validatePetWeight("5,5"))
+        assertEquals(5.5, validatePetWeight.parse("5,5")!!, 0.0)
+        assertEquals(12.25, validatePetWeight.parse(" 12.25 ")!!, 0.0)
     }
 }

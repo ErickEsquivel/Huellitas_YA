@@ -45,12 +45,12 @@ import com.example.huellitasya.core.designsystem.GrayText
 import com.example.huellitasya.core.designsystem.GreenAction
 import com.example.huellitasya.core.designsystem.GreenPrimary
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
+import com.example.huellitasya.core.designsystem.components.AppTitle
 import com.example.huellitasya.core.designsystem.MintSurface
 import com.example.huellitasya.core.designsystem.components.GoogleOptionButton
 import com.example.huellitasya.core.designsystem.components.HuellitasOptionButton
 import com.example.huellitasya.core.designsystem.components.LoadingOverlay
 import com.example.huellitasya.core.ui.ObserveAsEvents
-import com.example.huellitasya.feature.auth.components.AppTitle
 import com.example.huellitasya.feature.auth.components.AuthHero
 import com.example.huellitasya.feature.auth.components.AuthHeroSpec
 import com.example.huellitasya.feature.auth.components.PawDivider
@@ -135,7 +135,11 @@ internal fun AuthChooserScreen(
                             .offset(y = (57 * scale).dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        AppTitle(spacing = 0.dp, modifier = Modifier.offset(y = (-8).dp))
+                        AppTitle(
+                            logoDescription = stringResource(R.string.app_logo_description),
+                            spacing = 0.dp,
+                            modifier = Modifier.offset(y = (-8).dp),
+                        )
                         Text(
                             text = stringResource(R.string.auth_chooser_subtitle),
                             color = GrayText,

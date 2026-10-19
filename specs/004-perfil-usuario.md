@@ -35,7 +35,7 @@ Hoy `feature/profile/ProfileScreen.kt` es una maqueta con datos fijos, sin ViewM
 Perfil (pestaña) ──"Editar información"──► Datos Personales ──"<"──► atrás
 Configuración ──"Datos personales"──────► Datos Personales ──correo nuevo──► Verifica tu correo ──código──► Datos Personales
 Configuración ──"Seguridad"─────────────► Seguridad (cuentas Google: aviso, no abre)
-Configuración ──"Eliminar cuenta"──► Diálogo de confirmación ──► Reautenticación ──► (sesión cerrada) Presentación
+Configuración ──"Eliminar cuenta"──► Diálogo de confirmación ──► Reautenticación ──► (sesión cerrada) Bienvenido (spec 005)
 Perfil ──tocar la foto──► Photo Picker del sistema ──► subida ──► foto actualizada
 ```
 
