@@ -18,7 +18,8 @@ Las specs son la fuente de verdad de **qué** debe hacer cada feature antes de e
 | [001 — Firebase setup](001-firebase-setup.md) | Implemented |
 | [002 — Autenticación](002-auth.md) | Implemented |
 | [003 — Design system](003-design-system.md) | Implemented |
-| [004 — Perfil de usuario](004-perfil-usuario.md) | Implemented (pendiente de QA) |
+| [004 — Perfil de usuario](004-perfil-usuario.md) | Implemented |
+| [005 — Mascotas](005-mascotas.md) | Approved |
 
 ## Plantilla
 
