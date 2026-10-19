@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
-import com.example.huellitasya.core.model.SessionState
 import com.example.huellitasya.navigation.HuellitasApp
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,18 +19,19 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // El splash se mantiene hasta saber si hay sesión, así no se ve Welcome un instante antes de Home.
+        // El splash se mantiene hasta saber si hay sesión y dónde empieza (Home o Presentación, spec 005),
+        // así no se ve una pantalla un instante antes de la correcta.
         installSplashScreen().setKeepOnScreenCondition {
-            viewModel.sessionState.value == SessionState.Loading
+            viewModel.uiState.value == MainUiState.Loading
         }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val googleClientId = googleServerClientId()
         setContent {
-            val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             HuellitasYATheme {
                 HuellitasApp(
-                    sessionState = sessionState,
+                    uiState = uiState,
                     googleServerClientId = googleClientId,
                 )
             }

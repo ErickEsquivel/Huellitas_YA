@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 /** Mascotas del usuario con sesión, en vivo (spec 005). Sin sesión no emite nada. */
@@ -28,6 +29,23 @@ class ObservePetsUseCase @Inject constructor(
         authRepository.currentUser
             .distinctUntilChanged { old, new -> old?.uid == new?.uid }
             .flatMapLatest { user -> if (user == null) emptyFlow() else petRepository.observePets(user.uid) }
+}
+
+/**
+ * Presentación tras el login (spec 005): se muestra si la primera lectura de las mascotas viene
+ * vacía. Si la lectura falla o tarda más de [TIMEOUT_MS], se entra a Home.
+ */
+class ShouldShowPetsIntroUseCase @Inject constructor(
+    private val observePets: ObservePetsUseCase,
+) {
+    suspend operator fun invoke(): Boolean {
+        val first = withTimeoutOrNull(TIMEOUT_MS) { observePets().first() }
+        return first is AppResult.Success && first.data.isEmpty()
+    }
+
+    private companion object {
+        const val TIMEOUT_MS = 5_000L
+    }
 }
 
 /**

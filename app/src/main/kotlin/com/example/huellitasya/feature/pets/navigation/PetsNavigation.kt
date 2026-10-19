@@ -3,8 +3,19 @@ package com.example.huellitasya.feature.pets.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.huellitasya.feature.pets.intro.PetsIntroScreen
 import com.example.huellitasya.feature.pets.register.RegisterPetRoute
 import kotlinx.serialization.Serializable
+
+/** Presentación tras el login, si la cuenta no tiene mascotas (spec 005). */
+@Serializable
+data object PetsIntroDestination
+
+fun NavGraphBuilder.petsIntroScreen(onStartClick: () -> Unit) {
+    composable<PetsIntroDestination> {
+        PetsIntroScreen(onStartClick = onStartClick)
+    }
+}
 
 /**
  * "¡Conozcamos a tu mascota!" (spec 005).

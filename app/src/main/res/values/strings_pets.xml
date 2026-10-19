@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Presentación tras el login (spec 005, Figma 19:80) -->
+    <string name="pets_intro_slogan">El cuidado de tu mascota, en\nun solo lugar. 🐾</string>
+    <string name="pets_intro_description">Organiza vacunas, historial médico y\ngestiona la frecuencia de vacunación\nde tu mascota.</string>
+    <string name="pets_intro_image_description">Perro y gato</string>
+    <string name="pets_intro_start">Comenzar</string>
+    <string name="pets_intro_footer">Tu mascota merece el mejor cuidado 💚</string>
+
     <!-- Registrar mascota (spec 005, Figma 158:1359) -->
     <string name="pets_register_title">¡Conozcamos a\ntu mascota!</string>
     <string name="pets_register_back">Volver</string>

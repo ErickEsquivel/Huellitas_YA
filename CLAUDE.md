@@ -40,7 +40,7 @@ core/model|common|domain   Modelos, AppResult/AppError, @ApplicationScope, repos
 core/data            Firebase (Auth, Firestore, Storage, Functions) + módulos Hilt (di/)
 core/designsystem    Tema (Nunito, tokens de color), componentes Compose sin lógica
 core/ui              UiText, FieldFeedback, mapeo error→mensaje, ObserveAsEvents, google/ (GoogleIdTokenRequester)
-feature/auth|home|calendar|profile|settings
+feature/auth|home|pets|calendar|profile|settings
 ```
 
 Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tiene los fakes de cada repositorio (`FakeRepositories.kt`, `FakeNetworkMonitor`, `FakePasswordResetRepository`) y `MainDispatcherRule`.
@@ -61,7 +61,8 @@ Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tien
 - Los objetos de navegación se llaman `XDestination`, porque `XRoute` ya es el composable. Cada feature expone `NavGraphBuilder.xScreen()` o `authGraph()` en su paquete `navigation/`.
 
 **Sesión y navegación (lo que no es obvio):**
-- `HuellitasApp` elige el NavHost según `SessionState`: auth o principal.
+- `HuellitasApp` elige el NavHost según `MainUiState` (de `MainViewModel`): auth o principal.
+- Al entrar, el grafo principal empieza en Presentación si la cuenta no tiene mascotas (`ShouldShowPetsIntroUseCase`), y si no en Home (spec 005). Se decide una vez por `uid`: registrar la primera mascota o cambiar el nombre no recrea el grafo. Sin sesión, la app abre en Bienvenido.
 - Login, registro y logout **no navegan**: Firebase cambia la sesión y se reemplaza el NavHost completo, con lo que el historial queda limpio.
 - Por eso los use cases de inicio de sesión corren en `@ApplicationScope`: el ViewModel que los llamó se destruye en cuanto cambia el grafo, y así el perfil `users/{uid}` (`createIfMissing`) se escribe igual.
 - En tests de ViewModel, pasa el `TestScope` (`appScope = this`) como ese scope. `advanceUntilIdle()` no ejecuta trabajo de `backgroundScope`.

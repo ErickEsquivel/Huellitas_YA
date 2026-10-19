@@ -1,12 +1,4 @@
 <resources>
-    <!-- Presentación (Figma "PRESENTACION") -->
-    <string name="auth_logo_description">Logo Huellitas YA!</string>
-    <string name="auth_welcome_slogan">El cuidado de tu mascota, en\nun solo lugar. 🐾</string>
-    <string name="auth_welcome_description">Organiza vacunas, historial médico y\ngestiona la frecuencia de vacunación\nde tu mascota.</string>
-    <string name="auth_welcome_pets_description">Perro y gato</string>
-    <string name="auth_welcome_start">Comenzar</string>
-    <string name="auth_welcome_footer">Tu mascota merece el mejor cuidado 💚</string>
-
     <!-- Selector de acceso (Figma "BIENVENIDO") -->
     <string name="auth_chooser_subtitle">Inicia sesión para seguir cuidando a tu mascota.</string>
     <string name="auth_chooser_title">¡Bienvenido!</string>

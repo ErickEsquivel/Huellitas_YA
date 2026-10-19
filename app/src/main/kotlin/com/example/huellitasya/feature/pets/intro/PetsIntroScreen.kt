@@ -1,4 +1,4 @@
-package com.example.huellitasya.feature.auth.welcome
+package com.example.huellitasya.feature.pets.intro
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -31,8 +31,12 @@ import com.example.huellitasya.core.designsystem.components.AppTitle
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 
+/**
+ * Presentación (Figma `PRESENTACION`, 19:80). Desde la spec 005 se ve después de iniciar sesión,
+ * si la cuenta aún no tiene mascotas; "Comenzar" abre Registrar mascota.
+ */
 @Composable
-internal fun WelcomeScreen(onStartClick: () -> Unit) {
+internal fun PetsIntroScreen(onStartClick: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
@@ -54,12 +58,12 @@ internal fun WelcomeScreen(onStartClick: () -> Unit) {
         ) {
             Spacer(modifier = Modifier.height(HuellitasSpacing.xxl))
 
-            AppTitle(logoDescription = stringResource(R.string.auth_logo_description))
+            AppTitle(logoDescription = stringResource(R.string.app_logo_description))
 
             Spacer(modifier = Modifier.height(HuellitasSpacing.sm))
 
             Text(
-                text = stringResource(R.string.auth_welcome_slogan),
+                text = stringResource(R.string.pets_intro_slogan),
                 color = GrayText,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
@@ -69,7 +73,7 @@ internal fun WelcomeScreen(onStartClick: () -> Unit) {
             Spacer(modifier = Modifier.height(HuellitasSpacing.md))
 
             Text(
-                text = stringResource(R.string.auth_welcome_description),
+                text = stringResource(R.string.pets_intro_description),
                 color = LightGrayText,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
@@ -82,7 +86,7 @@ internal fun WelcomeScreen(onStartClick: () -> Unit) {
             // queden encima de la barra de navegación.
             Image(
                 painter = painterResource(id = R.drawable.img_pets),
-                contentDescription = stringResource(R.string.auth_welcome_pets_description),
+                contentDescription = stringResource(R.string.pets_intro_image_description),
                 modifier = Modifier
                     .weight(12f, fill = false)
                     .widthIn(max = 386.dp)
@@ -92,14 +96,14 @@ internal fun WelcomeScreen(onStartClick: () -> Unit) {
             Spacer(modifier = Modifier.weight(1f))
 
             HuellitasButton(
-                text = stringResource(R.string.auth_welcome_start),
+                text = stringResource(R.string.pets_intro_start),
                 onClick = onStartClick
             )
 
             Spacer(modifier = Modifier.height(HuellitasSpacing.md))
 
             Text(
-                text = stringResource(R.string.auth_welcome_footer),
+                text = stringResource(R.string.pets_intro_footer),
                 color = GrayText,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.ExtraBold,
@@ -113,8 +117,8 @@ internal fun WelcomeScreen(onStartClick: () -> Unit) {
 
 @Preview(showBackground = true)
 @Composable
-private fun WelcomeScreenPreview() {
+private fun PetsIntroScreenPreview() {
     HuellitasYATheme {
-        WelcomeScreen(onStartClick = {})
+        PetsIntroScreen(onStartClick = {})
     }
 }

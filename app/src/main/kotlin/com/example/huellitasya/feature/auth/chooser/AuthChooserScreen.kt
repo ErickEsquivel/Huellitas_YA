@@ -136,7 +136,7 @@ internal fun AuthChooserScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         AppTitle(
-                            logoDescription = stringResource(R.string.auth_logo_description),
+                            logoDescription = stringResource(R.string.app_logo_description),
                             spacing = 0.dp,
                             modifier = Modifier.offset(y = (-8).dp),
                         )
