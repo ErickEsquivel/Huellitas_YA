@@ -307,7 +307,7 @@ Callables en `functions/src/index.ts`, con las `setGlobalOptions` existentes (re
 - `feature/profile/personaldata`: `PersonalData*` con el mismo patrón. El estado incluye `isEditing`, `hasChanges` y un `FieldFeedback` por campo.
 - `feature/profile/verifyemail`: `VerifyEmailChange*` ("Verifica tu correo"), con la cuenta regresiva para reenviar.
 - `feature/settings/security`: `Security*` (cambio de contraseña).
-- `feature/settings`: `SettingsViewModel` pasa al patrón `UiState`/`Action`/`Event` y agrega eliminar la cuenta (confirmación, reautenticación y `LaunchGoogleReauth`). Las filas de "Mi cuenta" se rehacen según 3452:1018; el diálogo es `components/DeleteAccountDialog.kt`, con la tarjeta de Figma como imagen (`img_settings_delete_dialog`).
+- `feature/settings`: `SettingsViewModel` pasa al patrón `UiState`/`Action`/`Event` y agrega eliminar la cuenta (confirmación, reautenticación y `LaunchGoogleReauth`). Las filas de "Mi cuenta" se rehacen según 3452:1018; el diálogo es `DeleteConfirmDialog` (`core.designsystem`, desde la spec 005), con la tarjeta de Figma como imagen (`img_delete_dialog`).
 - `core.designsystem`: `HuellitasBackButton` (antes `AuthBackButton`), `PasswordConfirmDialog` y `PasswordRequirementRow` (antes en `feature.auth.components`), compartidos por Auth, Perfil y Configuración. El estado del diálogo vive en `core.ui.PasswordPromptState`.
 - `GoogleIdTokenRequester` sale de `feature.auth.google` y pasa a `core.ui.google`, porque Configuración también lo necesita para reautenticar y una feature no importa otra.
 - Strings en `res/values/strings_profile.xml` y `strings_settings.xml`; los errores nuevos, en `strings_errors.xml`. Recursos con prefijo `img_profile_*` / `ic_profile_*` e `ic_settings_*`.

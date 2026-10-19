@@ -44,6 +44,7 @@ import com.example.huellitasya.core.designsystem.BorderSubtle
 import com.example.huellitasya.core.designsystem.GrayText
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.LightGrayText
+import com.example.huellitasya.core.designsystem.components.DeleteConfirmDialog
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
@@ -52,7 +53,6 @@ import com.example.huellitasya.core.designsystem.components.PasswordConfirmDialo
 import com.example.huellitasya.core.designsystem.components.ScreenHeader
 import com.example.huellitasya.core.ui.ObserveAsEvents
 import com.example.huellitasya.core.ui.google.rememberGoogleIdTokenRequester
-import com.example.huellitasya.feature.settings.components.DeleteAccountDialog
 import kotlinx.coroutines.launch
 
 @Composable
@@ -166,7 +166,12 @@ internal fun SettingsScreen(
     }
 
     if (state.showDeleteConfirmation) {
-        DeleteAccountDialog(
+        DeleteConfirmDialog(
+            title = stringResource(R.string.settings_delete_title),
+            message = stringResource(R.string.settings_delete_message),
+            confirmText = stringResource(R.string.settings_delete_confirm),
+            closeDescription = stringResource(R.string.settings_delete_close),
+            imageDescription = stringResource(R.string.settings_delete_image_description),
             onConfirm = { onAction(SettingsAction.ConfirmDelete) },
             onDismiss = { onAction(SettingsAction.DismissDelete) },
         )
