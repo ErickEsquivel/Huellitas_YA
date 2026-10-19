@@ -45,6 +45,19 @@ internal class FirestorePetRepository @Inject constructor(
         awaitClose { registration.remove() }
     }
 
+    override fun observePet(uid: String, petId: String): Flow<AppResult<Pet, DataError>> = callbackFlow {
+        val registration = petsCollection(uid).document(petId).addSnapshotListener { snapshot, error ->
+            val pet = snapshot?.takeIf { it.exists() }?.toPet()
+            val result = when {
+                error != null -> AppResult.Failure(error.toDataError())
+                pet == null -> AppResult.Failure(DataError.NotFound)
+                else -> AppResult.Success(pet)
+            }
+            trySend(result)
+        }
+        awaitClose { registration.remove() }
+    }
+
     override fun newPetId(uid: String): String = petsCollection(uid).document().id
 
     override suspend fun createPet(

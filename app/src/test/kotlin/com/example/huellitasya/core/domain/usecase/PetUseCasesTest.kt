@@ -39,6 +39,19 @@ class PetUseCasesTest {
     }
 
     @Test
+    fun `observar una mascota la emite y avisa si se elimino`() = runTest {
+        authRepository.currentUser.value = TestUser
+        petRepository.pets.value = AppResult.Success(listOf(TestPet))
+
+        ObservePetUseCase(authRepository, petRepository)(TestPet.id).test {
+            assertEquals(AppResult.Success(TestPet), awaitItem())
+
+            petRepository.pets.value = AppResult.Success(emptyList())
+            assertEquals(AppResult.Failure(DataError.NotFound), awaitItem())
+        }
+    }
+
+    @Test
     fun `registrar sin foto crea el documento sin photoUrl`() = runTest {
         authRepository.currentUser.value = TestUser
 

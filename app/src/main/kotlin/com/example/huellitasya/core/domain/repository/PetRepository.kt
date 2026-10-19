@@ -11,6 +11,9 @@ interface PetRepository {
     /** Emite la lista, ordenada por fecha de registro, cada vez que cambia; sin red, desde la caché. */
     fun observePets(uid: String): Flow<AppResult<List<Pet>, DataError>>
 
+    /** Emite la mascota cada vez que cambia; `NotFound` si no existe o se eliminó. */
+    fun observePet(uid: String, petId: String): Flow<AppResult<Pet, DataError>>
+
     /** Id para una mascota nueva. Se genera antes de subir la foto, que usa la misma ruta. */
     fun newPetId(uid: String): String
 

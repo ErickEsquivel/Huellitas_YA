@@ -10,6 +10,7 @@ import com.example.huellitasya.core.model.PetSex
 import com.example.huellitasya.core.model.PetSpecies
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
 val TestPetDraft = PetDraft(
@@ -45,6 +46,15 @@ class FakePetRepository : PetRepository {
     private var nextId = 1
 
     override fun observePets(uid: String): Flow<AppResult<List<Pet>, DataError>> = pets
+
+    override fun observePet(uid: String, petId: String): Flow<AppResult<Pet, DataError>> =
+        pets.map { result ->
+            when (result) {
+                is AppResult.Success -> result.data.firstOrNull { it.id == petId }
+                    ?.let { AppResult.Success(it) } ?: AppResult.Failure(DataError.NotFound)
+                is AppResult.Failure -> result
+            }
+        }
 
     override fun newPetId(uid: String): String = "pet-${nextId++}"
 
