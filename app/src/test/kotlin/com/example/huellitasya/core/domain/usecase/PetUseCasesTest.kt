@@ -98,6 +98,63 @@ class PetUseCasesTest {
         assertTrue(petRepository.created.isEmpty())
     }
 
+    @Test
+    fun `actualizar sin foto nueva guarda los datos y conserva la foto`() = runTest {
+        authRepository.currentUser.value = TestUser
+        petRepository.pets.value = AppResult.Success(listOf(TestPet.copy(photoUrl = "https://storage.test/vieja.jpg")))
+        val draft = TestPetDraft.copy(weightKg = 6.0)
+
+        val result = UpdatePetUseCase(authRepository, petRepository, photoRepository, backgroundScope)(TestPet.id, draft, null)
+
+        assertEquals(AppResult.Success(Unit), result)
+        assertTrue(photoRepository.uploads.isEmpty())
+        assertEquals(Triple(TestPet.id, draft, null), petRepository.updated.single())
+    }
+
+    @Test
+    fun `actualizar con foto nueva la sube primero y guarda su URL`() = runTest {
+        authRepository.currentUser.value = TestUser
+
+        UpdatePetUseCase(authRepository, petRepository, photoRepository, backgroundScope)(TestPet.id, TestPetDraft, "content://nueva")
+
+        assertEquals(TestPet.id, photoRepository.uploads.single().second)
+        assertEquals("https://storage.test/pet.jpg", petRepository.updated.single().third)
+    }
+
+    @Test
+    fun `si la foto nueva falla no se actualiza nada`() = runTest {
+        authRepository.currentUser.value = TestUser
+        photoRepository.uploadResult = AppResult.Failure(DataError.Network)
+
+        val result = UpdatePetUseCase(authRepository, petRepository, photoRepository, backgroundScope)(TestPet.id, TestPetDraft, "content://nueva")
+
+        assertEquals(AppResult.Failure(DataError.Network), result)
+        assertTrue(petRepository.updated.isEmpty())
+    }
+
+    @Test
+    fun `eliminar borra la foto y luego el documento`() = runTest {
+        authRepository.currentUser.value = TestUser
+        petRepository.pets.value = AppResult.Success(listOf(TestPet))
+
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, backgroundScope)(TestPet.id)
+
+        assertEquals(AppResult.Success(Unit), result)
+        assertEquals(listOf(TestPet.id), photoRepository.deletedPhotos)
+        assertEquals(listOf(TestPet.id), petRepository.deleted)
+    }
+
+    @Test
+    fun `si no se puede borrar la foto la mascota se conserva`() = runTest {
+        authRepository.currentUser.value = TestUser
+        photoRepository.deleteResult = AppResult.Failure(DataError.Network)
+
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, backgroundScope)(TestPet.id)
+
+        assertEquals(AppResult.Failure(DataError.Network), result)
+        assertTrue(petRepository.deleted.isEmpty())
+    }
+
     private fun TestScope.registerPet() =
         RegisterPetUseCase(authRepository, petRepository, photoRepository, backgroundScope)
 }

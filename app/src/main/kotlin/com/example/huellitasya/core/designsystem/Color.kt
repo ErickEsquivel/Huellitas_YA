@@ -37,3 +37,5 @@ val PinkSurface = Color(0xFFFCE4EC)
 val DarkGrayText = Color(0xFF707070)
 /** Conteo de archivos en las tarjetas de "Registros Medicos". */
 val RecordCountGreen = Color(0xFF005716)
+/** Botón de acción destructiva ("Eliminar mascota", spec 005). */
+val DestructiveRed = Color(0xFFB50004)

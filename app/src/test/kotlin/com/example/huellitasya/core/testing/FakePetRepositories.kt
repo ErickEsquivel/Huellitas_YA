@@ -72,6 +72,35 @@ class FakePetRepository : PetRepository {
         return writeResult
     }
 
+    /** (petId, draft, photoUrl) de cada `updatePet`. */
+    val updated = mutableListOf<Triple<String, PetDraft, String?>>()
+    val deleted = mutableListOf<String>()
+
+    override suspend fun updatePet(
+        uid: String,
+        petId: String,
+        draft: PetDraft,
+        photoUrl: String?,
+    ): AppResult<Unit, DataError> {
+        updated += Triple(petId, draft, photoUrl)
+        val current = (pets.value as? AppResult.Success)?.data
+        if (writeResult is AppResult.Success && current != null) {
+            pets.value = AppResult.Success(
+                current.map { pet -> if (pet.id == petId) draft.toPet(petId, photoUrl ?: pet.photoUrl) else pet },
+            )
+        }
+        return writeResult
+    }
+
+    override suspend fun deletePet(uid: String, petId: String): AppResult<Unit, DataError> {
+        deleted += petId
+        val current = (pets.value as? AppResult.Success)?.data
+        if (writeResult is AppResult.Success && current != null) {
+            pets.value = AppResult.Success(current.filterNot { it.id == petId })
+        }
+        return writeResult
+    }
+
     data class CreatedPet(val uid: String, val petId: String, val draft: PetDraft, val photoUrl: String?)
 }
 
@@ -95,5 +124,13 @@ class FakePetPhotoRepository : PetPhotoRepository {
     override suspend fun upload(uid: String, petId: String, localUri: String): AppResult<String, DataError> {
         uploads += Triple(uid, petId, localUri)
         return uploadResult
+    }
+
+    var deleteResult: AppResult<Unit, DataError> = AppResult.Success(Unit)
+    val deletedPhotos = mutableListOf<String>()
+
+    override suspend fun delete(uid: String, petId: String): AppResult<Unit, DataError> {
+        deletedPhotos += petId
+        return deleteResult
     }
 }

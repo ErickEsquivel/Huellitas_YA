@@ -30,6 +30,7 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `PinkSurface` | `#FCE4EC` | Recuadro de la foto en la tarjeta de mascota |
 | `DarkGrayText` | `#707070` | Etiquetas y valores del perfil de la mascota |
 | `RecordCountGreen` | `#005716` | Conteo de archivos en "Registros Medicos" |
+| `DestructiveRed` | `#B50004` | Botón "Eliminar mascota" |
 
 - Espaciados en `HuellitasSpacing` (`xs=4, sm=8, md=16, lg=24, xl=32, xxl=48` dp).
 - Tipografía: **Nunito** (Regular 400, Bold 700, ExtraBold 800) en `res/font`, con licencia SIL OFL 1.1. `Typography` aplica Nunito a todos los estilos, así que cualquier `Text` la hereda.
@@ -55,6 +56,7 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `HuellitasBackButton` | Flecha "<" de 16×14 dp de los formularios y de Datos Personales. |
 | `PasswordConfirmDialog` | Diálogo "Confirma tu contraseña" antes de una operación sensible (cambiar el correo, eliminar la cuenta). |
 | `PasswordRequirementRow` | Fila de la checklist de contraseña (✗ naranja / ✓ verde), en "Crear nueva contraseña" y Seguridad. |
+| `DeleteConfirmDialog` | "¿Seguro deseas eliminarlo?" con el cachorro (Figma 3050:1515): eliminar una mascota o la cuenta. Recibe los textos y el del botón. |
 | `AddPlaceholderCard` | Tarjeta gris con ícono "+" (agregar mascota/evento). |
 
 En `core.ui`, `FieldFeedback(status, message: UiText?)` es lo que los ViewModels asignan a cada campo. Los mapeos `ValidationError.toFieldFeedback()` y `AuthError.toFieldFeedback()` aplican las reglas de la spec 002.

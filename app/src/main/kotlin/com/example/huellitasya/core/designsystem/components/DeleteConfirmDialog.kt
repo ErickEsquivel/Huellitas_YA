@@ -1,4 +1,4 @@
-package com.example.huellitasya.feature.settings.components
+package com.example.huellitasya.core.designsystem.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,12 +48,19 @@ private const val ButtonWidth = 237.72f
 private const val ButtonHeight = 40.9f
 
 /**
- * "¿Seguro deseas eliminarlo?" (Figma `EDIT PERRO 2`, 3050:1515), reutilizado para eliminar la
- * cuenta (spec 004). La tarjeta con el cachorro y la papelera es una sola imagen; los textos y el
- * botón van encima en las posiciones de Figma, escaladas al ancho disponible.
+ * "¿Seguro deseas eliminarlo?" (Figma `EDIT PERRO 2`, 3050:1515): eliminar una mascota (spec 005)
+ * y eliminar la cuenta (spec 004). La tarjeta con el cachorro y la papelera es una sola imagen; los
+ * textos y el botón van encima en las posiciones de Figma, escaladas al ancho disponible.
+ *
+ * @param confirmText "Eliminar Información" o "Eliminar cuenta".
  */
 @Composable
-internal fun DeleteAccountDialog(
+fun DeleteConfirmDialog(
+    title: String,
+    message: String,
+    confirmText: String,
+    closeDescription: String,
+    imageDescription: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -62,12 +68,17 @@ internal fun DeleteAccountDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false),
     ) {
-        DeleteAccountDialogContent(onConfirm = onConfirm, onDismiss = onDismiss)
+        DeleteConfirmDialogContent(title, message, confirmText, closeDescription, imageDescription, onConfirm, onDismiss)
     }
 }
 
 @Composable
-private fun DeleteAccountDialogContent(
+private fun DeleteConfirmDialogContent(
+    title: String,
+    message: String,
+    confirmText: String,
+    closeDescription: String,
+    imageDescription: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -90,8 +101,8 @@ private fun DeleteAccountDialogContent(
                 .padding(top = 4.dp, end = 8.dp),
         ) {
             Image(
-                painter = painterResource(R.drawable.ic_settings_close),
-                contentDescription = stringResource(R.string.settings_delete_close),
+                painter = painterResource(R.drawable.ic_dialog_close),
+                contentDescription = closeDescription,
                 modifier = Modifier.size(37.5.dp),
             )
         }
@@ -114,8 +125,8 @@ private fun DeleteAccountDialogContent(
                     ),
             ) {
                 Image(
-                    painter = painterResource(R.drawable.img_settings_delete_dialog),
-                    contentDescription = stringResource(R.string.settings_delete_image_description),
+                    painter = painterResource(R.drawable.img_delete_dialog),
+                    contentDescription = imageDescription,
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -126,7 +137,7 @@ private fun DeleteAccountDialogContent(
                     Spacer(modifier = Modifier.height((TitleTop * scale).dp))
                     // La zona blanca de la tarjeta es más angosta que la imagen: el título se reduce si no cabe.
                     Text(
-                        text = stringResource(R.string.settings_delete_title),
+                        text = title,
                         color = AlertRed,
                         maxLines = 1,
                         autoSize = TextAutoSize.StepBased(minFontSize = 16.sp, maxFontSize = (26 * scale).sp),
@@ -136,7 +147,7 @@ private fun DeleteAccountDialogContent(
                     )
                     Spacer(modifier = Modifier.height((16 * scale).dp))
                     Text(
-                        text = stringResource(R.string.settings_delete_message),
+                        text = message,
                         color = Color.Black.copy(alpha = 0.5f),
                         fontSize = (16 * scale).sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -154,7 +165,7 @@ private fun DeleteAccountDialogContent(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = stringResource(R.string.settings_delete_confirm),
+                            text = confirmText,
                             color = Color.White,
                             fontSize = (20 * scale).sp,
                             maxLines = 1,
@@ -169,6 +180,16 @@ private fun DeleteAccountDialogContent(
 
 @Preview(showBackground = true, widthDp = 412, heightDp = 917)
 @Composable
-private fun DeleteAccountDialogPreview() {
-    HuellitasYATheme { DeleteAccountDialogContent(onConfirm = {}, onDismiss = {}) }
+private fun DeleteConfirmDialogPreview() {
+    HuellitasYATheme {
+        DeleteConfirmDialogContent(
+            title = "¿Seguro deseas eliminarlo?",
+            message = "No podrás recuperar los datos luego de confirmar la eliminación.",
+            confirmText = "Eliminar Información",
+            closeDescription = "Cerrar",
+            imageDescription = "Cachorro triste junto a una papelera",
+            onConfirm = {},
+            onDismiss = {},
+        )
+    }
 }

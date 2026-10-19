@@ -12,4 +12,7 @@ interface PetPhotoRepository {
      * @return la URL de descarga para guardar en `photoUrl`.
      */
     suspend fun upload(uid: String, petId: String, localUri: String): AppResult<String, DataError>
+
+    /** Borra la foto de la mascota. Si no tenía foto, también es un éxito. */
+    suspend fun delete(uid: String, petId: String): AppResult<Unit, DataError>
 }
