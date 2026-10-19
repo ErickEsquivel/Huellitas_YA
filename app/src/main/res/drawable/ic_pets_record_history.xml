@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma 56:173: "Historial clínico" -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="41.7082dp"
+    android:height="37.7999dp"
+    android:viewportWidth="41.7082"
+    android:viewportHeight="37.7999">
+    <path
+        android:pathData="M41.0416 11.5438C41.0416 5.53653 36.1716 0.666667 30.1643 0.666667C26.2094 0.666667 22.7578 2.78444 20.8541 5.94092C18.9502 2.78444 15.4987 0.666667 11.5438 0.666667C5.53653 0.666667 0.666667 5.53653 0.666667 11.5438C0.666667 12.9171 0.931866 14.2255 1.39618 15.4354C4.99285 25.7808 20.8542 37.1333 20.8542 37.1333C20.8542 37.1333 36.7154 25.7808 40.3122 15.4354C40.7765 14.2257 41.0416 12.9171 41.0416 11.5438Z"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="1.33333"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

@@ -31,6 +31,18 @@ class ObservePetsUseCase @Inject constructor(
             .flatMapLatest { user -> if (user == null) emptyFlow() else petRepository.observePets(user.uid) }
 }
 
+/** Una mascota del usuario con sesión, en vivo (perfil de la mascota, spec 005). */
+class ObservePetUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val petRepository: PetRepository,
+) {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    operator fun invoke(petId: String): Flow<AppResult<Pet, DataError>> =
+        authRepository.currentUser
+            .distinctUntilChanged { old, new -> old?.uid == new?.uid }
+            .flatMapLatest { user -> if (user == null) emptyFlow() else petRepository.observePet(user.uid, petId) }
+}
+
 /**
  * Presentación tras el login (spec 005): se muestra si la primera lectura de las mascotas viene
  * vacía. Si la lectura falla o tarda más de [TIMEOUT_MS], se entra a Home.

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma 56:154: "Carné de vacunas" -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="41.32dp"
+    android:height="41.32dp"
+    android:viewportWidth="41.32"
+    android:viewportHeight="41.32">
+    <path
+        android:pathData="M12.4796 23.5772L26.168 9.88878C26.576 9.48078 27.2084 9.48078 27.6164 9.88878L31.4312 13.7036C31.8392 14.1116 31.8392 14.744 31.4312 15.152L17.7428 28.8404"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.56"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M32.1656 9.1748L40.04 1.28"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.56"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M5.89042 35.4296L9.84802 31.472"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.56"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M7.88958 24.23L17.09 33.4304"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.56"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M1.28 36.1028L5.2376 40.04"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2.56"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

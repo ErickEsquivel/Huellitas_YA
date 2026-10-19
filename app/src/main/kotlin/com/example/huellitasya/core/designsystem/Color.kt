@@ -29,3 +29,11 @@ val GreenDeep = Color(0xFF378B5F)
 val OverlayScrim = Color(0x99FFFFFF)
 /** Advertencias de validación (borde naranja + ícono de alerta). */
 val WarningOrange = Color(0x80FF6A00)
+/** Tarjetas de mascota en Home y de "Registros Medicos" (spec 005). */
+val GreenCard = Color(0xFF80CC80)
+/** Recuadro de la foto en la tarjeta de mascota de Home. */
+val PinkSurface = Color(0xFFFCE4EC)
+/** Etiquetas y valores del perfil de la mascota ("Fecha de nacimiento", "5 kg"). */
+val DarkGrayText = Color(0xFF707070)
+/** Conteo de archivos en las tarjetas de "Registros Medicos". */
+val RecordCountGreen = Color(0xFF005716)

@@ -3,6 +3,7 @@ package com.example.huellitasya.feature.pets.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.huellitasya.feature.pets.detail.PetDetailRoute
 import com.example.huellitasya.feature.pets.intro.PetsIntroScreen
 import com.example.huellitasya.feature.pets.register.RegisterPetRoute
 import kotlinx.serialization.Serializable
@@ -36,5 +37,20 @@ fun NavGraphBuilder.registerPetScreen(
             onBackClick = onBack,
             onPetSaved = { onPetSaved(destination.fromIntro) },
         )
+    }
+}
+
+/** Perfil de una mascota. El nombre de la propiedad es la clave que lee `PetDetailViewModel`. */
+@Serializable
+data class PetDetailDestination(val petId: String)
+
+/** @param onPetGone la mascota se eliminó: vuelve a Home. */
+fun NavGraphBuilder.petDetailScreen(
+    onBack: () -> Unit,
+    onEditClick: (petId: String) -> Unit,
+    onPetGone: () -> Unit,
+) {
+    composable<PetDetailDestination> {
+        PetDetailRoute(onBackClick = onBack, onEditClick = onEditClick, onPetGone = onPetGone)
     }
 }

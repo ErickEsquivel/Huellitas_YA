@@ -17,7 +17,9 @@ import com.example.huellitasya.feature.auth.navigation.authGraph
 import com.example.huellitasya.feature.calendar.navigation.calendarScreen
 import com.example.huellitasya.feature.home.navigation.HomeDestination
 import com.example.huellitasya.feature.home.navigation.homeScreen
+import com.example.huellitasya.feature.pets.navigation.PetDetailDestination
 import com.example.huellitasya.feature.pets.navigation.PetsIntroDestination
+import com.example.huellitasya.feature.pets.navigation.petDetailScreen
 import com.example.huellitasya.feature.pets.navigation.petsIntroScreen
 import com.example.huellitasya.feature.pets.navigation.RegisterPetDestination
 import com.example.huellitasya.feature.pets.navigation.registerPetScreen
@@ -85,7 +87,16 @@ private fun MainNavHost(googleServerClientId: String?, startWithIntro: Boolean) 
             startDestination = if (startWithIntro) PetsIntroDestination else HomeDestination,
             modifier = Modifier.padding(innerPadding), // Evita que el contenido quede debajo de la barra
         ) {
-            homeScreen(onAddPetClick = { navController.navigate(RegisterPetDestination()) })
+            homeScreen(
+                onAddPetClick = { navController.navigate(RegisterPetDestination()) },
+                onPetClick = { navController.navigate(PetDetailDestination(it)) },
+            )
+            petDetailScreen(
+                onBack = { navController.popBackStack() },
+                // Editar mascota llega con la parte de Julian (spec 005, "Reparto").
+                onEditClick = {},
+                onPetGone = { navController.popBackStack<HomeDestination>(inclusive = false) },
+            )
             petsIntroScreen(onStartClick = { navController.navigate(RegisterPetDestination(fromIntro = true)) })
             registerPetScreen(
                 onBack = { navController.popBackStack() },
