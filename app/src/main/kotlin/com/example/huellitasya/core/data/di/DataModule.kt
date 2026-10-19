@@ -5,7 +5,9 @@ import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
 import com.example.huellitasya.core.data.repository.FunctionsAccountRepository
 import com.example.huellitasya.core.data.repository.FunctionsEmailChangeRepository
+import com.example.huellitasya.core.data.repository.FirebaseStoragePetPhotoRepository
 import com.example.huellitasya.core.data.repository.FirebaseStorageProfilePhotoRepository
+import com.example.huellitasya.core.data.repository.FirestorePetRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
 import com.example.huellitasya.core.data.repository.FunctionsPasswordResetRepository
 import com.example.huellitasya.core.domain.repository.AccountRepository
@@ -13,6 +15,8 @@ import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.domain.repository.EmailChangeRepository
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.repository.PasswordResetRepository
+import com.example.huellitasya.core.domain.repository.PetPhotoRepository
+import com.example.huellitasya.core.domain.repository.PetRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -49,7 +53,7 @@ internal object FirebaseModule {
     @Singleton
     fun provideFirebaseFunctions(): FirebaseFunctions = FirebaseFunctions.getInstance(FUNCTIONS_REGION)
 
-    /** Bucket por defecto del proyecto (spec 004, fotos de perfil). */
+    /** Bucket por defecto del proyecto (fotos de perfil y de mascotas, specs 004 y 005). */
     @Provides
     @Singleton
     fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
@@ -91,6 +95,14 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindEmailChangeRepository(impl: FunctionsEmailChangeRepository): EmailChangeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPetRepository(impl: FirestorePetRepository): PetRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPetPhotoRepository(impl: FirebaseStoragePetPhotoRepository): PetPhotoRepository
 }
 
 private const val FUNCTIONS_REGION = "southamerica-east1"

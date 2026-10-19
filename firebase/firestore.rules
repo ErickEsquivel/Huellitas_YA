@@ -43,6 +43,36 @@ service cloud.firestore {
                     && (unchanged('updatedAt') || request.resource.data.updatedAt == request.time);
       // Solo la Cloud Function deleteAccount (Admin SDK) borra perfiles (spec 004).
       allow delete: if false;
+
+      // Mascotas (spec 005): solo el dueño. deleteAccount las borra junto con el perfil.
+      match /pets/{petId} {
+        function textBetween(field, minSize, maxSize) {
+          let value = request.resource.data.get(field, null);
+          return value is string && value.trim().size() >= minSize && value.size() <= maxSize;
+        }
+
+        function isValidPet() {
+          let data = request.resource.data;
+          return data.keys().hasOnly([
+                   'name', 'species', 'breed', 'birthDate', 'sex', 'weightKg',
+                   'photoUrl', 'createdAt', 'updatedAt'])
+                 && data.keys().hasAll(['name', 'species', 'breed', 'birthDate', 'sex', 'weightKg'])
+                 && textBetween('name', 2, 50)
+                 && data.species in ['dog', 'cat', 'other']
+                 && textBetween('breed', 2, 50)
+                 && data.birthDate is string
+                 && data.birthDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+                 && data.sex in ['male', 'female']
+                 && data.weightKg is number && data.weightKg > 0 && data.weightKg <= 150
+                 && optionalString('photoUrl', 2048);
+        }
+
+        allow read: if isOwner();
+        allow create: if isOwner()
+                      && isValidPet()
+                      && request.resource.data.createdAt == request.time
+                      && request.resource.data.updatedAt == request.time;
+      }
     }
 
     // passwordResetCodes (códigos de recuperación hasheados) solo lo usan las Cloud Functions

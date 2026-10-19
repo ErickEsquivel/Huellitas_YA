@@ -3,6 +3,9 @@ package com.example.huellitasya.core.data.mapper
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.model.AuthProvider
+import com.example.huellitasya.core.model.Pet
+import com.example.huellitasya.core.model.PetSex
+import com.example.huellitasya.core.model.PetSpecies
 import com.example.huellitasya.core.model.User
 import com.example.huellitasya.core.model.UserProfile
 import com.google.firebase.FirebaseNetworkException
@@ -51,6 +54,31 @@ internal fun Throwable.toDataError(): DataError = when {
     this is StorageException && errorCode == StorageException.ERROR_RETRY_LIMIT_EXCEEDED -> DataError.Network
     this is StorageException && errorCode == StorageException.ERROR_NOT_AUTHORIZED -> DataError.PermissionDenied
     else -> DataError.Unknown
+}
+
+/**
+ * Esquema `users/{uid}/pets/{petId}` de la spec 005. Si falta un dato obligatorio o está mal
+ * formado, la mascota se omite (`null`) en lugar de mostrarse a medias.
+ */
+internal fun DocumentSnapshot.toPet(): Pet? {
+    val name = getString("name")?.takeIf { it.isNotBlank() } ?: return null
+    val breed = getString("breed")?.takeIf { it.isNotBlank() } ?: return null
+    val birthDate = getString("birthDate")?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return null
+    val weightKg = getDouble("weightKg") ?: return null
+    return Pet(
+        id = id,
+        name = name,
+        species = when (getString("species")) {
+            "dog" -> PetSpecies.DOG
+            "cat" -> PetSpecies.CAT
+            else -> PetSpecies.OTHER
+        },
+        breed = breed,
+        birthDate = birthDate,
+        sex = if (getString("sex") == "female") PetSex.FEMALE else PetSex.MALE,
+        weightKg = weightKg,
+        photoUrl = getString("photoUrl")?.takeIf { it.isNotBlank() },
+    )
 }
 
 /** Esquema `users/{uid}` de las specs 002 y 004. Un dato mal formado se trata como no registrado. */

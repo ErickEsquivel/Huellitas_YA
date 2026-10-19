@@ -17,6 +17,9 @@
     <string name="error_invalid_phone">Ingresa un teléfono válido</string>
     <string name="error_address_too_long">Máximo 100 caracteres</string>
     <string name="error_invalid_birth_date">Fecha no válida</string>
+    <string name="error_missing_pet_fields">Rellene todas las casillas indicadas</string>
+    <string name="error_breed_too_short">La raza debe tener al menos 2 caracteres</string>
+    <string name="error_invalid_weight">Ingresa un peso válido</string>
     <string name="error_profile_not_found">No encontramos tu perfil</string>
     <string name="error_photo_too_large">La imagen es demasiado grande</string>
     <string name="error_new_email_invalid">Ingresa un correo distinto al actual</string>

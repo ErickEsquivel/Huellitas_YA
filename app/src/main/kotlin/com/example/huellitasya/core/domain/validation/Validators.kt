@@ -5,7 +5,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 /**
- * Validadores de formularios (specs 002 y 004). Devuelven `null` si el valor es válido.
+ * Validadores de formularios (specs 002, 004 y 005). Devuelven `null` si el valor es válido.
  * Son lógica pura: no dependen de Android para poder probarse en la JVM.
  */
 class ValidateNameUseCase @Inject constructor() {
@@ -66,6 +66,56 @@ class ValidateBirthDateUseCase @Inject constructor() {
 
     private companion object {
         val MIN_DATE: LocalDate = LocalDate.of(1900, 1, 1)
+    }
+}
+
+/** Raza de la mascota (spec 005): obligatoria, de 2 a 50 caracteres. */
+class ValidatePetBreedUseCase @Inject constructor() {
+    operator fun invoke(breed: String): ValidationError? {
+        val trimmed = breed.trim()
+        return when {
+            trimmed.isEmpty() -> ValidationError.EmptyBreed
+            trimmed.length < MIN_LENGTH -> ValidationError.BreedTooShort
+            trimmed.length > MAX_LENGTH -> ValidationError.BreedTooLong
+            else -> null
+        }
+    }
+
+    private companion object {
+        const val MIN_LENGTH = 2
+
+        /** Mismo límite que `firebase/firestore.rules`. */
+        const val MAX_LENGTH = 50
+    }
+}
+
+/** Fecha de nacimiento de la mascota (spec 005): obligatoria, ni futura ni anterior a 1990. */
+class ValidatePetBirthDateUseCase @Inject constructor() {
+    operator fun invoke(date: LocalDate?, today: LocalDate = LocalDate.now()): ValidationError? = when {
+        date == null -> ValidationError.EmptyBirthDate
+        date.isAfter(today) || date.isBefore(MIN_DATE) -> ValidationError.InvalidBirthDate
+        else -> null
+    }
+
+    companion object {
+        val MIN_DATE: LocalDate = LocalDate.of(1990, 1, 1)
+    }
+}
+
+/** Peso de la mascota en kg (spec 005): obligatorio, mayor que 0 y hasta 150. Acepta punto o coma. */
+class ValidatePetWeightUseCase @Inject constructor() {
+    operator fun invoke(weight: String): ValidationError? {
+        if (weight.isBlank()) return ValidationError.EmptyWeight
+        val value = parse(weight) ?: return ValidationError.InvalidWeight
+        return if (value > 0.0 && value <= MAX_WEIGHT_KG) null else ValidationError.InvalidWeight
+    }
+
+    /** `"5,5"` → `5.5`; `null` si no es un número. */
+    fun parse(weight: String): Double? = weight.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it.isFinite() }
+
+    private companion object {
+        /** Mismo límite que `firebase/firestore.rules`. */
+        const val MAX_WEIGHT_KG = 150.0
     }
 }
 

@@ -14,6 +14,17 @@ service firebase.storage {
       allow delete: if false;
     }
 
+    // Foto de cada mascota (spec 005): solo su dueño la lee y la reemplaza.
+    match /users/{uid}/pets/{photoName} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null
+                            && request.auth.uid == uid
+                            && photoName.matches('[A-Za-z0-9]+[.]jpg')
+                            && request.resource.contentType.matches('image/.*')
+                            && request.resource.size < 5 * 1024 * 1024;
+      allow delete: if false;
+    }
+
     // Todo lo demás queda denegado hasta que una spec lo defina.
     match /{allPaths=**} {
       allow read, write: if false;

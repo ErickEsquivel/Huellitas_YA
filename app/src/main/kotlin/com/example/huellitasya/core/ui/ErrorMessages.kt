@@ -35,7 +35,7 @@ fun ValidationError.toFieldFeedback(): FieldFeedback = when {
     else -> FieldFeedback(FieldStatus.Warning, toUiText())
 }
 
-/** Mensajes de las specs 002 y 004 para cada error de validación. */
+/** Mensajes de las specs 002, 004 y 005 para cada error de validación. */
 fun ValidationError.toUiText(): UiText = UiText.Resource(
     when (this) {
         ValidationError.EmptyName -> R.string.error_empty_name
@@ -52,6 +52,12 @@ fun ValidationError.toUiText(): UiText = UiText.Resource(
         ValidationError.InvalidPhone -> R.string.error_invalid_phone
         ValidationError.AddressTooLong -> R.string.error_address_too_long
         ValidationError.InvalidBirthDate -> R.string.error_invalid_birth_date
+        // Los campos vacíos de la mascota solo se resaltan: el aviso es el del formulario.
+        ValidationError.EmptySpecies, ValidationError.EmptyBreed, ValidationError.EmptyBirthDate,
+        ValidationError.EmptySex, ValidationError.EmptyWeight -> R.string.error_missing_pet_fields
+        ValidationError.BreedTooShort -> R.string.error_breed_too_short
+        ValidationError.BreedTooLong -> R.string.error_name_too_long
+        ValidationError.InvalidWeight -> R.string.error_invalid_weight
     },
 )
 
