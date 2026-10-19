@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.huellitasya.feature.pets.detail.PetDetailRoute
+import com.example.huellitasya.feature.pets.edit.EditPetRoute
 import com.example.huellitasya.feature.pets.intro.PetsIntroScreen
 import com.example.huellitasya.feature.pets.register.RegisterPetRoute
 import kotlinx.serialization.Serializable
@@ -52,5 +53,23 @@ fun NavGraphBuilder.petDetailScreen(
 ) {
     composable<PetDetailDestination> {
         PetDetailRoute(onBackClick = onBack, onEditClick = onEditClick, onPetGone = onPetGone)
+    }
+}
+
+/** Editar mascota. El nombre de la propiedad es la clave que lee `EditPetViewModel`. */
+@Serializable
+data class EditPetDestination(val petId: String)
+
+/**
+ * @param onPetUpdated vuelve al perfil, que ya muestra los cambios en vivo.
+ * @param onPetDeleted vuelve a Home.
+ */
+fun NavGraphBuilder.editPetScreen(
+    onBack: () -> Unit,
+    onPetUpdated: () -> Unit,
+    onPetDeleted: () -> Unit,
+) {
+    composable<EditPetDestination> {
+        EditPetRoute(onBackClick = onBack, onPetUpdated = onPetUpdated, onPetDeleted = onPetDeleted)
     }
 }

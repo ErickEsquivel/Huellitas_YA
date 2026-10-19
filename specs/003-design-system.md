@@ -30,6 +30,7 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `PinkSurface` | `#FCE4EC` | Recuadro de la foto en la tarjeta de mascota |
 | `DarkGrayText` | `#707070` | Etiquetas y valores del perfil de la mascota |
 | `RecordCountGreen` | `#005716` | Conteo de archivos en "Registros Medicos" |
+| `DestructiveRed` | `#B50004` | Botón "Eliminar mascota" |
 
 - Espaciados en `HuellitasSpacing` (`xs=4, sm=8, md=16, lg=24, xl=32, xxl=48` dp).
 - Tipografía: **Nunito** (Regular 400, Bold 700, ExtraBold 800) en `res/font`, con licencia SIL OFL 1.1. `Typography` aplica Nunito a todos los estilos, así que cualquier `Text` la hereda.
