@@ -8,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,7 +45,6 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.ButtonIncomplete
 import com.example.huellitasya.core.designsystem.GreenPrimary
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
-import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.designsystem.components.ProgressOverlay
@@ -55,6 +53,7 @@ import com.example.huellitasya.core.model.PetSpecies
 import com.example.huellitasya.core.ui.ObserveAsEvents
 import com.example.huellitasya.feature.pets.components.PetFormFields
 import com.example.huellitasya.feature.pets.components.PetPhotoPicker
+import com.example.huellitasya.feature.pets.components.petFormWave
 import com.example.huellitasya.feature.pets.form.PetFormAction
 import com.example.huellitasya.feature.pets.form.PetFormState
 import kotlinx.coroutines.launch
@@ -120,10 +119,6 @@ internal fun RegisterPetScreen(
                     .height(446.dp)
                     .alpha(0.3f),
             )
-            CurvedBackground(
-                modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.64f)
-            )
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -156,24 +151,30 @@ internal fun RegisterPetScreen(
                     onClick = onPhotoClick,
                     modifier = Modifier.offset(x = 10.dp),
                 )
-                Spacer(modifier = Modifier.height(44.dp))
-                PetFormFields(
-                    form = state.form,
-                    onAction = { onAction(RegisterPetAction.Form(it)) },
-                )
-                Spacer(modifier = Modifier.height(48.dp))
-                HuellitasButton(
-                    text = stringResource(R.string.pets_register_button),
-                    onClick = {
-                        focusManager.clearFocus()
-                        onAction(RegisterPetAction.Save)
-                    },
-                    containerColor = if (state.form.isComplete) GreenPrimary else ButtonIncomplete,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.size(width = 279.dp, height = 48.dp),
-                )
-                Spacer(modifier = Modifier.height(32.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .petFormWave(horizontalBleed = 24.dp)
+                        .padding(top = 64.dp, bottom = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    PetFormFields(
+                        form = state.form,
+                        onAction = { onAction(RegisterPetAction.Form(it)) },
+                    )
+                    Spacer(modifier = Modifier.height(48.dp))
+                    HuellitasButton(
+                        text = stringResource(R.string.pets_register_button),
+                        onClick = {
+                            focusManager.clearFocus()
+                            onAction(RegisterPetAction.Save)
+                        },
+                        containerColor = if (state.form.isComplete) GreenPrimary else ButtonIncomplete,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        modifier = Modifier.size(width = 279.dp, height = 48.dp),
+                    )
+                }
             }
 
             SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))

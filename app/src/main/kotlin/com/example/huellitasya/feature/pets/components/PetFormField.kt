@@ -39,16 +39,20 @@ import androidx.compose.ui.unit.sp
 import com.example.huellitasya.core.designsystem.BorderSubtle
 import com.example.huellitasya.core.designsystem.ErrorRed
 import com.example.huellitasya.core.designsystem.GreenPrimary
+import com.example.huellitasya.core.designsystem.Nunito
 import com.example.huellitasya.core.designsystem.WarningOrange
 import com.example.huellitasya.core.designsystem.components.FieldMessage
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 
 private val FieldShape = RoundedCornerShape(10.dp)
 private val LabelColor = Color.Black.copy(alpha = 0.2f)
-private val ValueStyle = TextStyle(color = Color.Black, fontSize = 19.sp, fontWeight = FontWeight.Bold)
+private val ValueStyle = TextStyle(fontFamily = Nunito, color = Color.Black, fontSize = 19.sp, fontWeight = FontWeight.Bold)
 
 /** Distancia de Figma entre el borde de la tarjeta y la etiqueta/valor (93 − 24 dp). */
-private val TextStart = 69.dp
+internal val PetFieldTextStart = 69.dp
+
+/** En las tarjetas angostas (Sexo, Peso) el texto empieza más cerca del ícono (Figma: ~62 dp). */
+internal val PetFieldTextStartNarrow = 60.dp
 
 /**
  * Tarjeta de un campo del formulario de mascota (Figma 19:63): ícono a la izquierda, etiqueta
@@ -63,6 +67,7 @@ private fun PetFieldCard(
     message: String?,
     modifier: Modifier = Modifier,
     iconSize: Dp = 50.dp,
+    textStart: Dp = PetFieldTextStart,
     cardModifier: Modifier = Modifier,
     value: @Composable () -> Unit,
 ) {
@@ -79,13 +84,13 @@ private fun PetFieldCard(
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-                    .padding(start = (TextStart - iconSize) / 2)
+                    .padding(start = ((textStart - iconSize) / 2).coerceAtLeast(4.dp))
                     .size(iconSize),
             )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = TextStart, end = 12.dp, top = 6.dp, bottom = 6.dp),
+                    .padding(start = textStart, end = 8.dp, top = 6.dp, bottom = 6.dp),
             ) {
                 Text(text = label, color = LabelColor, fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
                 value()
@@ -115,6 +120,7 @@ internal fun PetTextField(
     status: FieldStatus = FieldStatus.Default,
     message: String? = null,
     iconSize: Dp = 50.dp,
+    textStart: Dp = PetFieldTextStart,
     suffix: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
@@ -125,6 +131,7 @@ internal fun PetTextField(
         message = message,
         modifier = modifier,
         iconSize = iconSize,
+        textStart = textStart,
     ) {
         BasicTextField(
             value = value,
@@ -165,6 +172,7 @@ internal fun PetClickableField(
     status: FieldStatus = FieldStatus.Default,
     message: String? = null,
     iconSize: Dp = 50.dp,
+    textStart: Dp = PetFieldTextStart,
 ) {
     PetFieldCard(
         label = label,
@@ -173,6 +181,7 @@ internal fun PetClickableField(
         message = message,
         modifier = modifier,
         iconSize = iconSize,
+        textStart = textStart,
         cardModifier = Modifier.clickable(role = Role.Button, onClick = onClick),
     ) {
         Text(text = valueText.orEmpty(), style = ValueStyle, maxLines = 1)
@@ -192,6 +201,7 @@ internal fun <T> PetDropdownField(
     status: FieldStatus = FieldStatus.Default,
     message: String? = null,
     iconSize: Dp = 50.dp,
+    textStart: Dp = PetFieldTextStart,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = modifier) {
@@ -203,6 +213,7 @@ internal fun <T> PetDropdownField(
             status = status,
             message = message,
             iconSize = iconSize,
+            textStart = textStart,
         )
         DropdownMenu(
             expanded = expanded,

@@ -95,6 +95,7 @@ internal fun PetFormFields(
                 label = stringResource(R.string.pets_field_sex),
                 icon = painterResource(R.drawable.ic_pets_sex),
                 iconSize = 44.dp,
+                textStart = PetFieldTextStartNarrow,
                 status = form.sexFeedback.statusOrDefault,
                 modifier = Modifier.weight(1f),
             )
@@ -103,7 +104,8 @@ internal fun PetFormFields(
                 onValueChange = { value -> onAction(PetFormAction.WeightChanged(value.filter { it.isDigit() || it == '.' || it == ',' })) },
                 label = stringResource(R.string.pets_field_weight),
                 icon = painterResource(R.drawable.ic_pets_weight),
-                iconSize = 56.dp,
+                iconSize = 50.dp,
+                textStart = PetFieldTextStartNarrow,
                 suffix = stringResource(R.string.pets_weight_unit),
                 status = form.weightFeedback.statusOrDefault,
                 message = form.weightFeedback?.message?.asString(),

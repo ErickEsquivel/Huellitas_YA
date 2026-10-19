@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
@@ -50,7 +51,8 @@ internal fun PetPhotoPicker(
             modifier = Modifier
                 .size(PhotoSize)
                 .clip(CircleShape)
-                .background(GreenBackground),
+                // Figma: sin foto, el círculo es solo el placeholder al 20 %; con foto, va sobre el verde.
+                .background(if (photoModel == null) Color.White else GreenBackground),
             contentAlignment = Alignment.Center,
         ) {
             if (photoModel == null) {

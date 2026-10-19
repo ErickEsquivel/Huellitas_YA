@@ -11,7 +11,7 @@
     <string name="pets_register_title">¡Conozcamos a\ntu mascota!</string>
     <string name="pets_register_back">Volver</string>
     <string name="pets_register_button">Guardar Mascota</string>
-    <string name="pets_register_saving">Guardando...</string>
+    <string name="pets_register_saving">Guardando…</string>
 
     <!-- Formulario de mascota (registrar y editar) -->
     <string name="pets_field_name">Nombre</string>

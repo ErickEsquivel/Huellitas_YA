@@ -39,7 +39,7 @@ Configuración ─"Cerrar sesión"─► Bienvenido
 - El grafo principal elige su destino inicial una sola vez, al crearse: Presentación si la primera lectura de `users/{uid}/pets` está vacía, Home si no. Si la lectura falla, va a Home. Mientras no hay respuesta se sigue viendo el splash del sistema.
 - Al guardar desde Presentación, Registrar reemplaza a Presentación por Home (`popUpTo` inclusivo): "atrás" desde Home sale de la app.
 - Home pasa a ser la pestaña inicial y se habilita en la barra inferior. Calendario sigue inhabilitado.
-- La barra inferior se oculta en Presentación, Registrar, Perfil de la mascota y Editar.
+- La barra inferior se oculta en Presentación, Registrar, Perfil de la mascota y Editar. Sin ella, el `Scaffold` solo reserva la barra de estado: cada pantalla aplica `navigationBarsPadding` y su fondo llega hasta abajo.
 
 ## Operaciones (CRUD)
 
@@ -61,7 +61,7 @@ Configuración ─"Cerrar sesión"─► Bienvenido
   - Peso: número decimal en kg; se muestra "5 KG".
 - "Guardar Mascota" se ve gris (`ButtonIncomplete`) hasta que todos los campos tienen valor; entonces se ve verde (`GreenPrimary`).
 - Con campos vacíos, se resaltan y aparece "Rellene todas las casillas indicadas" sobre el botón.
-- Al guardar se muestra el overlay "Guardando..." (spinner verde sobre la pantalla desenfocada) hasta que termina. Corre en `@ApplicationScope`: si el usuario sale, el guardado termina igual.
+- Al guardar se muestra el overlay "Guardando…" (spinner verde sobre la pantalla desenfocada) hasta que termina. Corre en `@ApplicationScope`: si el usuario sale, el guardado termina igual.
 - Antes de escribir se consulta `NetworkMonitor` (como en la spec 004): sin red, Snackbar "Sin conexión. Revisa tu internet".
 
 ### Home
@@ -219,13 +219,13 @@ Cada parte va en su rama y su PR, en orden, con un commit por tarea.
 
 > Marcar cada casilla al verificarla en dispositivo.
 
-- [ ] Sin sesión, la app abre en Bienvenido; "Cerrar sesión" vuelve a Bienvenido.
-- [ ] Una cuenta sin mascotas ve Presentación al iniciar sesión (y al reabrir la app); "Comenzar" abre Registrar mascota.
-- [ ] Una cuenta con mascotas entra directo a Home.
-- [ ] En Registrar, el botón se ve gris hasta llenar todos los campos; con campos vacíos se resaltan y aparece "Rellene todas las casillas indicadas".
+- [x] Sin sesión, la app abre en Bienvenido. ("Cerrar sesión" usa el mismo cambio de grafo, verificado en la spec 004.)
+- [x] Una cuenta sin mascotas ve Presentación al iniciar sesión (y al reabrir la app); "Comenzar" abre Registrar mascota.
+- [x] Una cuenta con mascotas entra directo a Home.
+- [x] En Registrar, el botón se ve gris hasta llenar todos los campos; con campos vacíos se resaltan y aparece "Rellene todas las casillas indicadas".
 - [ ] Datos inválidos (raza de 1 letra, peso 0, fecha futura) muestran su aviso y no se escribe nada.
-- [ ] Guardar muestra "Guardando..." y lleva a Home con la mascota nueva; "atrás" desde Home sale de la app.
-- [ ] La foto elegida se ve antes de guardar y queda en Storage en `users/{uid}/pets/{petId}.jpg`; sin foto, se guarda igual.
+- [x] Guardar muestra "Guardando…" y lleva a Home con la mascota nueva; "atrás" desde Home sale de la app.
+- [x] La foto elegida se ve antes de guardar y queda en Storage en `users/{uid}/pets/{petId}.jpg`; sin foto, se guarda igual.
 - [ ] Home muestra una tarjeta por mascota con "raza · edad", y "+" abre Registrar.
 - [ ] El perfil de la mascota muestra sus datos y las tres tarjetas de registros con "0 Archivos".
 - [ ] Editar guarda solo los cambios con "Actualizando..." y el perfil se actualiza en vivo.
@@ -233,6 +233,8 @@ Cada parte va en su rama y su PR, en orden, con un commit por tarea.
 - [ ] Sin conexión, Home muestra la caché, y guardar, editar o eliminar muestran "Sin conexión. Revisa tu internet" sin quedarse cargando.
 - [ ] Las reglas impiden leer o escribir las mascotas de otro usuario y guardar campos fuera del esquema.
 - [ ] Eliminar la cuenta borra también sus mascotas y sus fotos.
+
+> Verificados en un Vivo V2436 (Erick): Bienvenido sin sesión, Presentación sin mascotas, Home directo con mascotas, el formulario (avisos, menús, fecha, peso, foto) y el guardado con y sin foto. Reglas de creación y lectura probadas por REST (8 de 8): otra cuenta no lee ni crea, y se rechazan campos extra, especie inválida, peso 0 y faltantes. Quedan para Mateo y Julian Home, perfil, editar y eliminar.
 
 ## Plan de tests
 

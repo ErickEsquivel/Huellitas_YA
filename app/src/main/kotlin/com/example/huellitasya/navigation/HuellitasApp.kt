@@ -1,6 +1,8 @@
 package com.example.huellitasya.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -65,6 +67,9 @@ private fun MainNavHost(googleServerClientId: String?, startWithIntro: Boolean) 
     val showBottomBar = TopLevelDestination.entries.any { currentDestination?.hasRoute(it.route::class) == true }
 
     Scaffold(
+        // Solo la barra de estado: sin barra inferior, cada pantalla se ocupa de la de navegación
+        // (`navigationBarsPadding`) y su fondo llega hasta abajo, edge-to-edge.
+        contentWindowInsets = WindowInsets.statusBars,
         bottomBar = {
             if (showBottomBar) {
                 HuellitasBottomBar(
