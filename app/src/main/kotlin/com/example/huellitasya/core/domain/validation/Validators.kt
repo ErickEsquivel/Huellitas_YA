@@ -1,11 +1,14 @@
 package com.example.huellitasya.core.domain.validation
 
 import com.example.huellitasya.core.domain.error.ValidationError
+import com.example.huellitasya.core.model.LocalFileInfo
+import com.example.huellitasya.core.model.MAX_RECORD_BYTES
+import com.example.huellitasya.core.model.PDF_CONTENT_TYPE
 import java.time.LocalDate
 import javax.inject.Inject
 
 /**
- * Validadores de formularios (specs 002, 004 y 005). Devuelven `null` si el valor es válido.
+ * Validadores de formularios (specs 002, 004, 005 y 006). Devuelven `null` si el valor es válido.
  * Son lógica pura: no dependen de Android para poder probarse en la JVM.
  */
 class ValidateNameUseCase @Inject constructor() {
@@ -116,6 +119,28 @@ class ValidatePetWeightUseCase @Inject constructor() {
     private companion object {
         /** Mismo límite que `firebase/firestore.rules`. */
         const val MAX_WEIGHT_KG = 150.0
+    }
+}
+
+/** Archivo de un registro médico (spec 006): PDF o imagen, de menos de 10 MB. */
+class ValidateRecordFileUseCase @Inject constructor() {
+    operator fun invoke(file: LocalFileInfo): ValidationError? = when {
+        file.contentType != PDF_CONTENT_TYPE && !file.contentType.startsWith("image/") -> ValidationError.UnsupportedFileType
+        file.sizeBytes <= 0 || file.sizeBytes >= MAX_RECORD_BYTES -> ValidationError.FileTooBig
+        else -> null
+    }
+}
+
+/** Datos del formulario "Subir Archivo" (spec 006): fecha no futura ni anterior a 1990; veterinario de hasta 50. */
+class ValidateRecordFormUseCase @Inject constructor() {
+    fun date(date: LocalDate, today: LocalDate = LocalDate.now()): ValidationError? =
+        if (date.isAfter(today) || date.isBefore(ValidatePetBirthDateUseCase.MIN_DATE)) ValidationError.InvalidBirthDate else null
+
+    fun vet(vet: String): ValidationError? = if (vet.trim().length > MAX_VET_LENGTH) ValidationError.VetTooLong else null
+
+    private companion object {
+        /** Mismo límite que `firebase/firestore.rules`. */
+        const val MAX_VET_LENGTH = 50
     }
 }
 

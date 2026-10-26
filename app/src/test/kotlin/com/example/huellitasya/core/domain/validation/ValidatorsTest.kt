@@ -1,6 +1,7 @@
 package com.example.huellitasya.core.domain.validation
 
 import com.example.huellitasya.core.domain.error.ValidationError
+import com.example.huellitasya.core.model.LocalFileInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -17,6 +18,8 @@ class ValidatorsTest {
     private val validatePetBreed = ValidatePetBreedUseCase()
     private val validatePetBirthDate = ValidatePetBirthDateUseCase()
     private val validatePetWeight = ValidatePetWeightUseCase()
+    private val validateRecordFile = ValidateRecordFileUseCase()
+    private val validateRecordForm = ValidateRecordFormUseCase()
 
     @Test
     fun `nombre vacio o con espacios es EmptyName`() {
@@ -170,5 +173,22 @@ class ValidatorsTest {
         assertNull(validatePetWeight("5,5"))
         assertEquals(5.5, validatePetWeight.parse("5,5")!!, 0.0)
         assertEquals(12.25, validatePetWeight.parse(" 12.25 ")!!, 0.0)
+    }
+
+    @Test
+    fun `un registro acepta PDF e imagenes de menos de 10 MB`() {
+        assertNull(validateRecordFile(LocalFileInfo("a.pdf", "application/pdf", 1_000)))
+        assertNull(validateRecordFile(LocalFileInfo("a.jpg", "image/jpeg", 9 * 1024 * 1024)))
+        assertEquals(ValidationError.UnsupportedFileType, validateRecordFile(LocalFileInfo("a.docx", "application/msword", 1_000)))
+        assertEquals(ValidationError.FileTooBig, validateRecordFile(LocalFileInfo("a.pdf", "application/pdf", 10L * 1024 * 1024)))
+    }
+
+    @Test
+    fun `fecha y veterinario del registro`() {
+        val today = LocalDate.of(2026, 10, 26)
+        assertNull(validateRecordForm.date(today, today))
+        assertEquals(ValidationError.InvalidBirthDate, validateRecordForm.date(today.plusDays(1), today))
+        assertNull(validateRecordForm.vet(""))
+        assertEquals(ValidationError.VetTooLong, validateRecordForm.vet("a".repeat(51)))
     }
 }

@@ -58,6 +58,9 @@ fun ValidationError.toUiText(): UiText = UiText.Resource(
         ValidationError.BreedTooShort -> R.string.error_breed_too_short
         ValidationError.BreedTooLong -> R.string.error_name_too_long
         ValidationError.InvalidWeight -> R.string.error_invalid_weight
+        ValidationError.UnsupportedFileType -> R.string.error_unsupported_file
+        ValidationError.FileTooBig -> R.string.error_file_too_big
+        ValidationError.VetTooLong -> R.string.error_name_too_long
     },
 )
 
