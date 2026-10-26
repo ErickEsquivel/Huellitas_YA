@@ -171,7 +171,7 @@ private fun PetDetailContent(
 
     Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         PetDetailRow(
-            icon = R.drawable.ic_pets_calendar,
+            icon = R.drawable.ic_field_calendar,
             label = stringResource(R.string.pets_detail_birth_date),
             value = pet.birthDate.format(LongDateFormatter),
         )

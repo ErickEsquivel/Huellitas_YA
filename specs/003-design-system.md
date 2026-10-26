@@ -60,6 +60,7 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `PasswordConfirmDialog` | Diálogo "Confirma tu contraseña" antes de una operación sensible (cambiar el correo, eliminar la cuenta). |
 | `PasswordRequirementRow` | Fila de la checklist de contraseña (✗ naranja / ✓ verde), en "Crear nueva contraseña" y Seguridad. |
 | `DeleteConfirmDialog` | "¿Seguro deseas eliminarlo?" con el cachorro (Figma 3050:1515): eliminar una mascota o la cuenta. Recibe los textos y el del botón. |
+| `IconCardTextField` / `IconCardDropdownField` / `IconCardClickableField` | Tarjeta de campo con ícono a la izquierda, etiqueta gris y valor (Figma 19:63): formularios de mascota (spec 005) y de registros médicos (spec 006). |
 | `AddPlaceholderCard` | Tarjeta gris con ícono "+" (agregar mascota/evento). |
 
 En `core.ui`, `FieldFeedback(status, message: UiText?)` es lo que los ViewModels asignan a cada campo. Los mapeos `ValidationError.toFieldFeedback()` y `AuthError.toFieldFeedback()` aplican las reglas de la spec 002.
