@@ -161,7 +161,7 @@ data class RecordDraft(val category: RecordCategory, val date: LocalDate, val ty
 
 - [x] Las tarjetas del perfil abren su categoría y muestran el número real de archivos.
 - [x] Sin archivos, la lista muestra la tarjeta "+"; con archivos, una tarjeta por archivo con fecha, tipo y veterinario, y el "+" flotante.
-- [ ] Subir un PDF y una imagen funciona en las tres categorías, con la barra de progreso, y aparecen en la lista.
+- [x] Subir un PDF y una imagen funciona en las tres categorías, con la barra de progreso, y aparecen en la lista. (Desde la app: un PDF en Historial y una imagen en Archivos; las tres categorías usan la misma pantalla.)
 - [ ] Un archivo de otro tipo o de más de 10 MB se rechaza con su aviso y no se sube.
 - [ ] El detalle muestra la imagen o la primera página del PDF; descargar lo deja en Descargas.
 - [ ] Eliminar pide confirmación, muestra "Eliminando…", vuelve a la lista y el archivo desaparece de Storage.
@@ -169,6 +169,8 @@ data class RecordDraft(val category: RecordCategory, val date: LocalDate, val ty
 - [ ] Sin conexión, la lista muestra la caché, y subir o eliminar muestran "Sin conexión. Revisa tu internet".
 - [ ] Las reglas impiden leer, crear o borrar registros de otra cuenta, y guardar tipos, tamaños o campos fuera del esquema.
 
+> Mateo verificó la subida en el Vivo V2436: selector del sistema, formulario con el tipo por defecto de cada categoría, barra de avance y vuelta a la lista.
+>
 > Verificados en el Vivo V2436 (Erick): conteos del perfil y las listas vacía y con archivos (un PDF y una imagen creados por REST con las reglas desplegadas).
 
 ## Fuera de alcance

@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.huellitasya.core.model.RecordCategory
 import com.example.huellitasya.feature.records.list.RecordListRoute
+import com.example.huellitasya.feature.records.upload.UploadRecordRoute
 import kotlinx.serialization.Serializable
 
 /**
@@ -29,5 +30,21 @@ fun NavGraphBuilder.recordListScreen(
             onRecordClick = onRecordClick,
             onPetGone = onPetGone,
         )
+    }
+}
+
+/** "Subir Archivo" de una categoría. Las propiedades son las claves que lee `UploadRecordViewModel`. */
+@Serializable
+data class UploadRecordDestination(val petId: String, val category: String) {
+    constructor(petId: String, category: RecordCategory) : this(petId, category.name)
+}
+
+/** @param onUploaded el archivo quedó guardado: vuelve a la lista. */
+fun NavGraphBuilder.uploadRecordScreen(
+    onBack: () -> Unit,
+    onUploaded: () -> Unit,
+) {
+    composable<UploadRecordDestination> {
+        UploadRecordRoute(onBackClick = onBack, onUploaded = onUploaded)
     }
 }

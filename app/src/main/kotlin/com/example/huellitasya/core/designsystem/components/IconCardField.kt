@@ -1,4 +1,4 @@
-package com.example.huellitasya.feature.pets.components
+package com.example.huellitasya.core.designsystem.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.semantics.Role
@@ -41,34 +42,33 @@ import com.example.huellitasya.core.designsystem.ErrorRed
 import com.example.huellitasya.core.designsystem.GreenPrimary
 import com.example.huellitasya.core.designsystem.Nunito
 import com.example.huellitasya.core.designsystem.WarningOrange
-import com.example.huellitasya.core.designsystem.components.FieldMessage
-import com.example.huellitasya.core.designsystem.components.FieldStatus
 
 private val FieldShape = RoundedCornerShape(10.dp)
 private val LabelColor = Color.Black.copy(alpha = 0.2f)
 private val ValueStyle = TextStyle(fontFamily = Nunito, color = Color.Black, fontSize = 19.sp, fontWeight = FontWeight.Bold)
 
 /** Distancia de Figma entre el borde de la tarjeta y la etiqueta/valor (93 − 24 dp). */
-internal val PetFieldTextStart = 69.dp
+val IconCardTextStart = 69.dp
 
 /** En las tarjetas angostas (Sexo, Peso) el texto empieza más cerca del ícono (Figma: ~62 dp). */
-internal val PetFieldTextStartNarrow = 60.dp
+val IconCardTextStartNarrow = 60.dp
 
 /**
- * Tarjeta de un campo del formulario de mascota (Figma 19:63): ícono a la izquierda, etiqueta
- * gris arriba y el valor debajo. Con [status] distinto de `Default` el borde se colorea y, si
+ * Tarjeta de un campo de formulario con ícono (Figma 19:63; mascotas, spec 005, y registros
+ * médicos, spec 006): ícono a la izquierda, etiqueta gris arriba y el valor debajo. Con [status] distinto de `Default` el borde se colorea y, si
  * hay [message], se muestra debajo.
  */
 @Composable
-private fun PetFieldCard(
+private fun IconCardFieldFrame(
     label: String,
     icon: Painter,
     status: FieldStatus,
     message: String?,
     modifier: Modifier = Modifier,
     iconSize: Dp = 50.dp,
-    textStart: Dp = PetFieldTextStart,
+    textStart: Dp = IconCardTextStart,
     cardModifier: Modifier = Modifier,
+    iconTint: Color? = null,
     value: @Composable () -> Unit,
 ) {
     Column(modifier = modifier) {
@@ -82,6 +82,7 @@ private fun PetFieldCard(
             Image(
                 painter = icon,
                 contentDescription = null,
+                colorFilter = iconTint?.let { ColorFilter.tint(it) },
                 modifier = Modifier
                     .align(Alignment.CenterStart)
                     .padding(start = ((textStart - iconSize) / 2).coerceAtLeast(4.dp))
@@ -111,7 +112,7 @@ private val FieldStatus.borderColor: Color
 
 /** Campo de texto (Nombre, Raza, Peso). [suffix] se muestra tras el valor ("KG"). */
 @Composable
-internal fun PetTextField(
+fun IconCardTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -120,11 +121,11 @@ internal fun PetTextField(
     status: FieldStatus = FieldStatus.Default,
     message: String? = null,
     iconSize: Dp = 50.dp,
-    textStart: Dp = PetFieldTextStart,
+    textStart: Dp = IconCardTextStart,
     suffix: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
-    PetFieldCard(
+    IconCardFieldFrame(
         label = label,
         icon = icon,
         status = status,
@@ -163,7 +164,7 @@ private class SuffixTransformation(private val suffix: String) : VisualTransform
 
 /** Campo que se elige tocándolo (Fecha de nacimiento): muestra [valueText] o nada. */
 @Composable
-internal fun PetClickableField(
+fun IconCardClickableField(
     valueText: String?,
     onClick: () -> Unit,
     label: String,
@@ -172,9 +173,9 @@ internal fun PetClickableField(
     status: FieldStatus = FieldStatus.Default,
     message: String? = null,
     iconSize: Dp = 50.dp,
-    textStart: Dp = PetFieldTextStart,
+    textStart: Dp = IconCardTextStart,
 ) {
-    PetFieldCard(
+    IconCardFieldFrame(
         label = label,
         icon = icon,
         status = status,
@@ -190,7 +191,7 @@ internal fun PetClickableField(
 
 /** Campo con un menú de opciones (Especie, Sexo). */
 @Composable
-internal fun <T> PetDropdownField(
+fun <T> IconCardDropdownField(
     selected: T?,
     options: List<T>,
     optionLabel: @Composable (T) -> String,
@@ -201,11 +202,11 @@ internal fun <T> PetDropdownField(
     status: FieldStatus = FieldStatus.Default,
     message: String? = null,
     iconSize: Dp = 50.dp,
-    textStart: Dp = PetFieldTextStart,
+    textStart: Dp = IconCardTextStart,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box(modifier = modifier) {
-        PetClickableField(
+        IconCardClickableField(
             valueText = selected?.let { optionLabel(it) },
             onClick = { expanded = true },
             label = label,

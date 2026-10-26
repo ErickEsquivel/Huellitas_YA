@@ -43,3 +43,7 @@ val DestructiveRed = Color(0xFFB50004)
 val GreenDark = Color(0xFF3C6642)
 /** Fondo de las tarjetas de archivo de los registros médicos (#93B98F al 20 %). */
 val RecordCardSurface = Color(0x3393B98F)
+/** Barra de "Subiendo archivo…" (spec 006): degradado de Figma 3273:835 y su texto. */
+val UploadProgressStart = Color(0xFF1FE15C)
+val UploadProgressEnd = Color(0xFF72CC8C)
+val UploadProgressText = Color(0xFF194C31)

@@ -22,6 +22,10 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.components.FieldMessage
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.designsystem.components.HuellitasDatePickerDialog
+import com.example.huellitasya.core.designsystem.components.IconCardClickableField
+import com.example.huellitasya.core.designsystem.components.IconCardDropdownField
+import com.example.huellitasya.core.designsystem.components.IconCardTextField
+import com.example.huellitasya.core.designsystem.components.IconCardTextStartNarrow
 import com.example.huellitasya.core.domain.validation.ValidatePetBirthDateUseCase
 import com.example.huellitasya.core.model.PetSex
 import com.example.huellitasya.core.model.PetSpecies
@@ -47,17 +51,17 @@ internal fun PetFormFields(
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        PetTextField(
+        IconCardTextField(
             value = form.name,
             onValueChange = { onAction(PetFormAction.NameChanged(it)) },
             label = stringResource(R.string.pets_field_name),
-            icon = painterResource(R.drawable.ic_pets_name),
+            icon = painterResource(R.drawable.ic_field_person),
             iconSize = 40.dp,
             status = form.nameFeedback.statusOrDefault,
             message = form.nameFeedback?.message?.asString(),
             keyboardOptions = TextKeyboard,
         )
-        PetDropdownField(
+        IconCardDropdownField(
             selected = form.species,
             options = PetSpecies.entries,
             optionLabel = { stringResource(it.labelRes) },
@@ -67,7 +71,7 @@ internal fun PetFormFields(
             iconSize = 60.dp,
             status = form.speciesFeedback.statusOrDefault,
         )
-        PetTextField(
+        IconCardTextField(
             value = form.breed,
             onValueChange = { onAction(PetFormAction.BreedChanged(it)) },
             label = stringResource(R.string.pets_field_breed),
@@ -77,17 +81,17 @@ internal fun PetFormFields(
             message = form.breedFeedback?.message?.asString(),
             keyboardOptions = TextKeyboard,
         )
-        PetClickableField(
+        IconCardClickableField(
             valueText = form.birthDate?.format(BirthDateFormatter),
             onClick = { showDatePicker = true },
             label = stringResource(R.string.pets_field_birth_date),
-            icon = painterResource(R.drawable.ic_pets_calendar),
+            icon = painterResource(R.drawable.ic_field_calendar),
             iconSize = 40.dp,
             status = form.birthDateFeedback.statusOrDefault,
             message = form.birthDateFeedback?.message?.asString(),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.Top) {
-            PetDropdownField(
+            IconCardDropdownField(
                 selected = form.sex,
                 options = PetSex.entries,
                 optionLabel = { stringResource(it.labelRes) },
@@ -95,17 +99,17 @@ internal fun PetFormFields(
                 label = stringResource(R.string.pets_field_sex),
                 icon = painterResource(R.drawable.ic_pets_sex),
                 iconSize = 44.dp,
-                textStart = PetFieldTextStartNarrow,
+                textStart = IconCardTextStartNarrow,
                 status = form.sexFeedback.statusOrDefault,
                 modifier = Modifier.weight(1f),
             )
-            PetTextField(
+            IconCardTextField(
                 value = form.weight,
                 onValueChange = { value -> onAction(PetFormAction.WeightChanged(value.filter { it.isDigit() || it == '.' || it == ',' })) },
                 label = stringResource(R.string.pets_field_weight),
                 icon = painterResource(R.drawable.ic_pets_weight),
                 iconSize = 50.dp,
-                textStart = PetFieldTextStartNarrow,
+                textStart = IconCardTextStartNarrow,
                 suffix = stringResource(R.string.pets_weight_unit),
                 status = form.weightFeedback.statusOrDefault,
                 message = form.weightFeedback?.message?.asString(),
