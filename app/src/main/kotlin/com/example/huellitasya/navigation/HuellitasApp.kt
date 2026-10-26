@@ -26,8 +26,10 @@ import com.example.huellitasya.feature.pets.navigation.petsIntroScreen
 import com.example.huellitasya.feature.pets.navigation.RegisterPetDestination
 import com.example.huellitasya.feature.pets.navigation.registerPetScreen
 import com.example.huellitasya.feature.profile.navigation.PersonalDataDestination
+import com.example.huellitasya.feature.records.navigation.RecordDetailDestination
 import com.example.huellitasya.feature.records.navigation.RecordListDestination
 import com.example.huellitasya.feature.records.navigation.UploadRecordDestination
+import com.example.huellitasya.feature.records.navigation.recordDetailScreen
 import com.example.huellitasya.feature.records.navigation.recordListScreen
 import com.example.huellitasya.feature.records.navigation.uploadRecordScreen
 import com.example.huellitasya.feature.profile.navigation.VerifyEmailChangeDestination
@@ -106,8 +108,12 @@ private fun MainNavHost(googleServerClientId: String?, startWithIntro: Boolean) 
             recordListScreen(
                 onBack = { navController.popBackStack() },
                 onAddClick = { petId, category -> navController.navigate(UploadRecordDestination(petId, category)) },
-                // El detalle (Julian) llega en la siguiente parte (spec 006, "Reparto").
-                onRecordClick = { _, _ -> },
+                onRecordClick = { petId, recordId -> navController.navigate(RecordDetailDestination(petId, recordId)) },
+                onPetGone = { navController.popBackStack<HomeDestination>(inclusive = false) },
+            )
+            recordDetailScreen(
+                onBack = { navController.popBackStack() },
+                onDeleted = { navController.popBackStack() },
                 onPetGone = { navController.popBackStack<HomeDestination>(inclusive = false) },
             )
             uploadRecordScreen(

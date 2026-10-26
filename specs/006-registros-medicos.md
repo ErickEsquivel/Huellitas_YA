@@ -1,6 +1,6 @@
 # 006 — Registros médicos
 
-- **Estado:** Approved
+- **Estado:** Implemented
 - **Paquetes:** `feature.records`, `feature.pets` (perfil de la mascota), `navigation`, `core.model`, `core.domain`, `core.data`, `core.designsystem`, `core.ui`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-) ("Momento 3"). Capturas de referencia en [`figma/006-registros/`](figma/006-registros/).
 
@@ -67,7 +67,9 @@ Todas estas pantallas ocultan la barra inferior. "<" vuelve a la pantalla anteri
 - Ícono y nombre del archivo, con el botón de descarga a la derecha.
 - Vista previa grande: la imagen, o la primera página del PDF.
 - "Eliminar Archivo" (rojo) abre el diálogo del cachorro (`DeleteConfirmDialog`, botón "Eliminar Archivo"); luego "Eliminando…" y vuelve a la lista.
-- Descargar guarda el archivo en la carpeta Descargas del teléfono, con su notificación.
+- Descargar guarda el archivo en la carpeta Descargas del teléfono, con su notificación (`DownloadManager` con la `fileUrl`). Antes de Android 10 escribir ahí exige un permiso de almacenamiento, así que en esas versiones queda en la carpeta Download de la app.
+- La vista previa del PDF la dibuja `PdfFirstPageDecoder` (`core.ui.pdf`), un decoder de Coil con `PdfRenderer`: Coil descarga y cachea el archivo igual que una imagen.
+- Si el registro o la mascota se eliminan desde otro lado, el detalle vuelve a la lista o a Home.
 
 **Perfil de la mascota:**
 - Las tres tarjetas abren su categoría y muestran el conteo real: "1 Archivo", "3 Archivos".
@@ -135,9 +137,10 @@ data class RecordDraft(val category: RecordCategory, val date: LocalDate, val ty
   - `upload(uid, petId, recordId, localUri): Flow<UploadProgress>`;
   - `downloadUrl(...)`;
   - `delete(...)`.
+- `RecordDownloader`: `download(url, fileName, contentType)`, implementado con `DownloadManager`.
 - Use cases:
   - `ObserveRecordsUseCase`, `ObserveRecordCountsUseCase`, `ObserveRecordUseCase`;
-  - `UploadRecordUseCase`, `DeleteRecordUseCase` (`@ApplicationScope`).
+  - `UploadRecordUseCase`, `DeleteRecordUseCase` (`@ApplicationScope`), `DownloadRecordUseCase`.
 
 ### Rutas
 
@@ -162,13 +165,15 @@ data class RecordDraft(val category: RecordCategory, val date: LocalDate, val ty
 - [x] Las tarjetas del perfil abren su categoría y muestran el número real de archivos.
 - [x] Sin archivos, la lista muestra la tarjeta "+"; con archivos, una tarjeta por archivo con fecha, tipo y veterinario, y el "+" flotante.
 - [x] Subir un PDF y una imagen funciona en las tres categorías, con la barra de progreso, y aparecen en la lista. (Desde la app: un PDF en Historial y una imagen en Archivos; las tres categorías usan la misma pantalla.)
-- [ ] Un archivo de otro tipo o de más de 10 MB se rechaza con su aviso y no se sube.
-- [ ] El detalle muestra la imagen o la primera página del PDF; descargar lo deja en Descargas.
-- [ ] Eliminar pide confirmación, muestra "Eliminando…", vuelve a la lista y el archivo desaparece de Storage.
-- [ ] Eliminar una mascota borra también sus registros y archivos.
-- [ ] Sin conexión, la lista muestra la caché, y subir o eliminar muestran "Sin conexión. Revisa tu internet".
-- [ ] Las reglas impiden leer, crear o borrar registros de otra cuenta, y guardar tipos, tamaños o campos fuera del esquema.
+- [x] Un archivo de otro tipo o de más de 10 MB se rechaza con su aviso y no se sube. (El selector solo ofrece PDF e imágenes; las reglas rechazan los demás tipos.)
+- [x] El detalle muestra la imagen o la primera página del PDF; descargar lo deja en Descargas.
+- [x] Eliminar pide confirmación, muestra "Eliminando…", vuelve a la lista y el archivo desaparece de Storage.
+- [x] Eliminar una mascota borra también sus registros y archivos.
+- [x] Sin conexión, la lista muestra la caché, y subir, descargar o eliminar muestran "Sin conexión. Revisa tu internet".
+- [x] Las reglas impiden leer, crear o borrar registros de otra cuenta, y guardar tipos, tamaños o campos fuera del esquema.
 
+> Julian verificó en el Vivo V2436 el detalle de un PDF (primera página) y de una imagen, la descarga a Descargas, eliminar (diálogo, "Eliminando…", vuelta a la lista y el archivo con 404 en Storage), eliminar la mascota (sin documento, registros ni archivos), un JPG de 11 MB rechazado y el modo avión en la lista, al subir, al descargar y al eliminar. Las reglas pasaron 19 pruebas por REST con una segunda cuenta.
+>
 > Mateo verificó la subida en el Vivo V2436: selector del sistema, formulario con el tipo por defecto de cada categoría, barra de avance y vuelta a la lista.
 >
 > Verificados en el Vivo V2436 (Erick): conteos del perfil y las listas vacía y con archivos (un PDF y una imagen creados por REST con las reglas desplegadas).

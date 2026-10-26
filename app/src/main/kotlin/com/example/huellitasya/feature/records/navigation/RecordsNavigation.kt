@@ -3,6 +3,7 @@ package com.example.huellitasya.feature.records.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.huellitasya.core.model.RecordCategory
+import com.example.huellitasya.feature.records.detail.RecordDetailRoute
 import com.example.huellitasya.feature.records.list.RecordListRoute
 import com.example.huellitasya.feature.records.upload.UploadRecordRoute
 import kotlinx.serialization.Serializable
@@ -46,5 +47,23 @@ fun NavGraphBuilder.uploadRecordScreen(
 ) {
     composable<UploadRecordDestination> {
         UploadRecordRoute(onBackClick = onBack, onUploaded = onUploaded)
+    }
+}
+
+/** Detalle de un registro. Las propiedades son las claves que lee `RecordDetailViewModel`. */
+@Serializable
+data class RecordDetailDestination(val petId: String, val recordId: String)
+
+/**
+ * @param onDeleted el registro se eliminó: vuelve a la lista.
+ * @param onPetGone la mascota se eliminó: vuelve a Home.
+ */
+fun NavGraphBuilder.recordDetailScreen(
+    onBack: () -> Unit,
+    onDeleted: () -> Unit,
+    onPetGone: () -> Unit,
+) {
+    composable<RecordDetailDestination> {
+        RecordDetailRoute(onBackClick = onBack, onDeleted = onDeleted, onPetGone = onPetGone)
     }
 }
