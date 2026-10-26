@@ -29,4 +29,15 @@
     <string name="records_date_cancel">Cancelar</string>
     <string name="records_size_kb">%1$s KB</string>
     <string name="records_size_mb">%1$s MB</string>
+
+    <!-- Detalle (Figma 3193:3746, 3279:1344 y 3281:1849) -->
+    <string name="records_preview">Vista previa de %s</string>
+    <string name="records_download">Descargar %s</string>
+    <string name="records_download_started">Descargando %s. Lo encontrarás en Descargas.</string>
+    <string name="records_delete">Eliminar Archivo</string>
+    <string name="records_deleting">Eliminando…</string>
+    <string name="records_delete_title">¿Seguro deseas eliminarlo?</string>
+    <string name="records_delete_message">No podrás recuperar los datos luego de confirmar la eliminación.</string>
+    <string name="records_delete_close">Cerrar</string>
+    <string name="records_delete_image_description">Cachorro triste junto a una papelera</string>
 </resources>

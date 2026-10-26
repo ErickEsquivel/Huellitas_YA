@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma 3193:3763: descargar archivo -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="31dp"
+    android:height="27dp"
+    android:viewportWidth="31"
+    android:viewportHeight="27">
+    <path
+        android:pathData="M15.5002 2V18.611M9.50016 13.0207L15.5002 18.611L21.5002 13.0207"
+        android:strokeColor="#FF808080"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M20 25H11C6.75737 25 4.63606 25 3.31804 23.8772C2.00002 22.7545 2.00002 20.9474 2.00002 17.3334M29 17.3334C29 20.9474 29 22.7545 27.682 23.8772C27.2323 24.2603 26.6891 24.5127 26 24.6789"
+        android:strokeColor="#FF808080"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

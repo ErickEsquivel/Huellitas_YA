@@ -5,6 +5,7 @@ import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.common.map
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.repository.AuthRepository
+import com.example.huellitasya.core.domain.repository.RecordDownloader
 import com.example.huellitasya.core.domain.repository.RecordFileRepository
 import com.example.huellitasya.core.domain.repository.RecordRepository
 import com.example.huellitasya.core.model.LocalFileInfo
@@ -104,4 +105,46 @@ class UploadRecordUseCase @Inject constructor(
             if (result is AppResult.Failure) fileRepository.delete(uid, petId, recordId)
         }
     }.await()
+}
+
+/** Un registro de la mascota, en vivo (detalle, spec 006). `NotFound` si se eliminó. */
+class ObserveRecordUseCase @Inject constructor(
+    private val observePetRecords: ObservePetRecordsUseCase,
+) {
+    operator fun invoke(petId: String, recordId: String): Flow<AppResult<MedicalRecord, DataError>> =
+        observePetRecords(petId).map { result ->
+            when (result) {
+                is AppResult.Success -> result.data.firstOrNull { it.id == recordId }
+                    ?.let { AppResult.Success(it) } ?: AppResult.Failure(DataError.NotFound)
+                is AppResult.Failure -> result
+            }
+        }
+}
+
+/**
+ * Elimina un registro: primero su archivo (si ya no existía, sigue) y luego el documento, para no
+ * dejar archivos huérfanos. Corre en [ApplicationScope]: el detalle vuelve a la lista al terminar.
+ */
+class DeleteRecordUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val recordRepository: RecordRepository,
+    private val fileRepository: RecordFileRepository,
+    @param:ApplicationScope private val appScope: CoroutineScope,
+) {
+    suspend operator fun invoke(petId: String, recordId: String): AppResult<Unit, DataError> = appScope.async {
+        val uid = authRepository.currentUser.first()?.uid
+            ?: return@async AppResult.Failure(DataError.PermissionDenied)
+        when (val file = fileRepository.delete(uid, petId, recordId)) {
+            is AppResult.Success -> recordRepository.deleteRecord(uid, petId, recordId)
+            is AppResult.Failure -> file
+        }
+    }.await()
+}
+
+/** Descarga el archivo del registro a la carpeta Descargas. */
+class DownloadRecordUseCase @Inject constructor(
+    private val downloader: RecordDownloader,
+) {
+    operator fun invoke(record: MedicalRecord): AppResult<Unit, DataError> =
+        downloader.download(record.fileUrl, record.fileName, record.contentType)
 }

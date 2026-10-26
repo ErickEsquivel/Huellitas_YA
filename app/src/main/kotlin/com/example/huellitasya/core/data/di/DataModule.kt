@@ -1,6 +1,7 @@
 package com.example.huellitasya.core.data.di
 
 import com.example.huellitasya.core.common.ApplicationScope
+import com.example.huellitasya.core.data.download.DownloadManagerRecordDownloader
 import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
 import com.example.huellitasya.core.data.repository.FunctionsAccountRepository
@@ -19,6 +20,7 @@ import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.repository.PasswordResetRepository
 import com.example.huellitasya.core.domain.repository.PetPhotoRepository
 import com.example.huellitasya.core.domain.repository.PetRepository
+import com.example.huellitasya.core.domain.repository.RecordDownloader
 import com.example.huellitasya.core.domain.repository.RecordFileRepository
 import com.example.huellitasya.core.domain.repository.RecordRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
@@ -115,6 +117,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindRecordFileRepository(impl: FirebaseStorageRecordFileRepository): RecordFileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRecordDownloader(impl: DownloadManagerRecordDownloader): RecordDownloader
 }
 
 private const val FUNCTIONS_REGION = "southamerica-east1"

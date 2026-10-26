@@ -2,6 +2,7 @@ package com.example.huellitasya.core.testing
 
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.DataError
+import com.example.huellitasya.core.domain.repository.RecordDownloader
 import com.example.huellitasya.core.domain.repository.RecordFileRepository
 import com.example.huellitasya.core.domain.repository.RecordRepository
 import com.example.huellitasya.core.model.LocalFileInfo
@@ -105,5 +106,17 @@ class FakeRecordFileRepository : RecordFileRepository {
     override suspend fun delete(uid: String, petId: String, recordId: String): AppResult<Unit, DataError> {
         deletedFiles += recordId
         return deleteResult
+    }
+}
+
+class FakeRecordDownloader : RecordDownloader {
+    var result: AppResult<Unit, DataError> = AppResult.Success(Unit)
+
+    /** (url, fileName) de cada descarga. */
+    val downloads = mutableListOf<Pair<String, String>>()
+
+    override fun download(url: String, fileName: String, contentType: String): AppResult<Unit, DataError> {
+        downloads += url to fileName
+        return result
     }
 }

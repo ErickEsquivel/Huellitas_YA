@@ -41,12 +41,13 @@ import com.example.huellitasya.core.ui.breedAndAge
  * "raza  -  edad" a su derecha, "Registros Médicos - Registros Detallados" y la categoría. La ola
  * verde empieza detrás de la foto y sigue hasta el borde inferior de la pantalla.
  *
- * Va dentro de una columna con 24 dp de padding horizontal.
+ * Va dentro de una columna con 24 dp de padding horizontal. Sin [category] (aún cargando), la
+ * línea de la categoría queda vacía.
  */
 @Composable
 internal fun RecordsHeader(
     pet: Pet?,
-    category: RecordCategory,
+    category: RecordCategory?,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -93,7 +94,7 @@ internal fun RecordsHeader(
                     fontWeight = FontWeight.ExtraBold,
                 )
                 Text(
-                    text = stringResource(category.labelRes),
+                    text = category?.let { stringResource(it.labelRes) }.orEmpty(),
                     color = Color.Black,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
