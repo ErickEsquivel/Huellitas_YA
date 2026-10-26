@@ -5,12 +5,14 @@ import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.model.RecordCategory
 import com.example.huellitasya.core.testing.FakeAuthRepository
+import com.example.huellitasya.core.testing.FakeRecordFileRepository
 import com.example.huellitasya.core.testing.FakeRecordRepository
 import com.example.huellitasya.core.testing.TestPet
 import com.example.huellitasya.core.testing.TestRecord
 import com.example.huellitasya.core.testing.TestUser
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class RecordUseCasesTest {
@@ -58,5 +60,40 @@ class RecordUseCasesTest {
         ObserveRecordCountsUseCase(observePetRecords)(TestPet.id).test {
             assertEquals(AppResult.Failure(DataError.PermissionDenied), awaitItem())
         }
+    }
+
+    @Test
+    fun `observar un registro avisa NotFound cuando se elimina`() = runTest {
+        authRepository.currentUser.value = TestUser
+        recordRepository.records.value = AppResult.Success(listOf(TestRecord))
+
+        ObserveRecordUseCase(observePetRecords)(TestPet.id, TestRecord.id).test {
+            assertEquals(AppResult.Success(TestRecord), awaitItem())
+            recordRepository.records.value = AppResult.Success(emptyList())
+            assertEquals(AppResult.Failure(DataError.NotFound), awaitItem())
+        }
+    }
+
+    @Test
+    fun `eliminar un registro borra el archivo y luego el documento`() = runTest {
+        authRepository.currentUser.value = TestUser
+        val fileRepository = FakeRecordFileRepository()
+
+        val result = DeleteRecordUseCase(authRepository, recordRepository, fileRepository, backgroundScope)(TestPet.id, TestRecord.id)
+
+        assertEquals(AppResult.Success(Unit), result)
+        assertEquals(listOf(TestRecord.id), fileRepository.deletedFiles)
+        assertEquals(listOf(TestRecord.id), recordRepository.deleted)
+    }
+
+    @Test
+    fun `si no se puede borrar el archivo el registro se conserva`() = runTest {
+        authRepository.currentUser.value = TestUser
+        val fileRepository = FakeRecordFileRepository().apply { deleteResult = AppResult.Failure(DataError.Network) }
+
+        val result = DeleteRecordUseCase(authRepository, recordRepository, fileRepository, backgroundScope)(TestPet.id, TestRecord.id)
+
+        assertEquals(AppResult.Failure(DataError.Network), result)
+        assertTrue(recordRepository.deleted.isEmpty())
     }
 }

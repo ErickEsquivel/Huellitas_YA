@@ -6,8 +6,11 @@ import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.testing.FakeAuthRepository
 import com.example.huellitasya.core.testing.FakePetPhotoRepository
 import com.example.huellitasya.core.testing.FakePetRepository
+import com.example.huellitasya.core.testing.FakeRecordFileRepository
+import com.example.huellitasya.core.testing.FakeRecordRepository
 import com.example.huellitasya.core.testing.TestPet
 import com.example.huellitasya.core.testing.TestPetDraft
+import com.example.huellitasya.core.testing.TestRecord
 import com.example.huellitasya.core.testing.TestUser
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -20,6 +23,8 @@ class PetUseCasesTest {
     private val authRepository = FakeAuthRepository()
     private val petRepository = FakePetRepository()
     private val photoRepository = FakePetPhotoRepository()
+    private val recordRepository = FakeRecordRepository()
+    private val recordFileRepository = FakeRecordFileRepository()
 
     @Test
     fun `sin sesion no se observan mascotas`() = runTest {
@@ -137,7 +142,7 @@ class PetUseCasesTest {
         authRepository.currentUser.value = TestUser
         petRepository.pets.value = AppResult.Success(listOf(TestPet))
 
-        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, backgroundScope)(TestPet.id)
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, backgroundScope)(TestPet.id)
 
         assertEquals(AppResult.Success(Unit), result)
         assertEquals(listOf(TestPet.id), photoRepository.deletedPhotos)
@@ -149,10 +154,24 @@ class PetUseCasesTest {
         authRepository.currentUser.value = TestUser
         photoRepository.deleteResult = AppResult.Failure(DataError.Network)
 
-        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, backgroundScope)(TestPet.id)
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, backgroundScope)(TestPet.id)
 
         assertEquals(AppResult.Failure(DataError.Network), result)
         assertTrue(petRepository.deleted.isEmpty())
+    }
+
+    @Test
+    fun `eliminar la mascota borra antes sus registros y archivos`() = runTest {
+        authRepository.currentUser.value = TestUser
+        petRepository.pets.value = AppResult.Success(listOf(TestPet))
+        recordRepository.records.value = AppResult.Success(listOf(TestRecord, TestRecord.copy(id = "record-2")))
+
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, backgroundScope)(TestPet.id)
+
+        assertEquals(AppResult.Success(Unit), result)
+        assertEquals(listOf("record-1", "record-2"), recordFileRepository.deletedFiles)
+        assertEquals(listOf("record-1", "record-2"), recordRepository.deleted)
+        assertEquals(listOf(TestPet.id), petRepository.deleted)
     }
 
     private fun TestScope.registerPet() =

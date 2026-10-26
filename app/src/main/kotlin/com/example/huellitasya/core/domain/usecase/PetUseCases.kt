@@ -6,6 +6,8 @@ import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.domain.repository.PetPhotoRepository
 import com.example.huellitasya.core.domain.repository.PetRepository
+import com.example.huellitasya.core.domain.repository.RecordFileRepository
+import com.example.huellitasya.core.domain.repository.RecordRepository
 import com.example.huellitasya.core.model.Pet
 import com.example.huellitasya.core.model.PetDraft
 import kotlinx.coroutines.CoroutineScope
@@ -117,19 +119,30 @@ class UpdatePetUseCase @Inject constructor(
 }
 
 /**
- * Elimina una mascota: primero su foto (si no tenía, sigue) y luego el documento, para no dejar
- * fotos huérfanas. Corre en [ApplicationScope]: Editar vuelve a Home al terminar.
+ * Elimina una mascota: primero sus registros médicos (archivo y documento, spec 006), luego su
+ * foto (si no tenía, sigue) y al final el documento, para no dejar nada huérfano: el cliente no
+ * borra subcolecciones. Corre en [ApplicationScope]: Editar vuelve a Home al terminar.
  */
 class DeletePetUseCase @Inject constructor(
     private val authRepository: AuthRepository,
     private val petRepository: PetRepository,
     private val photoRepository: PetPhotoRepository,
+    private val recordRepository: RecordRepository,
+    private val recordFileRepository: RecordFileRepository,
     @param:ApplicationScope private val appScope: CoroutineScope,
 ) {
     suspend operator fun invoke(petId: String): AppResult<Unit, DataError> =
         appScope.async {
             val uid = authRepository.currentUser.first()?.uid
                 ?: return@async AppResult.Failure(DataError.PermissionDenied)
+            val records = when (val result = recordRepository.observeRecords(uid, petId).first()) {
+                is AppResult.Success -> result.data
+                is AppResult.Failure -> return@async result
+            }
+            for (record in records) {
+                recordFileRepository.delete(uid, petId, record.id).let { if (it is AppResult.Failure) return@async it }
+                recordRepository.deleteRecord(uid, petId, record.id).let { if (it is AppResult.Failure) return@async it }
+            }
             when (val photo = photoRepository.delete(uid, petId)) {
                 is AppResult.Success -> petRepository.deletePet(uid, petId)
                 is AppResult.Failure -> photo
