@@ -16,4 +16,17 @@
     <string name="records_add">Agregar archivo</string>
     <string name="records_open">Abrir %s</string>
     <string name="records_pet_photo">Foto de %s</string>
+
+    <!-- Subir archivo (Figma 3193:3730 y 3281:1697) -->
+    <string name="records_upload_title">Subir Archivo</string>
+    <string name="records_upload_change">Toca para elegir otro archivo</string>
+    <string name="records_upload_button">Subir Archivo</string>
+    <string name="records_uploading">Subiendo archivo…</string>
+    <string name="records_field_date">Fecha</string>
+    <string name="records_field_type">Tipo</string>
+    <string name="records_field_vet">Veterinario (opcional)</string>
+    <string name="records_date_accept">Aceptar</string>
+    <string name="records_date_cancel">Cancelar</string>
+    <string name="records_size_kb">%1$s KB</string>
+    <string name="records_size_mb">%1$s MB</string>
 </resources>

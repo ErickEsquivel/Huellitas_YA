@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Campo "Tipo" del formulario de registros: la carpeta de Figma 56:177 en negro. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="42.7708dp"
+    android:height="33.6236dp"
+    android:viewportWidth="42.7708"
+    android:viewportHeight="33.6236">
+    <path
+        android:pathData="M40.1686 5.17061H22.2035C20.1181 5.05671 15.9017 0.668585 13.5037 0.668585H2.98356V0.666671C2.37034 0.66543 1.78174 0.907834 1.34724 1.34056C0.912745 1.77328 0.667936 2.36088 0.666669 2.9741V10.737H42.1042V7.10606C42.1041 6.59274 41.9002 6.10045 41.5372 5.73748C41.1742 5.37452 40.6819 5.17061 40.1686 5.17061Z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.33333"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M42.1042 10.737H0.666668V30.6418C0.666292 30.9455 0.725725 31.2462 0.841577 31.5269C0.957428 31.8076 1.12743 32.0627 1.34187 32.2776C1.55631 32.4926 1.811 32.6632 2.09138 32.7798C2.37177 32.8963 2.67237 32.9565 2.97601 32.9569H39.7873C40.4005 32.9581 40.9891 32.7157 41.4236 32.283C41.8581 31.8503 42.1029 31.2627 42.1042 30.6495V10.737Z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1.33333"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

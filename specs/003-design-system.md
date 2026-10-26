@@ -33,6 +33,7 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `DestructiveRed` | `#B50004` | Botón "Eliminar mascota" y "Eliminar Archivo" |
 | `GreenDark` | `#3C6642` | Botón flotante "+" de los registros médicos |
 | `RecordCardSurface` | `#3393B98F` | Tarjetas de archivo de los registros médicos |
+| `UploadProgressStart` / `UploadProgressEnd` / `UploadProgressText` | `#1FE15C` / `#72CC8C` / `#194C31` | Barra y texto de "Subiendo archivo…" |
 
 - Espaciados en `HuellitasSpacing` (`xs=4, sm=8, md=16, lg=24, xl=32, xxl=48` dp).
 - Tipografía: **Nunito** (Regular 400, Bold 700, ExtraBold 800) en `res/font`, con licencia SIL OFL 1.1. `Typography` aplica Nunito a todos los estilos, así que cualquier `Text` la hereda.
