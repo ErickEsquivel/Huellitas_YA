@@ -8,6 +8,8 @@ import com.example.huellitasya.core.data.repository.FunctionsEmailChangeReposito
 import com.example.huellitasya.core.data.repository.FirebaseStoragePetPhotoRepository
 import com.example.huellitasya.core.data.repository.FirebaseStorageProfilePhotoRepository
 import com.example.huellitasya.core.data.repository.FirestorePetRepository
+import com.example.huellitasya.core.data.repository.FirestoreRecordRepository
+import com.example.huellitasya.core.data.repository.FirebaseStorageRecordFileRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
 import com.example.huellitasya.core.data.repository.FunctionsPasswordResetRepository
 import com.example.huellitasya.core.domain.repository.AccountRepository
@@ -17,6 +19,8 @@ import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.repository.PasswordResetRepository
 import com.example.huellitasya.core.domain.repository.PetPhotoRepository
 import com.example.huellitasya.core.domain.repository.PetRepository
+import com.example.huellitasya.core.domain.repository.RecordFileRepository
+import com.example.huellitasya.core.domain.repository.RecordRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -103,6 +107,14 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPetPhotoRepository(impl: FirebaseStoragePetPhotoRepository): PetPhotoRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRecordRepository(impl: FirestoreRecordRepository): RecordRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRecordFileRepository(impl: FirebaseStorageRecordFileRepository): RecordFileRepository
 }
 
 private const val FUNCTIONS_REGION = "southamerica-east1"

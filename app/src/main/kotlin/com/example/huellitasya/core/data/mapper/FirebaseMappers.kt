@@ -3,9 +3,12 @@ package com.example.huellitasya.core.data.mapper
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.model.AuthProvider
+import com.example.huellitasya.core.model.MedicalRecord
 import com.example.huellitasya.core.model.Pet
 import com.example.huellitasya.core.model.PetSex
 import com.example.huellitasya.core.model.PetSpecies
+import com.example.huellitasya.core.model.RecordCategory
+import com.example.huellitasya.core.model.RecordType
 import com.example.huellitasya.core.model.User
 import com.example.huellitasya.core.model.UserProfile
 import com.google.firebase.FirebaseNetworkException
@@ -78,6 +81,38 @@ internal fun DocumentSnapshot.toPet(): Pet? {
         sex = if (getString("sex") == "female") PetSex.FEMALE else PetSex.MALE,
         weightKg = weightKg,
         photoUrl = getString("photoUrl")?.takeIf { it.isNotBlank() },
+    )
+}
+
+/**
+ * Esquema `users/{uid}/pets/{petId}/records/{recordId}` de la spec 006. Un registro con datos
+ * obligatorios faltantes o mal formados se omite (`null`).
+ */
+internal fun DocumentSnapshot.toMedicalRecord(petId: String): MedicalRecord? {
+    val category = when (getString("category")) {
+        "vaccines" -> RecordCategory.VACCINES
+        "history" -> RecordCategory.HISTORY
+        "files" -> RecordCategory.FILES
+        else -> return null
+    }
+    val fileName = getString("fileName")?.takeIf { it.isNotBlank() } ?: return null
+    val contentType = getString("contentType") ?: return null
+    val date = getString("date")?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return null
+    return MedicalRecord(
+        id = id,
+        petId = petId,
+        category = category,
+        fileName = fileName,
+        contentType = contentType,
+        sizeBytes = getLong("sizeBytes") ?: 0L,
+        date = date,
+        type = when (getString("type")) {
+            "vaccination" -> RecordType.VACCINATION
+            "consultation" -> RecordType.CONSULTATION
+            "exam" -> RecordType.EXAM
+            else -> RecordType.OTHER
+        },
+        vet = getString("vet")?.takeIf { it.isNotBlank() },
     )
 }
 
