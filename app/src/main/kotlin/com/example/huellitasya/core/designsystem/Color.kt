@@ -39,3 +39,7 @@ val DarkGrayText = Color(0xFF707070)
 val RecordCountGreen = Color(0xFF005716)
 /** Botón de acción destructiva ("Eliminar mascota", spec 005). */
 val DestructiveRed = Color(0xFFB50004)
+/** Botón flotante "+" de los registros médicos (spec 006). */
+val GreenDark = Color(0xFF3C6642)
+/** Fondo de las tarjetas de archivo de los registros médicos (#93B98F al 20 %). */
+val RecordCardSurface = Color(0x3393B98F)

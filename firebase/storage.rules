@@ -25,6 +25,16 @@ service firebase.storage {
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
 
+    // Archivos de los registros médicos (spec 006): PDF o imágenes de hasta 10 MB, solo del dueño.
+    match /users/{uid}/pets/{petId}/records/{recordId} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null
+                    && request.auth.uid == uid
+                    && (request.resource.contentType == 'application/pdf'
+                        || request.resource.contentType.matches('image/.*'))
+                    && request.resource.size < 10 * 1024 * 1024;
+    }
+
     // Todo lo demás queda denegado hasta que una spec lo defina.
     match /{allPaths=**} {
       allow read, write: if false;

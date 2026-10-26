@@ -77,6 +77,30 @@ service cloud.firestore {
                       && unchanged('createdAt')
                       && request.resource.data.updatedAt == request.time;
         allow delete: if isOwner();
+
+        // Registros médicos de la mascota (spec 006): el dueño los lee, crea y borra; no se editan.
+        match /records/{recordId} {
+          function isValidRecord() {
+            let data = request.resource.data;
+            return data.keys().hasOnly([
+                     'category', 'fileName', 'contentType', 'sizeBytes', 'date', 'type', 'vet', 'fileUrl', 'createdAt'])
+                   && data.keys().hasAll(['category', 'fileName', 'contentType', 'sizeBytes', 'date', 'type', 'fileUrl', 'createdAt'])
+                   && data.category in ['vaccines', 'history', 'files']
+                   && data.fileName is string && data.fileName.size() >= 1 && data.fileName.size() <= 120
+                   && data.contentType is string
+                   && (data.contentType == 'application/pdf' || data.contentType.matches('image/.*'))
+                   && data.sizeBytes is int && data.sizeBytes > 0 && data.sizeBytes < 10 * 1024 * 1024
+                   && data.date is string && data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+                   && data.type in ['vaccination', 'consultation', 'exam', 'other']
+                   && optionalString('vet', 50)
+                   && data.fileUrl is string && data.fileUrl.size() <= 2048
+                   && data.createdAt == request.time;
+          }
+
+          allow read: if isOwner();
+          allow create: if isOwner() && isValidRecord();
+          allow delete: if isOwner();
+        }
       }
     }
 

@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.greenWave
 import com.example.huellitasya.feature.pets.form.PetFormAction
 import com.example.huellitasya.feature.pets.form.PetFormState
 
@@ -98,7 +99,7 @@ internal fun PetFormLayout(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .petFormWave(horizontalBleed = 24.dp)
+                    .greenWave(horizontalBleed = 24.dp)
                     .padding(top = 64.dp, bottom = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

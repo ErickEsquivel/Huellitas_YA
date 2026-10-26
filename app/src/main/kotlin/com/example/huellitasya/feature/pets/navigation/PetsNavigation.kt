@@ -3,6 +3,7 @@ package com.example.huellitasya.feature.pets.navigation
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.huellitasya.core.model.RecordCategory
 import com.example.huellitasya.feature.pets.detail.PetDetailRoute
 import com.example.huellitasya.feature.pets.edit.EditPetRoute
 import com.example.huellitasya.feature.pets.intro.PetsIntroScreen
@@ -49,10 +50,16 @@ data class PetDetailDestination(val petId: String)
 fun NavGraphBuilder.petDetailScreen(
     onBack: () -> Unit,
     onEditClick: (petId: String) -> Unit,
+    onRecordsClick: (petId: String, category: RecordCategory) -> Unit,
     onPetGone: () -> Unit,
 ) {
     composable<PetDetailDestination> {
-        PetDetailRoute(onBackClick = onBack, onEditClick = onEditClick, onPetGone = onPetGone)
+        PetDetailRoute(
+            onBackClick = onBack,
+            onEditClick = onEditClick,
+            onRecordsClick = onRecordsClick,
+            onPetGone = onPetGone,
+        )
     }
 }
 

@@ -3,6 +3,7 @@ package com.example.huellitasya.feature.pets.detail
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,11 +61,12 @@ import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.model.Pet
 import com.example.huellitasya.core.model.PetSex
 import com.example.huellitasya.core.model.PetSpecies
+import com.example.huellitasya.core.model.RecordCategory
 import com.example.huellitasya.core.ui.ObserveAsEvents
 import com.example.huellitasya.core.ui.breedAndAge
 import com.example.huellitasya.core.ui.weightLabel
 import com.example.huellitasya.feature.pets.components.labelRes
-import com.example.huellitasya.feature.pets.components.petFormWave
+import com.example.huellitasya.core.designsystem.components.greenWave
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -77,6 +80,7 @@ private val LongDateFormatter: DateTimeFormatter =
 internal fun PetDetailRoute(
     onBackClick: () -> Unit,
     onEditClick: (petId: String) -> Unit,
+    onRecordsClick: (petId: String, category: RecordCategory) -> Unit,
     onPetGone: () -> Unit,
     viewModel: PetDetailViewModel = hiltViewModel(),
 ) {
@@ -96,9 +100,11 @@ internal fun PetDetailRoute(
 
     PetDetailScreen(
         pet = uiState.pet,
+        recordCounts = uiState.recordCounts,
         snackbarHostState = snackbarHostState,
         onBackClick = onBackClick,
         onEditClick = { onEditClick(viewModel.petId) },
+        onRecordsClick = { onRecordsClick(viewModel.petId, it) },
     )
 }
 
@@ -106,9 +112,11 @@ internal fun PetDetailRoute(
 @Composable
 internal fun PetDetailScreen(
     pet: Pet?,
+    recordCounts: Map<RecordCategory, Int>,
     snackbarHostState: SnackbarHostState,
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
+    onRecordsClick: (RecordCategory) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
         Column(
@@ -136,7 +144,7 @@ internal fun PetDetailScreen(
                 )
             }
             if (pet != null) {
-                PetDetailContent(pet = pet, onEditClick = onEditClick)
+                PetDetailContent(pet = pet, recordCounts = recordCounts, onEditClick = onEditClick, onRecordsClick = onRecordsClick)
             }
         }
 
@@ -149,7 +157,12 @@ internal fun PetDetailScreen(
 }
 
 @Composable
-private fun PetDetailContent(pet: Pet, onEditClick: () -> Unit) {
+private fun PetDetailContent(
+    pet: Pet,
+    recordCounts: Map<RecordCategory, Int>,
+    onEditClick: () -> Unit,
+    onRecordsClick: (RecordCategory) -> Unit,
+) {
     Spacer(modifier = Modifier.height(8.dp))
     PetDetailPhoto(photoUrl = pet.photoUrl, contentDescription = stringResource(R.string.pets_photo_description))
     Spacer(modifier = Modifier.height(16.dp))
@@ -176,7 +189,7 @@ private fun PetDetailContent(pet: Pet, onEditClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 24.dp)
-            .petFormWave(horizontalBleed = 24.dp)
+            .greenWave(horizontalBleed = 24.dp)
             .padding(top = 56.dp, bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -193,9 +206,27 @@ private fun PetDetailContent(pet: Pet, onEditClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth().bleedHorizontally(14.dp),
             horizontalArrangement = Arrangement.spacedBy(5.dp),
         ) {
-            MedicalRecordCard(R.drawable.ic_pets_record_vaccines, stringResource(R.string.pets_record_vaccines), Modifier.weight(1f))
-            MedicalRecordCard(R.drawable.ic_pets_record_history, stringResource(R.string.pets_record_history), Modifier.weight(1f))
-            MedicalRecordCard(R.drawable.ic_pets_record_files, stringResource(R.string.pets_record_files), Modifier.weight(1f))
+            MedicalRecordCard(
+                icon = R.drawable.ic_pets_record_vaccines,
+                title = stringResource(R.string.pets_record_vaccines),
+                count = recordCounts[RecordCategory.VACCINES] ?: 0,
+                onClick = { onRecordsClick(RecordCategory.VACCINES) },
+                modifier = Modifier.weight(1f),
+            )
+            MedicalRecordCard(
+                icon = R.drawable.ic_pets_record_history,
+                title = stringResource(R.string.pets_record_history),
+                count = recordCounts[RecordCategory.HISTORY] ?: 0,
+                onClick = { onRecordsClick(RecordCategory.HISTORY) },
+                modifier = Modifier.weight(1f),
+            )
+            MedicalRecordCard(
+                icon = R.drawable.ic_pets_record_files,
+                title = stringResource(R.string.pets_record_files),
+                count = recordCounts[RecordCategory.FILES] ?: 0,
+                onClick = { onRecordsClick(RecordCategory.FILES) },
+                modifier = Modifier.weight(1f),
+            )
         }
         Spacer(modifier = Modifier.height(56.dp))
         HuellitasButton(
@@ -264,14 +295,21 @@ private fun PetDetailRow(@DrawableRes icon: Int, label: String, value: String, i
     }
 }
 
-/** Tarjeta verde de "Registros Medicos" (Figma 56:144). En esta spec no tiene acción y cuenta 0 archivos. */
+/** Tarjeta verde de "Registros Medicos" (Figma 56:144): abre su categoría (spec 006) y cuenta sus archivos. */
 @Composable
-private fun MedicalRecordCard(@DrawableRes icon: Int, title: String, modifier: Modifier = Modifier) {
+private fun MedicalRecordCard(
+    @DrawableRes icon: Int,
+    title: String,
+    count: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier
             .height(149.dp)
             .clip(RoundedCornerShape(30.dp))
             .background(GreenCard)
+            .clickable(onClickLabel = title, role = Role.Button, onClick = onClick)
             .padding(horizontal = 6.dp, vertical = 10.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -287,7 +325,7 @@ private fun MedicalRecordCard(@DrawableRes icon: Int, title: String, modifier: M
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = pluralStringResource(R.plurals.pets_record_count, 0, 0),
+            text = pluralStringResource(R.plurals.pets_record_count, count, count),
             color = RecordCountGreen,
             fontSize = 12.sp,
             fontWeight = FontWeight.ExtraBold,
@@ -311,9 +349,11 @@ private fun PetDetailScreenPreview() {
                 weightKg = 5.0,
                 photoUrl = null,
             ),
+            recordCounts = mapOf(RecordCategory.VACCINES to 3, RecordCategory.HISTORY to 1),
             snackbarHostState = SnackbarHostState(),
             onBackClick = {},
             onEditClick = {},
+            onRecordsClick = {},
         )
     }
 }

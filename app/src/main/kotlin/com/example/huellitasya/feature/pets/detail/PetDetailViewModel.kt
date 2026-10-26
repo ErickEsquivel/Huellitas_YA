@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.usecase.ObservePetUseCase
+import com.example.huellitasya.core.domain.usecase.ObserveRecordCountsUseCase
 import com.example.huellitasya.core.model.Pet
+import com.example.huellitasya.core.model.RecordCategory
 import com.example.huellitasya.core.ui.UiText
 import com.example.huellitasya.core.ui.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +25,8 @@ import javax.inject.Inject
 data class PetDetailUiState(
     /** `null` mientras carga. */
     val pet: Pet? = null,
+    /** Archivos de cada categoría de "Registros Medicos" (spec 006). */
+    val recordCounts: Map<RecordCategory, Int> = emptyMap(),
 )
 
 sealed interface PetDetailEvent {
@@ -37,6 +41,7 @@ sealed interface PetDetailEvent {
 class PetDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     observePet: ObservePetUseCase,
+    observeRecordCounts: ObserveRecordCountsUseCase,
 ) : ViewModel() {
 
     /** Argumento de `PetDetailDestination`. */
@@ -61,6 +66,12 @@ class PetDetailViewModel @Inject constructor(
                         },
                     )
                 }
+            }
+        }
+        viewModelScope.launch {
+            // Un error al contar no interrumpe el perfil: las tarjetas siguen en 0.
+            observeRecordCounts(petId).collect { result ->
+                if (result is AppResult.Success) _uiState.update { it.copy(recordCounts = result.data) }
             }
         }
     }

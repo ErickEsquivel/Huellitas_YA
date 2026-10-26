@@ -26,6 +26,8 @@ import com.example.huellitasya.feature.pets.navigation.petsIntroScreen
 import com.example.huellitasya.feature.pets.navigation.RegisterPetDestination
 import com.example.huellitasya.feature.pets.navigation.registerPetScreen
 import com.example.huellitasya.feature.profile.navigation.PersonalDataDestination
+import com.example.huellitasya.feature.records.navigation.RecordListDestination
+import com.example.huellitasya.feature.records.navigation.recordListScreen
 import com.example.huellitasya.feature.profile.navigation.VerifyEmailChangeDestination
 import com.example.huellitasya.feature.profile.navigation.personalDataScreen
 import com.example.huellitasya.feature.profile.navigation.popBackToPersonalData
@@ -96,6 +98,14 @@ private fun MainNavHost(googleServerClientId: String?, startWithIntro: Boolean) 
             petDetailScreen(
                 onBack = { navController.popBackStack() },
                 onEditClick = { navController.navigate(EditPetDestination(it)) },
+                onRecordsClick = { petId, category -> navController.navigate(RecordListDestination(petId, category)) },
+                onPetGone = { navController.popBackStack<HomeDestination>(inclusive = false) },
+            )
+            recordListScreen(
+                onBack = { navController.popBackStack() },
+                // Subir archivo (Mateo) y el detalle (Julian) llegan en las siguientes partes (spec 006, "Reparto").
+                onAddClick = { _, _ -> },
+                onRecordClick = { _, _ -> },
                 onPetGone = { navController.popBackStack<HomeDestination>(inclusive = false) },
             )
             editPetScreen(
