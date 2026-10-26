@@ -63,7 +63,7 @@ import com.example.huellitasya.core.ui.ObserveAsEvents
 import com.example.huellitasya.core.ui.breedAndAge
 import com.example.huellitasya.core.ui.weightLabel
 import com.example.huellitasya.feature.pets.components.labelRes
-import com.example.huellitasya.feature.pets.components.petFormWave
+import com.example.huellitasya.core.designsystem.components.greenWave
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -176,7 +176,7 @@ private fun PetDetailContent(pet: Pet, onEditClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 24.dp)
-            .petFormWave(horizontalBleed = 24.dp)
+            .greenWave(horizontalBleed = 24.dp)
             .padding(top = 56.dp, bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

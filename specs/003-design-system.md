@@ -48,6 +48,7 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `HuellitasPasswordField` | `HuellitasTextField` con mostrar/ocultar contraseña. |
 | `FieldMessage` | Ícono (alerta o X) + mensaje bajo un campo o un formulario. |
 | `CurvedBackground` | Fondo con ola verde. |
+| `Modifier.greenWave()` | Ola verde que empieza en el borde superior del contenido y llega hasta el final de la pantalla aunque el contenido sea corto (formularios de mascota, perfil de la mascota, registros médicos). |
 | `ScreenHeader` | Título + subtítulo opcional + campana de notificaciones (`ic_bell`, la de Figma 99:731). |
 | `LoadingOverlay` | Capa semitransparente con indicador de progreso. |
 | `ProgressOverlay` | Desenfoca la pantalla y la cubre con el spinner de Figma y un texto ("Guardando...", "Actualizando...", "Eliminando..."; spec 005). `SpinnerWithLabel` es el spinner solo ("Conectando..."). |
