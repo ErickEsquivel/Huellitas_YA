@@ -99,7 +99,7 @@ enum class RecordType { VACCINATION, CONSULTATION, EXAM, OTHER }
 data class MedicalRecord(
     val id: String, val petId: String, val category: RecordCategory,
     val fileName: String, val contentType: String, val sizeBytes: Long,
-    val date: LocalDate, val type: RecordType, val vet: String?,
+    val date: LocalDate, val type: RecordType, val vet: String?, val fileUrl: String,
 )
 
 data class RecordDraft(val category: RecordCategory, val date: LocalDate, val type: RecordType, val vet: String?)
@@ -116,6 +116,7 @@ data class RecordDraft(val category: RecordCategory, val date: LocalDate, val ty
 | `date` | string | `yyyy-MM-dd` |
 | `type` | string | `vaccination`, `consultation`, `exam` u `other` |
 | `vet` | string? | hasta 50 caracteres |
+| `fileUrl` | string | URL de descarga de Storage (miniatura, vista previa y descarga) |
 | `createdAt` | timestamp | `serverTimestamp()` |
 
 - **Reglas:** solo el dueño lee, crea y borra; los registros no se editan.
@@ -128,7 +129,7 @@ data class RecordDraft(val category: RecordCategory, val date: LocalDate, val ty
 - `RecordRepository`:
   - `observeRecords(uid, petId)`;
   - `newRecordId(uid, petId)`;
-  - `createRecord(uid, petId, recordId, draft, file)`;
+  - `createRecord(uid, petId, recordId, draft, file, fileUrl)`;
   - `deleteRecord(uid, petId, recordId)`.
 - `RecordFileRepository`:
   - `upload(uid, petId, recordId, localUri): Flow<UploadProgress>`;
@@ -158,8 +159,8 @@ data class RecordDraft(val category: RecordCategory, val date: LocalDate, val ty
 
 > Marcar cada casilla al verificarla en dispositivo.
 
-- [ ] Las tarjetas del perfil abren su categoría y muestran el número real de archivos.
-- [ ] Sin archivos, la lista muestra la tarjeta "+"; con archivos, una tarjeta por archivo con fecha, tipo y veterinario, y el "+" flotante.
+- [x] Las tarjetas del perfil abren su categoría y muestran el número real de archivos.
+- [x] Sin archivos, la lista muestra la tarjeta "+"; con archivos, una tarjeta por archivo con fecha, tipo y veterinario, y el "+" flotante.
 - [ ] Subir un PDF y una imagen funciona en las tres categorías, con la barra de progreso, y aparecen en la lista.
 - [ ] Un archivo de otro tipo o de más de 10 MB se rechaza con su aviso y no se sube.
 - [ ] El detalle muestra la imagen o la primera página del PDF; descargar lo deja en Descargas.
@@ -167,6 +168,8 @@ data class RecordDraft(val category: RecordCategory, val date: LocalDate, val ty
 - [ ] Eliminar una mascota borra también sus registros y archivos.
 - [ ] Sin conexión, la lista muestra la caché, y subir o eliminar muestran "Sin conexión. Revisa tu internet".
 - [ ] Las reglas impiden leer, crear o borrar registros de otra cuenta, y guardar tipos, tamaños o campos fuera del esquema.
+
+> Verificados en el Vivo V2436 (Erick): conteos del perfil y las listas vacía y con archivos (un PDF y una imagen creados por REST con las reglas desplegadas).
 
 ## Fuera de alcance
 

@@ -98,6 +98,7 @@ internal fun DocumentSnapshot.toMedicalRecord(petId: String): MedicalRecord? {
     val fileName = getString("fileName")?.takeIf { it.isNotBlank() } ?: return null
     val contentType = getString("contentType") ?: return null
     val date = getString("date")?.let { runCatching { LocalDate.parse(it) }.getOrNull() } ?: return null
+    val fileUrl = getString("fileUrl")?.takeIf { it.isNotBlank() } ?: return null
     return MedicalRecord(
         id = id,
         petId = petId,
@@ -113,6 +114,7 @@ internal fun DocumentSnapshot.toMedicalRecord(petId: String): MedicalRecord? {
             else -> RecordType.OTHER
         },
         vet = getString("vet")?.takeIf { it.isNotBlank() },
+        fileUrl = fileUrl,
     )
 }
 

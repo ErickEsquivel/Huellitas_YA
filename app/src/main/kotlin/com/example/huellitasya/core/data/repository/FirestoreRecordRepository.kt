@@ -54,6 +54,7 @@ internal class FirestoreRecordRepository @Inject constructor(
         recordId: String,
         draft: RecordDraft,
         file: LocalFileInfo,
+        fileUrl: String,
     ): AppResult<Unit, DataError> = runData {
         val data = mapOf(
             CATEGORY to draft.category.name.lowercase(Locale.ROOT),
@@ -63,6 +64,7 @@ internal class FirestoreRecordRepository @Inject constructor(
             DATE to draft.date.toString(),
             TYPE to draft.type.name.lowercase(Locale.ROOT),
             VET to draft.vet,
+            FILE_URL to fileUrl,
             CREATED_AT to FieldValue.serverTimestamp(),
         )
         recordsCollection(uid, petId).document(recordId).set(data).await()
@@ -96,6 +98,7 @@ internal class FirestoreRecordRepository @Inject constructor(
         const val DATE = "date"
         const val TYPE = "type"
         const val VET = "vet"
+        const val FILE_URL = "fileUrl"
         const val CREATED_AT = "createdAt"
     }
 }

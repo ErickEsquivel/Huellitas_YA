@@ -22,6 +22,7 @@ interface RecordRepository {
         recordId: String,
         draft: RecordDraft,
         file: LocalFileInfo,
+        fileUrl: String,
     ): AppResult<Unit, DataError>
 
     suspend fun deleteRecord(uid: String, petId: String, recordId: String): AppResult<Unit, DataError>

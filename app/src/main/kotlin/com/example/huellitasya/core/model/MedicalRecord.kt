@@ -18,6 +18,8 @@ data class MedicalRecord(
     val date: LocalDate,
     val type: RecordType,
     val vet: String?,
+    /** URL de descarga del archivo: miniatura, vista previa y descarga. */
+    val fileUrl: String,
 ) {
     val isPdf: Boolean get() = contentType == PDF_CONTENT_TYPE
 }

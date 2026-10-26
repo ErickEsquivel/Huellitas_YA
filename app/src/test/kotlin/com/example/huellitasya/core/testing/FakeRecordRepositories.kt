@@ -25,6 +25,7 @@ val TestRecord = MedicalRecord(
     date = LocalDate.of(2026, 9, 10),
     type = RecordType.VACCINATION,
     vet = "Dr. A. Ramírez",
+    fileUrl = "https://storage.test/record-1",
 )
 
 val TestLocalFile = LocalFileInfo(name = "Carnet.pdf", contentType = "application/pdf", sizeBytes = 200_000)
@@ -50,11 +51,12 @@ class FakeRecordRepository : RecordRepository {
         recordId: String,
         draft: RecordDraft,
         file: LocalFileInfo,
+        fileUrl: String,
     ): AppResult<Unit, DataError> {
         created += Triple(recordId, draft, file)
         val current = (records.value as? AppResult.Success)?.data
         if (writeResult is AppResult.Success && current != null) {
-            val record = MedicalRecord(recordId, petId, draft.category, file.name, file.contentType, file.sizeBytes, draft.date, draft.type, draft.vet)
+            val record = MedicalRecord(recordId, petId, draft.category, file.name, file.contentType, file.sizeBytes, draft.date, draft.type, draft.vet, fileUrl)
             records.value = AppResult.Success(listOf(record) + current)
         }
         return writeResult

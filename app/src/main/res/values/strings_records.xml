@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Registros médicos (spec 006) -->
+    <string name="records_back">Volver</string>
+    <string name="records_pet_title">Perfil de %s</string>
+    <string name="records_section_title">Registros Médicos - Registros Detallados</string>
+    <string name="records_category_vaccines">Carné de vacunas</string>
+    <string name="records_category_history">Historial Clínico</string>
+    <string name="records_category_files">Archivos Adicionales</string>
+    <string name="records_type_vaccination">Vacunación</string>
+    <string name="records_type_consultation">Consulta</string>
+    <string name="records_type_exam">Examen</string>
+    <string name="records_type_other">Otro</string>
+    <string name="records_card_date_type">Fecha: %1$s | Tipo: %2$s</string>
+    <string name="records_card_vet">Veterinario: %s</string>
+    <string name="records_add">Agregar archivo</string>
+    <string name="records_open">Abrir %s</string>
+    <string name="records_pet_photo">Foto de %s</string>
+</resources>

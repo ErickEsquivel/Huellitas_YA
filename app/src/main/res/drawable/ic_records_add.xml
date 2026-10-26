@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma 3193:3363: "+" del botón flotante de Registros -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="15.5dp"
+    android:height="15.5dp"
+    android:viewportWidth="15.5"
+    android:viewportHeight="15.5">
+    <path
+        android:pathData="M1 7.75H7.75M7.75 7.75H14.5M7.75 7.75V1M7.75 7.75V14.5"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
