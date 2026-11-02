@@ -102,6 +102,43 @@ service cloud.firestore {
           allow delete: if isOwner();
         }
       }
+
+      // Recordatorios (spec 007): solo el dueño y para una de sus mascotas. Al editar solo cambian
+      // la fecha y la hora. deleteAccount los borra junto con el perfil.
+      match /reminders/{reminderId} {
+        function titleOk(data) {
+          return data.get('title', null) is string
+                 && data.title.trim().size() >= 1
+                 && data.title.size() <= 50;
+        }
+
+        function isValidReminder() {
+          let data = request.resource.data;
+          let kind = data.get('kind', null);
+          let subtype = data.get('subtype', null);
+          let needsTitle = kind == 'other' || subtype == 'other';
+          return data.keys().hasOnly(['petId', 'kind', 'subtype', 'title', 'dateTime', 'createdAt', 'updatedAt'])
+                 && data.keys().hasAll(['petId', 'kind', 'dateTime', 'createdAt', 'updatedAt'])
+                 && data.petId is string && data.petId.size() > 0 && data.petId.size() <= 128
+                 && ((kind == 'vaccine' && subtype in ['rabies', 'parvovirus', 'leptospirosis', 'other'])
+                     || (kind == 'vet' && subtype in ['general', 'deworming', 'grooming', 'surgery', 'other'])
+                     || (kind == 'other' && !data.keys().hasAny(['subtype'])))
+                 && ((needsTitle && titleOk(data)) || (!needsTitle && !data.keys().hasAny(['title'])))
+                 && data.dateTime is timestamp;
+        }
+
+        allow read: if isOwner();
+        allow create: if isOwner()
+                      && isValidReminder()
+                      && exists(/databases/$(database)/documents/users/$(uid)/pets/$(request.resource.data.petId))
+                      && request.resource.data.createdAt == request.time
+                      && request.resource.data.updatedAt == request.time;
+        allow update: if isOwner()
+                      && isValidReminder()
+                      && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['dateTime', 'updatedAt'])
+                      && request.resource.data.updatedAt == request.time;
+        allow delete: if isOwner();
+      }
     }
 
     // passwordResetCodes (códigos de recuperación hasheados) solo lo usan las Cloud Functions

@@ -9,10 +9,15 @@ import com.example.huellitasya.core.model.PetSex
 import com.example.huellitasya.core.model.PetSpecies
 import com.example.huellitasya.core.model.RecordCategory
 import com.example.huellitasya.core.model.RecordType
+import com.example.huellitasya.core.model.Reminder
+import com.example.huellitasya.core.model.ReminderKind
 import com.example.huellitasya.core.model.User
 import com.example.huellitasya.core.model.UserProfile
+import com.example.huellitasya.core.model.VaccineType
+import com.example.huellitasya.core.model.VetReason
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.FirebaseTooManyRequestsException
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
@@ -24,6 +29,10 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.storage.StorageException
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Date
+import java.util.Locale
 
 internal fun FirebaseUser.toUser(): User = User(
     uid = uid,
@@ -129,3 +138,50 @@ internal fun DocumentSnapshot.toUserProfile(): UserProfile = UserProfile(
     photoUrl = getString("photoUrl")?.takeIf { it.isNotBlank() },
     provider = if (getString("provider") == "google") AuthProvider.GOOGLE else AuthProvider.EMAIL,
 )
+
+/** Recordatorio de `users/{uid}/reminders/{id}` (spec 007). `null` si el documento está incompleto. */
+internal fun DocumentSnapshot.toReminder(): Reminder? {
+    val petId = getString("petId")?.takeIf { it.isNotBlank() } ?: return null
+    val kind = when (getString("kind")) {
+        "vaccine" -> ReminderKind.VACCINE
+        "vet" -> ReminderKind.VET
+        "other" -> ReminderKind.OTHER
+        else -> return null
+    }
+    val subtype = getString("subtype")
+    val dateTime = getTimestamp("dateTime")?.toLocalDateTime() ?: return null
+    return Reminder(
+        id = id,
+        petId = petId,
+        kind = kind,
+        vaccineType = if (kind == ReminderKind.VACCINE) VaccineType.entries.firstOrNull { it.wireValue() == subtype } ?: return null else null,
+        vetReason = if (kind == ReminderKind.VET) VetReason.entries.firstOrNull { it.wireValue() == subtype } ?: return null else null,
+        customTitle = getString("title"),
+        dateTime = dateTime,
+    )
+}
+
+internal fun ReminderKind.wireValue(): String = when (this) {
+    ReminderKind.VACCINE -> "vaccine"
+    ReminderKind.VET -> "vet"
+    ReminderKind.OTHER -> "other"
+}
+
+internal fun VaccineType.wireValue(): String = name.lowercase(Locale.ROOT)
+
+internal fun VetReason.wireValue(): String = when (this) {
+    VetReason.GENERAL -> "general"
+    VetReason.DEWORMING -> "deworming"
+    VetReason.GROOMING -> "grooming"
+    VetReason.SURGERY -> "surgery"
+    VetReason.OTHER -> "other"
+}
+
+/** Valor de `subtype`: la vacuna o el motivo; `null` en los recordatorios "Otro". */
+internal fun subtypeValue(vaccineType: VaccineType?, vetReason: VetReason?): String? =
+    vaccineType?.wireValue() ?: vetReason?.wireValue()
+
+/** Las fechas se guardan como instantes en la zona del teléfono. */
+internal fun LocalDateTime.toTimestamp(): Timestamp = Timestamp(Date.from(atZone(ZoneId.systemDefault()).toInstant()))
+
+internal fun Timestamp.toLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(toDate().toInstant(), ZoneId.systemDefault())

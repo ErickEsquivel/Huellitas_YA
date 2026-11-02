@@ -21,6 +21,7 @@ Las specs son la fuente de verdad de **qué** debe hacer cada feature antes de e
 | [004 — Perfil de usuario](004-perfil-usuario.md) | Implemented |
 | [005 — Mascotas](005-mascotas.md) | Implemented |
 | [006 — Registros médicos](006-registros-medicos.md) | Implemented |
+| [007 — Calendario y recordatorios](007-calendario.md) | Approved |
 
 ## Plantilla
 
