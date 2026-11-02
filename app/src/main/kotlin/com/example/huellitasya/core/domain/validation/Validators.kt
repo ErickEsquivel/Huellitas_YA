@@ -2,9 +2,11 @@ package com.example.huellitasya.core.domain.validation
 
 import com.example.huellitasya.core.domain.error.ValidationError
 import com.example.huellitasya.core.model.LocalFileInfo
+import com.example.huellitasya.core.model.MAX_REMINDER_TITLE_LENGTH
 import com.example.huellitasya.core.model.MAX_RECORD_BYTES
 import com.example.huellitasya.core.model.PDF_CONTENT_TYPE
 import java.time.LocalDate
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 /**
@@ -203,4 +205,17 @@ class ValidatePasswordUseCase @Inject constructor() {
     private companion object {
         const val MIN_PASSWORD_LENGTH = 8
     }
+}
+
+/** Nombre y fecha de un recordatorio (spec 007, "Reglas de validación"). */
+class ValidateReminderUseCase @Inject constructor() {
+    fun title(title: String): ValidationError? = when {
+        title.isBlank() -> ValidationError.EmptyReminderTitle
+        title.trim().length > MAX_REMINDER_TITLE_LENGTH -> ValidationError.ReminderTitleTooLong
+        else -> null
+    }
+
+    /** Debe quedar en el futuro: un recordatorio de una hora que ya pasó no avisaría nunca. */
+    fun dateTime(dateTime: LocalDateTime, now: LocalDateTime): ValidationError? =
+        if (dateTime.isAfter(now)) null else ValidationError.ReminderInPast
 }

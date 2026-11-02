@@ -61,6 +61,9 @@ fun ValidationError.toUiText(): UiText = UiText.Resource(
         ValidationError.UnsupportedFileType -> R.string.error_unsupported_file
         ValidationError.FileTooBig -> R.string.error_file_too_big
         ValidationError.VetTooLong -> R.string.error_name_too_long
+        ValidationError.EmptyReminderTitle -> R.string.error_empty_reminder_title
+        ValidationError.ReminderTitleTooLong -> R.string.error_name_too_long
+        ValidationError.ReminderInPast -> R.string.error_reminder_in_past
     },
 )
 

@@ -14,7 +14,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.huellitasya.MainUiState
 import com.example.huellitasya.feature.auth.navigation.AuthGraph
 import com.example.huellitasya.feature.auth.navigation.authGraph
+import com.example.huellitasya.feature.calendar.navigation.NewReminderDestination
 import com.example.huellitasya.feature.calendar.navigation.calendarScreen
+import com.example.huellitasya.feature.calendar.navigation.newReminderScreen
 import com.example.huellitasya.feature.home.navigation.HomeDestination
 import com.example.huellitasya.feature.home.navigation.homeScreen
 import com.example.huellitasya.feature.pets.navigation.EditPetDestination
@@ -140,11 +142,14 @@ private fun MainNavHost(googleServerClientId: String?, startWithIntro: Boolean) 
                 },
             )
             calendarScreen(
-                // La hoja "¿Qué deseas programar?…" (Mateo), el detalle y Notificaciones (Julian)
-                // llegan en las siguientes partes (spec 007, "Reparto").
-                onAddClick = {},
+                onNewReminderClick = { navController.navigate(NewReminderDestination(it)) },
+                // El detalle y Notificaciones (Julian) llegan en la siguiente parte (spec 007, "Reparto").
                 onReminderClick = {},
                 onNotificationsClick = {},
+            )
+            newReminderScreen(
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() },
             )
             profileScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
             settingsScreen(

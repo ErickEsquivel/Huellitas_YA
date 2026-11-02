@@ -6,6 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 class ValidatorsTest {
 
@@ -190,5 +191,17 @@ class ValidatorsTest {
         assertEquals(ValidationError.InvalidBirthDate, validateRecordForm.date(today.plusDays(1), today))
         assertNull(validateRecordForm.vet(""))
         assertEquals(ValidationError.VetTooLong, validateRecordForm.vet("a".repeat(51)))
+    }
+
+    @Test
+    fun `nombre y fecha del recordatorio`() {
+        val validateReminder = ValidateReminderUseCase()
+        val now = LocalDateTime.of(2026, 11, 1, 12, 0)
+        assertNull(validateReminder.title("Baño"))
+        assertEquals(ValidationError.EmptyReminderTitle, validateReminder.title("   "))
+        assertEquals(ValidationError.ReminderTitleTooLong, validateReminder.title("a".repeat(51)))
+        assertNull(validateReminder.dateTime(now.plusMinutes(1), now))
+        assertEquals(ValidationError.ReminderInPast, validateReminder.dateTime(now, now))
+        assertEquals(ValidationError.ReminderInPast, validateReminder.dateTime(now.minusDays(1), now))
     }
 }

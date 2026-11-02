@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono Campo Hora (Figma 3362:1617) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+    <path
+        android:pathData="M18 8.27778V18L13.1389 15.0833M35.5 18C35.5 27.6651 27.6651 35.5 18 35.5C8.33502 35.5 0.5 27.6651 0.5 18C0.5 8.33502 8.33502 0.5 18 0.5C27.6651 0.5 35.5 8.33502 35.5 18Z"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="1"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

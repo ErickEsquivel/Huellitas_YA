@@ -22,6 +22,8 @@
     <string name="error_invalid_weight">Ingresa un peso válido</string>
     <string name="error_unsupported_file">Elige un PDF o una imagen</string>
     <string name="error_file_too_big">El archivo es demasiado grande (máx. 10 MB)</string>
+    <string name="error_empty_reminder_title">Escribe el nombre del recordatorio</string>
+    <string name="error_reminder_in_past">Elige una fecha y hora futuras</string>
     <string name="error_profile_not_found">No encontramos tu perfil</string>
     <string name="error_photo_too_large">La imagen es demasiado grande</string>
     <string name="error_new_email_invalid">Ingresa un correo distinto al actual</string>

@@ -16,9 +16,10 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 
 /**
- * Selector de fecha de nacimiento de Material 3 (Datos Personales y mascotas, specs 004 y 005).
- * Trabaja en UTC (así lo define `DatePicker`) para que la fecha elegida no se corra un día por la
- * zona horaria. Solo deja elegir entre [minDate] y hoy.
+ * Selector de fecha de Material 3 (Datos Personales, mascotas, registros y recordatorios). Trabaja
+ * en UTC (así lo define `DatePicker`) para que la fecha elegida no se corra un día por la zona
+ * horaria. Solo deja elegir entre [minDate] y [maxDate]: hoy para fechas pasadas (nacimiento) y una
+ * fecha futura para los recordatorios (spec 007).
  *
  * @param clearText y [onClear]: botón "Borrar" para dejar la fecha sin registrar. Sin ellos no se muestra.
  */
@@ -33,18 +34,18 @@ fun HuellitasDatePickerDialog(
     onDismiss: () -> Unit,
     clearText: String? = null,
     onClear: (() -> Unit)? = null,
+    maxDate: LocalDate = LocalDate.now(),
 ) {
-    val today = LocalDate.now()
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
-        yearRange = minDate.year..today.year,
+        yearRange = minDate.year..maxDate.year,
         selectableDates = object : SelectableDates {
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 val date = utcTimeMillis.toLocalDate()
-                return !date.isAfter(LocalDate.now()) && !date.isBefore(minDate)
+                return !date.isAfter(maxDate) && !date.isBefore(minDate)
             }
 
-            override fun isSelectableYear(year: Int): Boolean = year in minDate.year..LocalDate.now().year
+            override fun isSelectableYear(year: Int): Boolean = year in minDate.year..maxDate.year
         },
     )
     val colors = DatePickerDefaults.colors(containerColor = Color.White)

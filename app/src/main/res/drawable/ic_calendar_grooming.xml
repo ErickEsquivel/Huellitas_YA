@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono Estética y Peluquería (Figma 3241:1398) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+    <path
+        android:pathData="M5.41341 5.41341L5.41421 5.41421M5.41421 5.41421L8.00004 8.00004M5.41421 5.41421C5.77614 5.05228 6 4.55228 6 4C6 2.89543 5.10457 2 4 2C2.89543 2 2 2.89543 2 4C2 5.10457 2.89543 6 4 6C4.55228 6 5.05228 5.77614 5.41421 5.41421ZM8.00004 8.00004L8.00008 8.00008M8.00004 8.00004L13.3334 2.66667M8.00004 8.00004L5.41425 10.5858M5.41425 10.5858L5.41341 10.5867M5.41425 10.5858C5.05232 10.2239 4.5523 10 4 10C2.89543 10 2 10.8954 2 12C2 13.1046 2.89543 14 4 14C5.10457 14 6 13.1046 6 12C6 11.4477 5.77616 10.9478 5.41425 10.5858ZM9.86654 9.86654L13.3332 13.3332"
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round" />
+</vector>
