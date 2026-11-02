@@ -177,11 +177,15 @@ private fun MainNavHost(googleServerClientId: String?, startWithIntro: Boolean, 
                 onBack = { navController.popBackStack() },
                 onSaved = { navController.popBackStack() },
             )
-            profileScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
+            profileScreen(
+                onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) },
+                onNotificationsClick = { navController.navigate(NotificationsDestination) },
+            )
             settingsScreen(
                 googleServerClientId = googleServerClientId,
                 onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) },
                 onNavigateToSecurity = { navController.navigate(SecurityDestination) },
+                onNotificationsClick = { navController.navigate(NotificationsDestination) },
             )
             securityScreen(onBack = { navController.popBackStack() })
             personalDataScreen(
