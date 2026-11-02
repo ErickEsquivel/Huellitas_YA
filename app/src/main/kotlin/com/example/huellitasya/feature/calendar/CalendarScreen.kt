@@ -279,8 +279,15 @@ private fun DayCell(day: Int, isToday: Boolean, markColorIndex: Int?) {
         modifier = Modifier
             .size(28.dp)
             .clip(CircleShape)
-            .then(if (isToday) Modifier.background(SurfaceGray).border(1.dp, LightGrayText, CircleShape) else Modifier)
-            .then(if (markColorIndex != null) Modifier.border(1.dp, petColors(markColorIndex).accent, CircleShape) else Modifier)
+            .then(if (isToday) Modifier.background(SurfaceGray) else Modifier)
+            // Un solo borde: si hoy también tiene eventos, gana el color de la mascota.
+            .then(
+                when {
+                    markColorIndex != null -> Modifier.border(1.dp, petColors(markColorIndex).accent, CircleShape)
+                    isToday -> Modifier.border(1.dp, LightGrayText, CircleShape)
+                    else -> Modifier
+                },
+            )
             .semantics {
                 if (markColorIndex != null) contentDescription = withEvents
                 else if (isToday) contentDescription = "$day, $today"
