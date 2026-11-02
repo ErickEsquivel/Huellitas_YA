@@ -139,7 +139,13 @@ private fun MainNavHost(googleServerClientId: String?, startWithIntro: Boolean) 
                     }
                 },
             )
-            calendarScreen()
+            calendarScreen(
+                // La hoja "¿Qué deseas programar?…" (Mateo), el detalle y Notificaciones (Julian)
+                // llegan en las siguientes partes (spec 007, "Reparto").
+                onAddClick = {},
+                onReminderClick = {},
+                onNotificationsClick = {},
+            )
             profileScreen(onNavigateToPersonalData = { navController.navigate(PersonalDataDestination) })
             settingsScreen(
                 googleServerClientId = googleServerClientId,

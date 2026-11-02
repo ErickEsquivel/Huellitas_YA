@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Calendario (spec 007) -->
+    <string name="calendar_title">Calendario</string>
+    <string name="calendar_subtitle">Gestiona los eventos de tu mascota</string>
+    <string name="calendar_notifications">Notificaciones</string>
+    <string name="calendar_previous_month">Mes anterior</string>
+    <string name="calendar_next_month">Mes siguiente</string>
+    <string name="calendar_month_year">%1$s %2$d</string>
+    <string name="calendar_upcoming">Próximos eventos</string>
+    <string name="calendar_add">Agregar recordatorio</string>
+    <string name="calendar_open">Abrir %s</string>
+    <string name="calendar_today">Hoy</string>
+    <string name="calendar_day_with_events">%1$d, con eventos</string>
+
+    <string-array name="calendar_months">
+        <item>Enero</item>
+        <item>Febrero</item>
+        <item>Marzo</item>
+        <item>Abril</item>
+        <item>Mayo</item>
+        <item>Junio</item>
+        <item>Julio</item>
+        <item>Agosto</item>
+        <item>Septiembre</item>
+        <item>Octubre</item>
+        <item>Noviembre</item>
+        <item>Diciembre</item>
+    </string-array>
+    <!-- Abreviaturas de Figma ("23 de sep. de 2026"). -->
+    <string-array name="calendar_months_short">
+        <item>ene.</item>
+        <item>feb.</item>
+        <item>mar.</item>
+        <item>abr.</item>
+        <item>may.</item>
+        <item>jun.</item>
+        <item>jul.</item>
+        <item>ago.</item>
+        <item>sep.</item>
+        <item>oct.</item>
+        <item>nov.</item>
+        <item>dic.</item>
+    </string-array>
+    <!-- La semana empieza el lunes. -->
+    <string-array name="calendar_weekdays">
+        <item>Lun</item>
+        <item>Mar</item>
+        <item>Mié</item>
+        <item>Jue</item>
+        <item>Vie</item>
+        <item>Sáb</item>
+        <item>Dom</item>
+    </string-array>
+    <string name="calendar_date">%1$d de %2$s de %3$d</string>
+
+    <!-- Títulos de los recordatorios -->
+    <string name="reminder_title_rabies">Vacuna contra la rabia</string>
+    <string name="reminder_title_parvovirus">Vacuna contra el parvovirus</string>
+    <string name="reminder_title_leptospirosis">Vacuna contra la leptospirosis</string>
+    <string name="reminder_title_vaccine">Vacuna</string>
+    <string name="reminder_title_general">Consulta general</string>
+    <string name="reminder_title_deworming">Desparasitación</string>
+    <string name="reminder_title_grooming">Estética y peluquería</string>
+    <string name="reminder_title_surgery">Cirugía y especialidad</string>
+    <string name="reminder_title_vet">Cita veterinaria</string>
+    <string name="reminder_title_other">Recordatorio</string>
+</resources>
