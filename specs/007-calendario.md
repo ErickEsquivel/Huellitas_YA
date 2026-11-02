@@ -53,7 +53,7 @@ El Calendario muestra la barra inferior. Nuevo recordatorio, Detalle y Notificac
 - Mes en una tarjeta con borde verde, con "<" y ">" para cambiar de mes. La semana empieza el lunes y los nombres van en español.
 - Hoy se marca con un círculo gris. Un día con eventos lleva un anillo del color de la mascota; si hay varias mascotas, el de la primera.
 - El botón "+" sobre el borde inferior abre la hoja.
-- "Próximos eventos": recordatorios desde ahora en adelante, agrupados por mascota. Cada grupo lleva un punto y el nombre en el color de la mascota. Cada tarjeta muestra el ícono del tipo, el título, la hora y la fecha.
+- "Próximos eventos": recordatorios desde ahora en adelante, agrupados por mascota. Solo esta lista se desplaza; la cabecera y el mes quedan fijos (Figma 3336:1114). Cada grupo lleva un punto y el nombre en el color de la mascota. Cada tarjeta muestra el ícono del tipo, el título, la hora y la fecha.
 - Sin próximos eventos, se muestra la tarjeta "+".
 
 **Hoja "¿Qué deseas programar?…":** tres opciones, Vacunas (jeringa), Veterinario (corazón) y Otro (lista). Se cierra tocando fuera.
@@ -172,9 +172,9 @@ Va al nivel del usuario y no dentro de la mascota, porque el Calendario lee las 
 
 > Marcar cada casilla al verificarla en el teléfono.
 
-- [ ] El Calendario muestra el mes actual con hoy marcado, y "<" / ">" cambian de mes.
-- [ ] Los días con recordatorios llevan el anillo del color de su mascota.
-- [ ] "Próximos eventos" agrupa los recordatorios futuros por mascota; sin eventos, muestra la tarjeta "+".
+- [x] El Calendario muestra el mes actual con hoy marcado, y "<" / ">" cambian de mes.
+- [x] Los días con recordatorios llevan el anillo del color de su mascota.
+- [x] "Próximos eventos" agrupa los recordatorios futuros por mascota; sin eventos, muestra la tarjeta "+".
 - [ ] Se puede crear una vacuna, una cita con el veterinario y un recordatorio "Otro". El botón queda gris hasta completar el formulario.
 - [ ] Una fecha u hora pasada se rechaza con su aviso.
 - [ ] El Detalle permite cambiar la fecha y la hora; "Actualizar información" se activa solo con cambios.
@@ -184,6 +184,8 @@ Va al nivel del usuario y no dentro de la mascota, porque el Calendario lee las 
 - [ ] Eliminar una mascota borra también sus recordatorios.
 - [ ] Sin conexión se ven los datos guardados, y crear, editar o eliminar muestran "Sin conexión. Revisa tu internet".
 - [ ] Las reglas impiden leer o escribir recordatorios de otra cuenta, guardar campos fuera del esquema y editar algo distinto de la fecha.
+
+> Verificados en el Vivo V2436 (Erick): mes con hoy y flechas, anillos por mascota, "Próximos eventos" agrupados (sin el pasado) y la tarjeta "+" sin eventos, con 2 mascotas y 4 recordatorios sembrados por REST. Reglas: 18 de 18 pruebas por REST.
 
 ## Fuera de alcance
 

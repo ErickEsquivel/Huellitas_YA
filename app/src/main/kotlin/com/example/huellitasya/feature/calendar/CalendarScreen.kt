@@ -119,11 +119,11 @@ internal fun CalendarScreen(
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
         CurvedBackground(modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.6f))
 
+        // Solo "Próximos eventos" se desplaza (Figma 3336:1114); la cabecera y el mes quedan fijos.
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(start = 21.dp, end = 21.dp, top = 45.dp, bottom = 24.dp),
+                .padding(start = 21.dp, end = 21.dp, top = 45.dp),
         ) {
             ScreenHeader(
                 title = stringResource(R.string.calendar_title),
@@ -149,21 +149,29 @@ internal fun CalendarScreen(
                 modifier = Modifier.padding(start = 8.dp),
             )
             Spacer(modifier = Modifier.height(14.dp))
-            if (!state.isLoading) {
-                if (state.upcoming.isEmpty()) {
-                    AddPlaceholderCard(
-                        contentDescription = stringResource(R.string.calendar_add),
-                        onClick = onAddClick,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(13.dp)) {
-                        state.upcoming.forEach { group ->
-                            val colors = petColors(group.colorIndex)
-                            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                PetGroupTitle(name = group.pet.name, colors = colors)
-                                group.reminders.forEach { reminder ->
-                                    ReminderCard(reminder = reminder, colors = colors, onClick = { onReminderClick(reminder.id) })
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(bottom = 16.dp),
+            ) {
+                if (!state.isLoading) {
+                    if (state.upcoming.isEmpty()) {
+                        AddPlaceholderCard(
+                            contentDescription = stringResource(R.string.calendar_add),
+                            onClick = onAddClick,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(13.dp)) {
+                            state.upcoming.forEach { group ->
+                                val colors = petColors(group.colorIndex)
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    PetGroupTitle(name = group.pet.name, colors = colors)
+                                    group.reminders.forEach { reminder ->
+                                        ReminderCard(reminder = reminder, colors = colors, onClick = { onReminderClick(reminder.id) })
+                                    }
                                 }
                             }
                         }

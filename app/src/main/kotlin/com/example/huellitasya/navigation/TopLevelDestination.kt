@@ -10,8 +10,7 @@ import com.example.huellitasya.feature.settings.navigation.SettingsDestination
 /**
  * Pestañas de la barra inferior. Agregar una pestaña = nueva entrada aquí + su `xScreen()` en el NavHost.
  *
- * @param isEnabled `false` = la pestaña se ve atenuada y no navega. Calendario está inhabilitado
- *   hasta que tenga su spec.
+ * @param isEnabled `false` = la pestaña se ve atenuada y no navega (para una pestaña que aún no tiene spec).
  */
 enum class TopLevelDestination(
     val title: String,
@@ -20,7 +19,7 @@ enum class TopLevelDestination(
     val isEnabled: Boolean = true,
 ) {
     HOME("Home", R.drawable.ic_nav_home, HomeDestination),
-    CALENDAR("Calendar", R.drawable.ic_nav_calendar, CalendarDestination, isEnabled = false),
+    CALENDAR("Calendar", R.drawable.ic_nav_calendar, CalendarDestination),
     PROFILE("Profile", R.drawable.ic_nav_profile, ProfileDestination),
     SETTINGS("Menu", R.drawable.ic_nav_menu, SettingsDestination),
 }
