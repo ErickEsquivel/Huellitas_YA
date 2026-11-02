@@ -84,6 +84,8 @@ El Calendario muestra la barra inferior. Nuevo recordatorio, Detalle y Notificac
 - **Sin el botón de cambiar el tema:** la app no tiene tema oscuro.
 - **Detalle siempre editable:** Figma muestra además una versión de solo lectura ("Hora de vacuna" / "Fecha de recordatorio"). Aquí los campos se editan directamente, como en Editar mascota.
 - **El color sale de la mascota:** Figma pinta "Chequeo veterinario" de rosa. Aquí cada mascota tiene un color fijo, asignado por orden de registro, y lo usan sus anillos, su grupo y sus tarjetas.
+- **Lista del paso 2 dentro de la sección:** Figma abre las vacunas o los motivos sobre toda la pantalla, con un fondo difuminado. Aquí se despliegan dentro de la caja verde del paso 2.
+- **Hoja con tarjetas más bajas:** las opciones de "¿Qué deseas programar?…" miden 100 dp en lugar de 121, para que la hoja quepa en pantallas pequeñas.
 - **Calendario en español:** Figma usa "September 2026" y "Mon…Sun". Aquí "Septiembre 2026" y "Lun…Dom".
 
 ## Reglas de validación

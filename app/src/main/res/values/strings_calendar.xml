@@ -65,4 +65,44 @@
     <string name="reminder_title_surgery">Cirugía y especialidad</string>
     <string name="reminder_title_vet">Cita veterinaria</string>
     <string name="reminder_title_other">Recordatorio</string>
+
+    <!-- Hoja "¿Qué deseas programar?…" (Figma 3241:1717) -->
+    <string name="calendar_sheet_title">¿Qué deseas programar?…</string>
+    <string name="reminder_kind_vaccine">Vacunas</string>
+    <string name="reminder_kind_vet">Veterinario</string>
+    <string name="reminder_kind_other">Otro</string>
+
+    <!-- Nuevo recordatorio (Figma 3362:1554, 3367:1782 y 3367:2019) -->
+    <string name="new_reminder_back">Volver</string>
+    <string name="new_reminder_step_pet">1). Selecciona la mascota</string>
+    <string name="new_reminder_step_vaccine">2). Selecciona la vacuna que se le aplicará</string>
+    <string name="new_reminder_step_reason">2). Selecciona el motivo de la cita</string>
+    <string name="new_reminder_step_title">2). Agrega el nombre del recordatorio</string>
+    <string name="new_reminder_step_date">3). Selecciona la fecha y hora</string>
+    <string name="new_reminder_pick_vaccine">Seleccionar una vacuna…</string>
+    <string name="new_reminder_pick_reason">Seleccionar tipo de cita…</string>
+    <string name="new_reminder_title_label">Nombre del recordatorio…</string>
+    <string name="reminder_date_vaccine">Fecha de vacuna</string>
+    <string name="reminder_time_vaccine">Hora de vacuna</string>
+    <string name="reminder_date_vet">Fecha de cita</string>
+    <string name="reminder_time_vet">Hora de cita</string>
+    <string name="reminder_date_other">Fecha de recordatorio</string>
+    <string name="reminder_time_other">Hora de recordatorio</string>
+    <string name="new_reminder_save">Agregar Recordatorio</string>
+    <string name="new_reminder_saving">Guardando…</string>
+    <string name="new_reminder_no_pets">Primero registra una mascota.</string>
+    <string name="new_reminder_pet_photo">Foto de %s</string>
+    <string name="new_reminder_selected">%s, elegida</string>
+    <string name="picker_accept">Aceptar</string>
+    <string name="picker_cancel">Cancelar</string>
+
+    <!-- Opciones del paso 2 -->
+    <string name="vaccine_rabies">Rabia</string>
+    <string name="vaccine_parvovirus">Parvovirus</string>
+    <string name="vaccine_leptospirosis">Leptospirosis</string>
+    <string name="vet_reason_general">Consulta General</string>
+    <string name="vet_reason_deworming">Desparasitación</string>
+    <string name="vet_reason_grooming">Estética y Peluquería</string>
+    <string name="vet_reason_surgery">Cirugía y Especialidad</string>
+    <string name="option_other">Otros</string>
 </resources>

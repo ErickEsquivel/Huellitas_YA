@@ -57,7 +57,8 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `LoadingOverlay` | Capa semitransparente con indicador de progreso. |
 | `ProgressOverlay` | Desenfoca la pantalla y la cubre con el spinner de Figma y un texto ("Guardando...", "Actualizando...", "Eliminando..."; spec 005). `SpinnerWithLabel` es el spinner solo ("Conectando..."). |
 | `AppTitle` | Logo + "Huellitas YA!" con el "YA!" en verde (Bienvenido y Presentación). |
-| `HuellitasDatePickerDialog` | Selector de fecha de nacimiento (Datos Personales y mascotas), en UTC y con "Borrar" opcional. |
+| `HuellitasDatePickerDialog` | Selector de fecha en UTC, entre `minDate` y `maxDate` (hoy por defecto; una fecha futura en los recordatorios), con "Borrar" opcional. |
+| `HuellitasTimePickerDialog` | Selector de hora de 12 horas con AM/PM (recordatorios, spec 007). |
 | `HuellitasBackButton` | Flecha "<" de 16×14 dp de los formularios y de Datos Personales. |
 | `PasswordConfirmDialog` | Diálogo "Confirma tu contraseña" antes de una operación sensible (cambiar el correo, eliminar la cuenta). |
 | `PasswordRequirementRow` | Fila de la checklist de contraseña (✗ naranja / ✓ verde), en "Crear nueva contraseña" y Seguridad. |

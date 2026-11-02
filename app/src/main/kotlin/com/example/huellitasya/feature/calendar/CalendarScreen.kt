@@ -27,8 +27,11 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,6 +70,7 @@ import com.example.huellitasya.core.model.VaccineType
 import com.example.huellitasya.core.ui.ObserveAsEvents
 import com.example.huellitasya.feature.calendar.components.PetGroupTitle
 import com.example.huellitasya.feature.calendar.components.ReminderCard
+import com.example.huellitasya.feature.calendar.components.ReminderKindSheet
 import com.example.huellitasya.feature.calendar.components.displayMonth
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -75,7 +79,7 @@ import java.time.YearMonth
 
 @Composable
 internal fun CalendarRoute(
-    onAddClick: () -> Unit,
+    onNewReminderClick: (ReminderKind) -> Unit,
     onReminderClick: (reminderId: String) -> Unit,
     onNotificationsClick: () -> Unit,
     viewModel: CalendarViewModel = hiltViewModel(),
@@ -84,6 +88,7 @@ internal fun CalendarRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var showKindSheet by rememberSaveable { mutableStateOf(false) }
 
     ObserveAsEvents(viewModel.events) { event ->
         when (event) {
@@ -97,10 +102,20 @@ internal fun CalendarRoute(
         state = uiState,
         snackbarHostState = snackbarHostState,
         onAction = viewModel::onAction,
-        onAddClick = onAddClick,
+        onAddClick = { showKindSheet = true },
         onReminderClick = onReminderClick,
         onNotificationsClick = onNotificationsClick,
     )
+
+    if (showKindSheet) {
+        ReminderKindSheet(
+            onKindSelected = { kind ->
+                showKindSheet = false
+                onNewReminderClick(kind)
+            },
+            onDismiss = { showKindSheet = false },
+        )
+    }
 }
 
 /**
