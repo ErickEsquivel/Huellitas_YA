@@ -3,8 +3,11 @@ package com.example.huellitasya.core.domain.usecase
 import app.cash.turbine.test
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.DataError
+import com.example.huellitasya.core.model.ReminderDraft
+import com.example.huellitasya.core.model.ReminderKind
 import com.example.huellitasya.core.testing.FakeAuthRepository
 import com.example.huellitasya.core.testing.FakeReminderRepository
+import com.example.huellitasya.core.testing.TestPet
 import com.example.huellitasya.core.testing.TestReminder
 import com.example.huellitasya.core.testing.TestUser
 import kotlinx.coroutines.test.runTest
@@ -56,5 +59,25 @@ class ReminderUseCasesTest {
         ObserveUpcomingRemindersUseCase(observeReminders)(now = { now }).test {
             assertEquals(AppResult.Failure(DataError.PermissionDenied), awaitItem())
         }
+    }
+
+    @Test
+    fun `crear un recordatorio lo guarda con el nombre recortado y devuelve su id`() = runTest {
+        authRepository.currentUser.value = TestUser
+        val draft = ReminderDraft(TestPet.id, ReminderKind.OTHER, null, null, "  Baño  ", LocalDateTime.of(2026, 11, 15, 10, 0))
+
+        val result = CreateReminderUseCase(authRepository, reminderRepository, backgroundScope)(draft)
+
+        assertEquals(AppResult.Success("reminder-1"), result)
+        assertEquals("reminder-1" to draft.copy(customTitle = "Baño"), reminderRepository.created.single())
+    }
+
+    @Test
+    fun `sin sesion no se crea`() = runTest {
+        val draft = ReminderDraft(TestPet.id, ReminderKind.OTHER, null, null, "Baño", LocalDateTime.of(2026, 11, 15, 10, 0))
+
+        val result = CreateReminderUseCase(authRepository, reminderRepository, backgroundScope)(draft)
+
+        assertEquals(AppResult.Failure(DataError.PermissionDenied), result)
     }
 }

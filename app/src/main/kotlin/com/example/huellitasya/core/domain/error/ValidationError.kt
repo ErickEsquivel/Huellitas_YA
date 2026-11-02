@@ -2,7 +2,7 @@ package com.example.huellitasya.core.domain.error
 
 import com.example.huellitasya.core.common.AppError
 
-/** Errores de validación en cliente (tablas "Reglas de validación" de las specs 002, 004, 005 y 006). */
+/** Errores de validación en cliente (tablas "Reglas de validación" de las specs 002, 004, 005, 006 y 007). */
 enum class ValidationError : AppError {
     EmptyName,
     NameTooShort,
@@ -29,6 +29,9 @@ enum class ValidationError : AppError {
     UnsupportedFileType,
     FileTooBig,
     VetTooLong,
+    EmptyReminderTitle,
+    ReminderTitleTooLong,
+    ReminderInPast,
 }
 
 /** `true` si el error se debe a un campo vacío (la UI lo agrupa en "Rellene todos los datos"). */

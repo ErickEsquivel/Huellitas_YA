@@ -1,15 +1,20 @@
 package com.example.huellitasya.core.domain.usecase
 
 import com.example.huellitasya.core.common.AppResult
+import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.common.map
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.domain.repository.ReminderRepository
 import com.example.huellitasya.core.model.Reminder
+import com.example.huellitasya.core.model.ReminderDraft
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
@@ -41,4 +46,22 @@ class ObserveUpcomingRemindersUseCase @Inject constructor(
                 reminders.filterNot { it.dateTime.isBefore(current) }
             }
         }
+}
+
+/**
+ * Guarda un recordatorio nuevo y devuelve su id. Corre en [ApplicationScope]: "Nuevo recordatorio"
+ * vuelve al Calendario al terminar.
+ */
+class CreateReminderUseCase @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val reminderRepository: ReminderRepository,
+    @param:ApplicationScope private val appScope: CoroutineScope,
+) {
+    suspend operator fun invoke(draft: ReminderDraft): AppResult<String, DataError> = appScope.async {
+        val uid = authRepository.currentUser.first()?.uid
+            ?: return@async AppResult.Failure(DataError.PermissionDenied)
+        val id = reminderRepository.newReminderId(uid)
+        val normalized = draft.copy(customTitle = draft.customTitle?.trim()?.takeIf { it.isNotEmpty() })
+        reminderRepository.createReminder(uid, id, normalized).map { id }
+    }.await()
 }
