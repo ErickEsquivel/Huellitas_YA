@@ -122,4 +122,9 @@
     <string name="reminder_delete_close">Cerrar</string>
     <string name="reminder_delete_image_description">Cachorro triste junto a una papelera</string>
     <string name="reminder_detail_pet_photo">Foto de %s</string>
+
+    <!-- Notificaciones (Figma 3263:914) -->
+    <string name="notifications_title">Notificaciones</string>
+    <string name="notifications_subtitle">Veamos como están tus mascotas</string>
+    <string name="notifications_empty">No tienes recordatorios próximos.</string>
 </resources>

@@ -42,6 +42,7 @@ import java.time.LocalDate
 internal fun HomeRoute(
     onAddPetClick: () -> Unit,
     onPetClick: (petId: String) -> Unit,
+    onNotificationsClick: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -62,6 +63,7 @@ internal fun HomeRoute(
         snackbarHostState = snackbarHostState,
         onAddPetClick = onAddPetClick,
         onPetClick = onPetClick,
+        onNotificationsClick = onNotificationsClick,
     )
 }
 
@@ -72,6 +74,7 @@ internal fun HomeScreen(
     snackbarHostState: SnackbarHostState,
     onAddPetClick: () -> Unit,
     onPetClick: (petId: String) -> Unit,
+    onNotificationsClick: () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
         CurvedBackground(
@@ -88,6 +91,7 @@ internal fun HomeScreen(
                     title = stringResource(R.string.home_title),
                     subtitle = stringResource(R.string.home_subtitle),
                     notificationsDescription = stringResource(R.string.home_notifications),
+                    onNotificationsClick = onNotificationsClick,
                     modifier = Modifier.padding(bottom = 22.dp),
                 )
             }
