@@ -66,6 +66,10 @@
     <string name="reminder_title_vet">Cita veterinaria</string>
     <string name="reminder_title_other">Recordatorio</string>
 
+    <!-- Aviso del teléfono -->
+    <string name="reminder_channel_name">Recordatorios</string>
+    <string name="reminder_channel_description">Vacunas, citas y otros recordatorios de tus mascotas</string>
+
     <!-- Hoja "¿Qué deseas programar?…" (Figma 3241:1717) -->
     <string name="calendar_sheet_title">¿Qué deseas programar?…</string>
     <string name="reminder_kind_vaccine">Vacunas</string>

@@ -18,6 +18,7 @@ import com.example.huellitasya.core.testing.FakePetPhotoRepository
 import com.example.huellitasya.core.testing.FakePetRepository
 import com.example.huellitasya.core.testing.FakeRecordFileRepository
 import com.example.huellitasya.core.testing.FakeRecordRepository
+import com.example.huellitasya.core.testing.FakeReminderRepository
 import com.example.huellitasya.core.testing.MainDispatcherRule
 import com.example.huellitasya.core.testing.TestPet
 import com.example.huellitasya.core.testing.TestUser
@@ -44,13 +45,14 @@ class EditPetViewModelTest {
     private val photoRepository = FakePetPhotoRepository()
     private val recordRepository = FakeRecordRepository()
     private val recordFileRepository = FakeRecordFileRepository()
+    private val reminderRepository = FakeReminderRepository()
     private val networkMonitor = FakeNetworkMonitor()
 
     private fun viewModel(appScope: CoroutineScope) = EditPetViewModel(
         savedStateHandle = SavedStateHandle(mapOf(EditPetViewModel.PET_ID_ARG to pet.id)),
         observePet = ObservePetUseCase(authRepository, petRepository),
         updatePet = UpdatePetUseCase(authRepository, petRepository, photoRepository, appScope),
-        deletePet = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, appScope),
+        deletePet = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, reminderRepository, appScope),
         validator = PetFormValidator(
             ValidateNameUseCase(),
             ValidatePetBreedUseCase(),

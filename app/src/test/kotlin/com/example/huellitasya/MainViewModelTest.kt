@@ -6,8 +6,11 @@ import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.usecase.ObservePetsUseCase
 import com.example.huellitasya.core.domain.usecase.ObserveSessionUseCase
 import com.example.huellitasya.core.domain.usecase.ShouldShowPetsIntroUseCase
+import com.example.huellitasya.core.domain.usecase.SyncReminderNotificationsUseCase
 import com.example.huellitasya.core.testing.FakeAuthRepository
 import com.example.huellitasya.core.testing.FakePetRepository
+import com.example.huellitasya.core.testing.FakeReminderNotifier
+import com.example.huellitasya.core.testing.FakeReminderRepository
 import com.example.huellitasya.core.testing.MainDispatcherRule
 import com.example.huellitasya.core.testing.TestPet
 import com.example.huellitasya.core.testing.TestUser
@@ -16,6 +19,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import java.time.Clock
 
 class MainViewModelTest {
 
@@ -29,6 +33,9 @@ class MainViewModelTest {
     private fun viewModel() = MainViewModel(
         observeSession = ObserveSessionUseCase(authRepository),
         shouldShowPetsIntro = ShouldShowPetsIntroUseCase(ObservePetsUseCase(authRepository, petRepository)),
+        syncReminderNotifications = SyncReminderNotificationsUseCase(
+            authRepository, petRepository, FakeReminderRepository(), FakeReminderNotifier(), Clock.systemDefaultZone(),
+        ),
     )
 
     @Test

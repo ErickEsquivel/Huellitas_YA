@@ -2,7 +2,9 @@ package com.example.huellitasya.core.testing
 
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.DataError
+import com.example.huellitasya.core.domain.repository.ReminderNotifier
 import com.example.huellitasya.core.domain.repository.ReminderRepository
+import com.example.huellitasya.core.domain.repository.ScheduledReminder
 import com.example.huellitasya.core.model.Reminder
 import com.example.huellitasya.core.model.ReminderDraft
 import com.example.huellitasya.core.model.ReminderKind
@@ -61,5 +63,14 @@ class FakeReminderRepository : ReminderRepository {
     private fun edit(change: (List<Reminder>) -> List<Reminder>) {
         val current = (reminders.value as? AppResult.Success)?.data ?: return
         if (writeResult is AppResult.Success) reminders.value = AppResult.Success(change(current))
+    }
+}
+
+class FakeReminderNotifier : ReminderNotifier {
+    /** Cada llamada a [sync], en orden. */
+    val syncs = mutableListOf<List<ScheduledReminder>>()
+
+    override fun sync(reminders: List<ScheduledReminder>) {
+        syncs += reminders
     }
 }

@@ -62,6 +62,7 @@ dependencies {
     // Carga de imágenes remotas (foto de perfil)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.androidx.work.runtime.ktx)
 
     // Inyección de dependencias
     implementation(libs.hilt.android)

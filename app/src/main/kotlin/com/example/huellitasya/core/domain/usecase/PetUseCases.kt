@@ -8,6 +8,7 @@ import com.example.huellitasya.core.domain.repository.PetPhotoRepository
 import com.example.huellitasya.core.domain.repository.PetRepository
 import com.example.huellitasya.core.domain.repository.RecordFileRepository
 import com.example.huellitasya.core.domain.repository.RecordRepository
+import com.example.huellitasya.core.domain.repository.ReminderRepository
 import com.example.huellitasya.core.model.Pet
 import com.example.huellitasya.core.model.PetDraft
 import kotlinx.coroutines.CoroutineScope
@@ -119,9 +120,10 @@ class UpdatePetUseCase @Inject constructor(
 }
 
 /**
- * Elimina una mascota: primero sus registros médicos (archivo y documento, spec 006), luego su
- * foto (si no tenía, sigue) y al final el documento, para no dejar nada huérfano: el cliente no
- * borra subcolecciones. Corre en [ApplicationScope]: Editar vuelve a Home al terminar.
+ * Elimina una mascota: primero sus registros médicos (archivo y documento, spec 006) y sus
+ * recordatorios (spec 007), luego su foto (si no tenía, sigue) y al final el documento, para no
+ * dejar nada huérfano: el cliente no borra subcolecciones. Los avisos de esos recordatorios los
+ * cancela `SyncReminderNotificationsUseCase`. Corre en [ApplicationScope]: Editar vuelve a Home al terminar.
  */
 class DeletePetUseCase @Inject constructor(
     private val authRepository: AuthRepository,
@@ -129,6 +131,7 @@ class DeletePetUseCase @Inject constructor(
     private val photoRepository: PetPhotoRepository,
     private val recordRepository: RecordRepository,
     private val recordFileRepository: RecordFileRepository,
+    private val reminderRepository: ReminderRepository,
     @param:ApplicationScope private val appScope: CoroutineScope,
 ) {
     suspend operator fun invoke(petId: String): AppResult<Unit, DataError> =
@@ -142,6 +145,13 @@ class DeletePetUseCase @Inject constructor(
             for (record in records) {
                 recordFileRepository.delete(uid, petId, record.id).let { if (it is AppResult.Failure) return@async it }
                 recordRepository.deleteRecord(uid, petId, record.id).let { if (it is AppResult.Failure) return@async it }
+            }
+            val reminders = when (val result = reminderRepository.observeReminders(uid).first()) {
+                is AppResult.Success -> result.data.filter { it.petId == petId }
+                is AppResult.Failure -> return@async result
+            }
+            for (reminder in reminders) {
+                reminderRepository.deleteReminder(uid, reminder.id).let { if (it is AppResult.Failure) return@async it }
             }
             when (val photo = photoRepository.delete(uid, petId)) {
                 is AppResult.Success -> petRepository.deletePet(uid, petId)
