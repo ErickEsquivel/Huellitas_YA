@@ -11,8 +11,9 @@ data object HomeDestination
 fun NavGraphBuilder.homeScreen(
     onAddPetClick: () -> Unit,
     onPetClick: (petId: String) -> Unit,
+    onNotificationsClick: () -> Unit,
 ) {
     composable<HomeDestination> {
-        HomeRoute(onAddPetClick = onAddPetClick, onPetClick = onPetClick)
+        HomeRoute(onAddPetClick = onAddPetClick, onPetClick = onPetClick, onNotificationsClick = onNotificationsClick)
     }
 }

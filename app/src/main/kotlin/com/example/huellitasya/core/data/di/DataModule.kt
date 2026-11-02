@@ -3,6 +3,7 @@ package com.example.huellitasya.core.data.di
 import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.data.download.DownloadManagerRecordDownloader
 import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
+import com.example.huellitasya.core.data.notifications.WorkManagerReminderNotifier
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
 import com.example.huellitasya.core.data.repository.FunctionsAccountRepository
 import com.example.huellitasya.core.data.repository.FunctionsEmailChangeRepository
@@ -24,6 +25,7 @@ import com.example.huellitasya.core.domain.repository.PetRepository
 import com.example.huellitasya.core.domain.repository.RecordDownloader
 import com.example.huellitasya.core.domain.repository.RecordFileRepository
 import com.example.huellitasya.core.domain.repository.RecordRepository
+import com.example.huellitasya.core.domain.repository.ReminderNotifier
 import com.example.huellitasya.core.domain.repository.ReminderRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
@@ -119,6 +121,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindReminderRepository(impl: FirestoreReminderRepository): ReminderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReminderNotifier(impl: WorkManagerReminderNotifier): ReminderNotifier
 
     @Binds
     @Singleton

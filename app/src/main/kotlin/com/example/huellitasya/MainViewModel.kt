@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.huellitasya.core.domain.usecase.ObserveSessionUseCase
 import com.example.huellitasya.core.domain.usecase.ShouldShowPetsIntroUseCase
+import com.example.huellitasya.core.domain.usecase.SyncReminderNotificationsUseCase
 import com.example.huellitasya.core.model.SessionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /** Qué grafo muestra la app (specs 002 y 005). */
@@ -26,13 +28,20 @@ sealed interface MainUiState {
 
 /**
  * Gate de sesión: decide si la app muestra el grafo de auth o el principal (spec 002) y, al
- * entrar, si el principal empieza en Presentación o en Home (spec 005).
+ * entrar, si el principal empieza en Presentación o en Home (spec 005). Además mantiene
+ * sincronizados los avisos de los recordatorios (spec 007).
  */
 @HiltViewModel
 class MainViewModel @Inject constructor(
     observeSession: ObserveSessionUseCase,
     private val shouldShowPetsIntro: ShouldShowPetsIntroUseCase,
+    syncReminderNotifications: SyncReminderNotificationsUseCase,
 ) : ViewModel() {
+
+    init {
+        // Avisos de los recordatorios al día mientras la app está abierta (spec 007).
+        viewModelScope.launch { syncReminderNotifications() }
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<MainUiState> = observeSession()

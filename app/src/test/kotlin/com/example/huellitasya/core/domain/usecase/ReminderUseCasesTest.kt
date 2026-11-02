@@ -5,14 +5,22 @@ import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.model.ReminderDraft
 import com.example.huellitasya.core.model.ReminderKind
+import com.example.huellitasya.core.domain.repository.ScheduledReminder
 import com.example.huellitasya.core.testing.FakeAuthRepository
+import com.example.huellitasya.core.testing.FakePetRepository
+import com.example.huellitasya.core.testing.FakeReminderNotifier
 import com.example.huellitasya.core.testing.FakeReminderRepository
 import com.example.huellitasya.core.testing.TestPet
 import com.example.huellitasya.core.testing.TestReminder
 import com.example.huellitasya.core.testing.TestUser
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.Clock
+import java.time.ZoneId
 import java.time.LocalDateTime
 
 class ReminderUseCasesTest {
@@ -79,5 +87,55 @@ class ReminderUseCasesTest {
         val result = CreateReminderUseCase(authRepository, reminderRepository, backgroundScope)(draft)
 
         assertEquals(AppResult.Failure(DataError.PermissionDenied), result)
+    }
+
+    @Test
+    fun `observar un recordatorio avisa NotFound cuando se elimina`() = runTest {
+        authRepository.currentUser.value = TestUser
+        reminderRepository.reminders.value = AppResult.Success(listOf(TestReminder))
+
+        ObserveReminderUseCase(observeReminders)(TestReminder.id).test {
+            assertEquals(AppResult.Success(TestReminder), awaitItem())
+            reminderRepository.reminders.value = AppResult.Success(emptyList())
+            assertEquals(AppResult.Failure(DataError.NotFound), awaitItem())
+        }
+    }
+
+    @Test
+    fun `actualizar y eliminar llegan al repositorio`() = runTest {
+        authRepository.currentUser.value = TestUser
+        reminderRepository.reminders.value = AppResult.Success(listOf(TestReminder))
+        val newDateTime = LocalDateTime.of(2026, 11, 20, 8, 30)
+
+        assertEquals(AppResult.Success(Unit), UpdateReminderUseCase(authRepository, reminderRepository, backgroundScope)(TestReminder.id, newDateTime))
+        assertEquals(AppResult.Success(Unit), DeleteReminderUseCase(authRepository, reminderRepository, backgroundScope)(TestReminder.id))
+
+        assertEquals(listOf(TestReminder.id to newDateTime), reminderRepository.updated)
+        assertEquals(listOf(TestReminder.id), reminderRepository.deleted)
+    }
+
+    @Test
+    fun `la sincronizacion programa los futuros con el nombre de su mascota y cancela todo al cerrar sesion`() = runTest {
+        authRepository.currentUser.value = TestUser
+        val petRepository = FakePetRepository().apply { pets.value = AppResult.Success(listOf(TestPet)) }
+        val orphan = TestReminder.copy(id = "orphan", petId = "pet-borrada")
+        reminderRepository.reminders.value = AppResult.Success(listOf(past, TestReminder, orphan))
+        val notifier = FakeReminderNotifier()
+        val clock = Clock.fixed(now.atZone(ZoneId.systemDefault()).toInstant(), ZoneId.systemDefault())
+        val sync = SyncReminderNotificationsUseCase(authRepository, petRepository, reminderRepository, notifier, clock)
+
+        backgroundScope.launch { sync() }
+        runCurrent()
+        assertEquals(listOf(ScheduledReminder(TestReminder, TestPet.name)), notifier.syncs.last())
+
+        reminderRepository.reminders.value = AppResult.Success(emptyList())
+        runCurrent()
+        assertTrue(notifier.syncs.last().isEmpty())
+
+        reminderRepository.reminders.value = AppResult.Success(listOf(TestReminder))
+        runCurrent()
+        authRepository.currentUser.value = null
+        runCurrent()
+        assertTrue(notifier.syncs.last().isEmpty())
     }
 }

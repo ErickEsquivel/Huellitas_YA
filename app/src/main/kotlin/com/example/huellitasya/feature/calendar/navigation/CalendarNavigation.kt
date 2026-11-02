@@ -4,7 +4,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.huellitasya.core.model.ReminderKind
 import com.example.huellitasya.feature.calendar.CalendarRoute
+import com.example.huellitasya.feature.calendar.detail.ReminderDetailRoute
 import com.example.huellitasya.feature.calendar.newreminder.NewReminderRoute
+import com.example.huellitasya.feature.calendar.notifications.NotificationsRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -42,5 +44,32 @@ fun NavGraphBuilder.newReminderScreen(
 ) {
     composable<NewReminderDestination> {
         NewReminderRoute(onBackClick = onBack, onSaved = onSaved)
+    }
+}
+
+/** Detalle de un recordatorio. La propiedad es la clave que lee `ReminderDetailViewModel`. */
+@Serializable
+data class ReminderDetailDestination(val reminderId: String)
+
+/** @param onClosed se actualizó, se eliminó o ya no existe: vuelve atrás. */
+fun NavGraphBuilder.reminderDetailScreen(
+    onBack: () -> Unit,
+    onClosed: () -> Unit,
+) {
+    composable<ReminderDetailDestination> {
+        ReminderDetailRoute(onBackClick = onBack, onClosed = onClosed)
+    }
+}
+
+/** Notificaciones: los próximos recordatorios, desde la campana de Home y del Calendario. */
+@Serializable
+data object NotificationsDestination
+
+fun NavGraphBuilder.notificationsScreen(
+    onBack: () -> Unit,
+    onReminderClick: (reminderId: String) -> Unit,
+) {
+    composable<NotificationsDestination> {
+        NotificationsRoute(onBackClick = onBack, onReminderClick = onReminderClick)
     }
 }

@@ -8,9 +8,11 @@ import com.example.huellitasya.core.testing.FakePetPhotoRepository
 import com.example.huellitasya.core.testing.FakePetRepository
 import com.example.huellitasya.core.testing.FakeRecordFileRepository
 import com.example.huellitasya.core.testing.FakeRecordRepository
+import com.example.huellitasya.core.testing.FakeReminderRepository
 import com.example.huellitasya.core.testing.TestPet
 import com.example.huellitasya.core.testing.TestPetDraft
 import com.example.huellitasya.core.testing.TestRecord
+import com.example.huellitasya.core.testing.TestReminder
 import com.example.huellitasya.core.testing.TestUser
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -25,6 +27,7 @@ class PetUseCasesTest {
     private val photoRepository = FakePetPhotoRepository()
     private val recordRepository = FakeRecordRepository()
     private val recordFileRepository = FakeRecordFileRepository()
+    private val reminderRepository = FakeReminderRepository()
 
     @Test
     fun `sin sesion no se observan mascotas`() = runTest {
@@ -142,7 +145,7 @@ class PetUseCasesTest {
         authRepository.currentUser.value = TestUser
         petRepository.pets.value = AppResult.Success(listOf(TestPet))
 
-        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, backgroundScope)(TestPet.id)
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, reminderRepository, backgroundScope)(TestPet.id)
 
         assertEquals(AppResult.Success(Unit), result)
         assertEquals(listOf(TestPet.id), photoRepository.deletedPhotos)
@@ -154,7 +157,7 @@ class PetUseCasesTest {
         authRepository.currentUser.value = TestUser
         photoRepository.deleteResult = AppResult.Failure(DataError.Network)
 
-        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, backgroundScope)(TestPet.id)
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, reminderRepository, backgroundScope)(TestPet.id)
 
         assertEquals(AppResult.Failure(DataError.Network), result)
         assertTrue(petRepository.deleted.isEmpty())
@@ -166,7 +169,7 @@ class PetUseCasesTest {
         petRepository.pets.value = AppResult.Success(listOf(TestPet))
         recordRepository.records.value = AppResult.Success(listOf(TestRecord, TestRecord.copy(id = "record-2")))
 
-        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, backgroundScope)(TestPet.id)
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, reminderRepository, backgroundScope)(TestPet.id)
 
         assertEquals(AppResult.Success(Unit), result)
         assertEquals(listOf("record-1", "record-2"), recordFileRepository.deletedFiles)
@@ -176,4 +179,18 @@ class PetUseCasesTest {
 
     private fun TestScope.registerPet() =
         RegisterPetUseCase(authRepository, petRepository, photoRepository, backgroundScope)
+
+    @Test
+    fun `eliminar la mascota borra sus recordatorios y deja los de otras`() = runTest {
+        authRepository.currentUser.value = TestUser
+        petRepository.pets.value = AppResult.Success(listOf(TestPet))
+        val other = TestReminder.copy(id = "reminder-other", petId = "pet-2")
+        reminderRepository.reminders.value = AppResult.Success(listOf(TestReminder, other))
+
+        val result = DeletePetUseCase(authRepository, petRepository, photoRepository, recordRepository, recordFileRepository, reminderRepository, backgroundScope)(TestPet.id)
+
+        assertEquals(AppResult.Success(Unit), result)
+        assertEquals(listOf(TestReminder.id), reminderRepository.deleted)
+        assertEquals(listOf(TestPet.id), petRepository.deleted)
+    }
 }

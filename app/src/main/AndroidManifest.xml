@@ -4,6 +4,8 @@
 
     <!-- Detectar la caída de conexión en las pantallas de autenticación (spec 002). -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Avisos de los recordatorios a su hora (spec 007). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".HuellitasApplication"

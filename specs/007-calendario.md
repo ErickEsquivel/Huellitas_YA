@@ -145,13 +145,14 @@ Va al nivel del usuario y no dentro de la mascota, porque el Calendario lee las 
   - `updateDateTime(uid, id, dateTime)`;
   - `deleteReminder(uid, id)`.
 - `ReminderNotifier`:
-  - `schedule(reminder, petName)`, `cancel(id)` y `cancelAll()`;
+  - `sync(reminders: List<ScheduledReminder>)`: deja programados exactamente esos avisos y cancela el resto (una lista vacía cancela todos);
   - se implementa con WorkManager: un trabajo único `reminder-<id>`, que sobrevive al reinicio;
   - puede llegar unos minutos tarde en modo de ahorro de batería.
 - Casos de uso:
   - `ObserveRemindersUseCase`, `ObserveUpcomingRemindersUseCase`;
   - `CreateReminderUseCase`, `UpdateReminderUseCase` y `DeleteReminderUseCase` (`@ApplicationScope`);
-  - `SyncReminderNotificationsUseCase`.
+  - `ObserveReminderUseCase`;
+  - `SyncReminderNotificationsUseCase`: se lanza una vez desde `MainViewModel`. Con cada cambio de los recordatorios o de las mascotas programa los futuros, y sin sesión cancela todos. Así un solo camino cubre crear, editar, eliminar (también desde otro dispositivo) y eliminar una mascota. Los avisos se reprograman al abrir la app.
 
 ### Rutas
 
@@ -171,6 +172,8 @@ Va al nivel del usuario y no dentro de la mascota, porque el Calendario lee las 
 | Julian | `feature/calendario-detalle` | Detalle, editar, eliminar, Notificaciones, avisos del teléfono, limpieza al eliminar una mascota y la verificación en el teléfono |
 
 ## Criterios de aceptación
+
+> Erick verificó los 3 primeros en el teléfono. El resto tiene tests unitarios y queda para el recorrido final en el Vivo, al cerrar el módulo.
 
 > Marcar cada casilla al verificarla en el teléfono.
 
