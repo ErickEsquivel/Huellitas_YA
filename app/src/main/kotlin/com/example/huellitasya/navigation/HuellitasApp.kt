@@ -15,8 +15,10 @@ import com.example.huellitasya.MainUiState
 import com.example.huellitasya.feature.auth.navigation.AuthGraph
 import com.example.huellitasya.feature.auth.navigation.authGraph
 import com.example.huellitasya.feature.calendar.navigation.NewReminderDestination
+import com.example.huellitasya.feature.calendar.navigation.ReminderDetailDestination
 import com.example.huellitasya.feature.calendar.navigation.calendarScreen
 import com.example.huellitasya.feature.calendar.navigation.newReminderScreen
+import com.example.huellitasya.feature.calendar.navigation.reminderDetailScreen
 import com.example.huellitasya.feature.home.navigation.HomeDestination
 import com.example.huellitasya.feature.home.navigation.homeScreen
 import com.example.huellitasya.feature.pets.navigation.EditPetDestination
@@ -143,9 +145,13 @@ private fun MainNavHost(googleServerClientId: String?, startWithIntro: Boolean) 
             )
             calendarScreen(
                 onNewReminderClick = { navController.navigate(NewReminderDestination(it)) },
-                // El detalle y Notificaciones (Julian) llegan en la siguiente parte (spec 007, "Reparto").
-                onReminderClick = {},
+                onReminderClick = { navController.navigate(ReminderDetailDestination(it)) },
+                // Notificaciones llega en el siguiente commit de esta parte (spec 007, "Reparto").
                 onNotificationsClick = {},
+            )
+            reminderDetailScreen(
+                onBack = { navController.popBackStack() },
+                onClosed = { navController.popBackStack() },
             )
             newReminderScreen(
                 onBack = { navController.popBackStack() },

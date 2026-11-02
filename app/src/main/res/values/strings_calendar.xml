@@ -109,4 +109,17 @@
     <string name="vet_reason_grooming">Estética y Peluquería</string>
     <string name="vet_reason_surgery">Cirugía y Especialidad</string>
     <string name="option_other">Otros</string>
+    <!-- Detalle del recordatorio (Figma 3376:1050 y 3241:1665) -->
+    <string name="reminder_detail_back">Volver</string>
+    <string name="reminder_detail_update">Actualizar información</string>
+    <string name="reminder_detail_updating">Actualizando…</string>
+    <string name="reminder_detail_delete">Eliminar recordatorio</string>
+    <string name="reminder_detail_delete_appointment">Eliminar cita</string>
+    <string name="reminder_detail_deleting">Eliminando…</string>
+    <string name="reminder_delete_title">¿Eliminar recordatorio?</string>
+    <string name="reminder_delete_message">No podrás recuperar los datos del recordatorio luego de aceptar</string>
+    <string name="reminder_delete_confirm">Eliminar Información</string>
+    <string name="reminder_delete_close">Cerrar</string>
+    <string name="reminder_delete_image_description">Cachorro triste junto a una papelera</string>
+    <string name="reminder_detail_pet_photo">Foto de %s</string>
 </resources>
