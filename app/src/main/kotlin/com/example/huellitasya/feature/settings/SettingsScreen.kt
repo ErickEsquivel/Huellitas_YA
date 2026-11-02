@@ -60,6 +60,7 @@ internal fun SettingsRoute(
     googleServerClientId: String?,
     onPersonalDataClick: () -> Unit,
     onSecurityClick: () -> Unit,
+    onNotificationsClick: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -85,6 +86,7 @@ internal fun SettingsRoute(
         snackbarHostState = snackbarHostState,
         onPersonalDataClick = onPersonalDataClick,
         onAction = viewModel::onAction,
+        onNotificationsClick = onNotificationsClick,
     )
 }
 
@@ -95,6 +97,7 @@ internal fun SettingsScreen(
     snackbarHostState: SnackbarHostState,
     onPersonalDataClick: () -> Unit,
     onAction: (SettingsAction) -> Unit,
+    onNotificationsClick: () -> Unit = {},
 ) {
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
         CurvedBackground(
@@ -111,6 +114,7 @@ internal fun SettingsScreen(
                 title = stringResource(R.string.settings_title),
                 titleFontSize = 32.sp,
                 notificationsDescription = stringResource(R.string.settings_notifications),
+                onNotificationsClick = onNotificationsClick,
             )
 
             Spacer(modifier = Modifier.height(32.dp))

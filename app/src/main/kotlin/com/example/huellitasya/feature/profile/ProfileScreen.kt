@@ -54,6 +54,7 @@ import java.time.LocalDate
 @Composable
 internal fun ProfileRoute(
     onEditClick: () -> Unit,
+    onNotificationsClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -78,6 +79,7 @@ internal fun ProfileRoute(
         state = uiState,
         snackbarHostState = snackbarHostState,
         onEditClick = onEditClick,
+        onNotificationsClick = onNotificationsClick,
         onPhotoClick = {
             photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         },
@@ -91,6 +93,7 @@ internal fun ProfileScreen(
     snackbarHostState: SnackbarHostState,
     onEditClick: () -> Unit,
     onPhotoClick: () -> Unit,
+    onNotificationsClick: () -> Unit = {},
 ) {
     val profile = state.profile
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -118,6 +121,7 @@ internal fun ProfileScreen(
                     title = stringResource(R.string.profile_title),
                     subtitle = stringResource(R.string.profile_subtitle),
                     notificationsDescription = stringResource(R.string.profile_notifications),
+                    onNotificationsClick = onNotificationsClick,
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))

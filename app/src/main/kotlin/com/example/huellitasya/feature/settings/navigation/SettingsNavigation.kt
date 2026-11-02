@@ -21,12 +21,14 @@ fun NavGraphBuilder.settingsScreen(
     googleServerClientId: String?,
     onNavigateToPersonalData: () -> Unit,
     onNavigateToSecurity: () -> Unit,
+    onNotificationsClick: () -> Unit,
 ) {
     composable<SettingsDestination> {
         SettingsRoute(
             googleServerClientId = googleServerClientId,
             onPersonalDataClick = onNavigateToPersonalData,
             onSecurityClick = onNavigateToSecurity,
+            onNotificationsClick = onNotificationsClick,
         )
     }
 }

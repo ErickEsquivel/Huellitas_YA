@@ -1,7 +1,7 @@
 # 007 — Calendario y recordatorios
 
 - **Estado:** Implemented
-- **Paquetes:** `feature.calendar`, `feature.home` (campana), `feature.pets` (eliminar mascota), `navigation`, `core.model`, `core.domain`, `core.data`, `core.designsystem`
+- **Paquetes:** `feature.calendar`, `feature.home`, `feature.profile` y `feature.settings` (campana), `feature.pets` (eliminar mascota), `navigation`, `core.model`, `core.domain`, `core.data`, `core.designsystem`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-). Capturas de referencia en [`figma/007-calendario/`](figma/007-calendario/).
 
 | Pantalla | Frames |
@@ -19,7 +19,7 @@
 
 Puntos de entrada:
 - la pestaña Calendario de la barra inferior;
-- la campana de Home y de Calendario, que abre Notificaciones;
+- la campana de Home, Calendario, Perfil y Configuración, que abre Notificaciones;
 - tocar un aviso del teléfono, que abre el Calendario.
 
 ## Objetivo
@@ -40,7 +40,7 @@ Que el dueño programe vacunas, citas veterinarias y otros recordatorios para ca
 Calendario ─"+" (botón o tarjeta)─► hoja "¿Qué deseas programar?…" ─Vacunas | Veterinario | Otro─► Nuevo recordatorio ─"Agregar Recordatorio"─► Calendario
 Calendario ─tarjeta de evento─► Detalle ─"Actualizar información"─► Calendario
 Detalle ─"Eliminar recordatorio" / "Eliminar cita"─► diálogo ─► "Eliminando…" ─► Calendario
-Home / Calendario ─campana─► Notificaciones ─tarjeta─► Detalle
+Home / Calendario / Perfil / Configuración ─campana─► Notificaciones ─tarjeta─► Detalle
 Aviso del teléfono ─toque─► Calendario
 ```
 
@@ -194,7 +194,7 @@ Va al nivel del usuario y no dentro de la mascota, porque el Calendario lee las 
 - [x] Una fecha u hora pasada se rechaza con su aviso.
 - [x] El Detalle permite cambiar la fecha y la hora; "Actualizar información" se activa solo con cambios.
 - [x] Eliminar pide confirmación, muestra "Eliminando…" y el recordatorio desaparece del Calendario.
-- [x] La campana de Home y del Calendario abre Notificaciones con los próximos recordatorios.
+- [x] La campana de Home, Calendario, Perfil y Configuración abre Notificaciones con los próximos recordatorios.
 - [x] A la hora programada llega un aviso al teléfono, aun con la app cerrada. Al eliminar o cambiar el recordatorio, el aviso anterior se cancela.
 - [x] Eliminar una mascota borra también sus recordatorios.
 - [x] Sin conexión se ven los datos guardados, y crear, editar o eliminar muestran "Sin conexión. Revisa tu internet".

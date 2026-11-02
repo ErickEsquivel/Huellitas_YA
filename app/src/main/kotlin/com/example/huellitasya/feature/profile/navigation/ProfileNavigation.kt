@@ -24,9 +24,13 @@ data class VerifyEmailChangeDestination(val newEmail: String)
 /** Clave con la que "Verifica tu correo" le devuelve el correo nuevo a Datos Personales. */
 private const val EMAIL_CHANGED_RESULT = "email_changed"
 
-fun NavGraphBuilder.profileScreen(onNavigateToPersonalData: () -> Unit) {
+/** @param onNotificationsClick la campana: abre Notificaciones (spec 007). */
+fun NavGraphBuilder.profileScreen(
+    onNavigateToPersonalData: () -> Unit,
+    onNotificationsClick: () -> Unit,
+) {
     composable<ProfileDestination> {
-        ProfileRoute(onEditClick = onNavigateToPersonalData)
+        ProfileRoute(onEditClick = onNavigateToPersonalData, onNotificationsClick = onNotificationsClick)
     }
 }
 
