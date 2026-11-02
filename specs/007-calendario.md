@@ -1,6 +1,6 @@
 # 007 — Calendario y recordatorios
 
-- **Estado:** Approved
+- **Estado:** Implemented
 - **Paquetes:** `feature.calendar`, `feature.home` (campana), `feature.pets` (eliminar mascota), `navigation`, `core.model`, `core.domain`, `core.data`, `core.designsystem`
 - **Figma:** [Huellitas YA!](https://www.figma.com/design/02Bq5fbLLxTbaAD5hZ1sxS/Huellitas-YA-). Capturas de referencia en [`figma/007-calendario/`](figma/007-calendario/).
 
@@ -173,22 +173,32 @@ Va al nivel del usuario y no dentro de la mascota, porque el Calendario lee las 
 
 ## Criterios de aceptación
 
-> Erick verificó los 3 primeros en el teléfono. El resto tiene tests unitarios y queda para el recorrido final en el Vivo, al cerrar el módulo.
+> Recorrido final en el Vivo V2436 (Julian), con 2 mascotas y recordatorios sembrados:
+> - campana de Home y del Calendario → Notificaciones → detalle;
+> - cambiar la hora de una cita (el botón se activa solo con cambios);
+> - crear una vacuna (Parvovirus) y un "Otro" con nombre; una hora pasada muestra "Elige una fecha y hora futuras";
+> - el permiso de notificaciones se pidió al guardar;
+> - el aviso llegó a las 13:35 con el proceso de la app cerrado, y al tocarlo abrió el Calendario;
+> - un recordatorio eliminado (13:50) no avisó;
+> - en modo avión se ven los datos y eliminar avisa "Sin conexión";
+> - eliminar a Maximiliano Cuarto borró su cita (comprobado por REST).
+>
+> El recorrido encontró un defecto, ya corregido: si hoy tenía un evento, el borde gris de "hoy" tapaba el anillo de la mascota.
 
 > Marcar cada casilla al verificarla en el teléfono.
 
 - [x] El Calendario muestra el mes actual con hoy marcado, y "<" / ">" cambian de mes.
 - [x] Los días con recordatorios llevan el anillo del color de su mascota.
 - [x] "Próximos eventos" agrupa los recordatorios futuros por mascota; sin eventos, muestra la tarjeta "+".
-- [ ] Se puede crear una vacuna, una cita con el veterinario y un recordatorio "Otro". El botón queda gris hasta completar el formulario.
-- [ ] Una fecha u hora pasada se rechaza con su aviso.
-- [ ] El Detalle permite cambiar la fecha y la hora; "Actualizar información" se activa solo con cambios.
-- [ ] Eliminar pide confirmación, muestra "Eliminando…" y el recordatorio desaparece del Calendario.
-- [ ] La campana de Home y del Calendario abre Notificaciones con los próximos recordatorios.
-- [ ] A la hora programada llega un aviso al teléfono, aun con la app cerrada. Al eliminar o cambiar el recordatorio, el aviso anterior se cancela.
-- [ ] Eliminar una mascota borra también sus recordatorios.
-- [ ] Sin conexión se ven los datos guardados, y crear, editar o eliminar muestran "Sin conexión. Revisa tu internet".
-- [ ] Las reglas impiden leer o escribir recordatorios de otra cuenta, guardar campos fuera del esquema y editar algo distinto de la fecha.
+- [x] Se puede crear una vacuna, una cita con el veterinario y un recordatorio "Otro". El botón queda gris hasta completar el formulario.
+- [x] Una fecha u hora pasada se rechaza con su aviso.
+- [x] El Detalle permite cambiar la fecha y la hora; "Actualizar información" se activa solo con cambios.
+- [x] Eliminar pide confirmación, muestra "Eliminando…" y el recordatorio desaparece del Calendario.
+- [x] La campana de Home y del Calendario abre Notificaciones con los próximos recordatorios.
+- [x] A la hora programada llega un aviso al teléfono, aun con la app cerrada. Al eliminar o cambiar el recordatorio, el aviso anterior se cancela.
+- [x] Eliminar una mascota borra también sus recordatorios.
+- [x] Sin conexión se ven los datos guardados, y crear, editar o eliminar muestran "Sin conexión. Revisa tu internet".
+- [x] Las reglas impiden leer o escribir recordatorios de otra cuenta, guardar campos fuera del esquema y editar algo distinto de la fecha.
 
 > Verificados en el Vivo V2436 (Erick): mes con hoy y flechas, anillos por mascota, "Próximos eventos" agrupados (sin el pasado) y la tarjeta "+" sin eventos, con 2 mascotas y 4 recordatorios sembrados por REST. Reglas: 18 de 18 pruebas por REST.
 
