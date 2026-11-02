@@ -10,6 +10,7 @@ import com.example.huellitasya.core.data.repository.FirebaseStoragePetPhotoRepos
 import com.example.huellitasya.core.data.repository.FirebaseStorageProfilePhotoRepository
 import com.example.huellitasya.core.data.repository.FirestorePetRepository
 import com.example.huellitasya.core.data.repository.FirestoreRecordRepository
+import com.example.huellitasya.core.data.repository.FirestoreReminderRepository
 import com.example.huellitasya.core.data.repository.FirebaseStorageRecordFileRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
 import com.example.huellitasya.core.data.repository.FunctionsPasswordResetRepository
@@ -23,6 +24,7 @@ import com.example.huellitasya.core.domain.repository.PetRepository
 import com.example.huellitasya.core.domain.repository.RecordDownloader
 import com.example.huellitasya.core.domain.repository.RecordFileRepository
 import com.example.huellitasya.core.domain.repository.RecordRepository
+import com.example.huellitasya.core.domain.repository.ReminderRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -113,6 +115,10 @@ internal abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindRecordRepository(impl: FirestoreRecordRepository): RecordRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReminderRepository(impl: FirestoreReminderRepository): ReminderRepository
 
     @Binds
     @Singleton
