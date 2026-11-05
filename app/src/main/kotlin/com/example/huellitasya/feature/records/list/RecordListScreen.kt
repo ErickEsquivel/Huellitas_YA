@@ -37,6 +37,8 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.GreenDark
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.components.AddPlaceholderCard
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.model.MedicalRecord
 import com.example.huellitasya.core.model.Pet
 import com.example.huellitasya.core.model.PetSex
@@ -96,16 +98,21 @@ internal fun RecordListScreen(
 ) {
     val hasRecords = state.records.isNotEmpty()
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        HuellitasBackBar(
+            onClick = onBackClick,
+            contentDescription = stringResource(R.string.records_back),
+        )
         // Column y no LazyColumn: la cabecera dibuja la ola y no debe desaparecer al desplazar.
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = HuellitasBackBarHeight)
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(start = 24.dp, end = 24.dp, bottom = 96.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            RecordsHeader(pet = state.pet, category = category, onBackClick = onBackClick)
+            RecordsHeader(pet = state.pet, category = category)
             if (!state.isLoading) {
                 if (hasRecords) {
                     state.records.forEach { record ->

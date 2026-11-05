@@ -67,7 +67,8 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.GrayText
 import com.example.huellitasya.core.designsystem.GreenHighlight
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import kotlin.math.roundToInt
 
 /** Ancho del frame de Figma ("Android Compact", 412 dp). Las medidas del encabezado escalan respecto a él. */
@@ -142,7 +143,7 @@ internal fun AuthBackButton(
     modifier: Modifier = Modifier,
     tint: Color = Color.Black,
 ) {
-    HuellitasBackButton(
+    HuellitasBackBar(
         onClick = onClick,
         contentDescription = stringResource(R.string.auth_back),
         modifier = modifier,
@@ -228,7 +229,7 @@ internal fun AuthFormScaffold(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Sin cabecera, el título baja lo justo para no quedar bajo la flecha de volver.
-                    Spacer(modifier = Modifier.height((statusBarTop + 44.dp) * (1f - headerFraction)))
+                    Spacer(modifier = Modifier.height((statusBarTop + HuellitasBackBarHeight) * (1f - headerFraction)))
                     val titleSize = if (isCompact) compactTitleFontSize else titleFontSize
                     Text(
                         text = title,
@@ -274,9 +275,7 @@ internal fun AuthFormScaffold(
             onClick = onBackClick,
             // Sobre la foto se usa el color de Figma; sin foto, negro para que se vea sobre el blanco.
             tint = if (headerFraction > 0.5f) backTint else Color.Black,
-            modifier = Modifier
-                .statusBarsPadding()
-                .padding(start = 17.dp)
+            modifier = Modifier.statusBarsPadding(),
         )
 
         SnackbarHost(

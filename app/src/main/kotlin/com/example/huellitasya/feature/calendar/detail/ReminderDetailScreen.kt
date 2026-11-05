@@ -57,7 +57,8 @@ import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.DeleteConfirmDialog
 import com.example.huellitasya.core.designsystem.components.FieldStatus
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.designsystem.components.HuellitasDatePickerDialog
 import com.example.huellitasya.core.designsystem.components.HuellitasTimePickerDialog
@@ -131,17 +132,20 @@ internal fun ReminderDetailScreen(
     ProgressOverlay(isVisible = state.isBusy, text = overlayText) {
         Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
             CurvedBackground(modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.55f))
+            HuellitasBackBar(
+                onClick = onBackClick,
+                contentDescription = stringResource(R.string.reminder_detail_back),
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(top = HuellitasBackBarHeight)
                     .navigationBarsPadding()
                     .verticalScroll(rememberScrollState())
                     .padding(start = 16.dp, end = 16.dp, bottom = 24.dp),
             ) {
-                Row(modifier = Modifier.padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                    HuellitasBackButton(onClick = onBackClick, contentDescription = stringResource(R.string.reminder_detail_back))
-                    if (reminder != null) {
-                        Spacer(modifier = Modifier.width(16.dp))
+                if (reminder != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
                             painter = painterResource(reminder.kind.iconRes),
                             contentDescription = null,

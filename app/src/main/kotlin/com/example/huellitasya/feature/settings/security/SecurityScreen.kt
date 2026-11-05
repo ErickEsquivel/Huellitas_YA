@@ -44,7 +44,8 @@ import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.FieldMessage
 import com.example.huellitasya.core.designsystem.components.FieldStatus
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.designsystem.components.HuellitasPasswordField
 import com.example.huellitasya.core.designsystem.components.PasswordRequirementRow
@@ -101,9 +102,14 @@ internal fun SecurityScreen(
             modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.22f)
         )
 
+        HuellitasBackBar(
+            onClick = onBackClick,
+            contentDescription = stringResource(R.string.security_back),
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = HuellitasBackBarHeight)
                 // Edge-to-edge: el botón no debe quedar debajo de la barra de navegación ni del teclado.
                 .navigationBarsPadding()
                 .imePadding()
@@ -111,13 +117,7 @@ internal fun SecurityScreen(
                 .padding(horizontal = 26.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            HuellitasBackButton(
-                onClick = onBackClick,
-                contentDescription = stringResource(R.string.security_back),
-                modifier = Modifier.align(Alignment.Start),
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Text(
                 text = stringResource(R.string.security_title),
                 color = Color.Black,

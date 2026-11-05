@@ -56,7 +56,8 @@ import com.example.huellitasya.core.designsystem.GreenCard
 import com.example.huellitasya.core.designsystem.GreenPrimary
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.RecordCountGreen
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.model.Pet
 import com.example.huellitasya.core.model.PetSex
@@ -119,30 +120,27 @@ internal fun PetDetailScreen(
     onRecordsClick: (RecordCategory) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        HuellitasBackBar(
+            onClick = onBackClick,
+            contentDescription = stringResource(R.string.pets_detail_back),
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = HuellitasBackBarHeight)
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(modifier = Modifier.fillMaxWidth()) {
-                HuellitasBackButton(
-                    onClick = onBackClick,
-                    contentDescription = stringResource(R.string.pets_detail_back),
-                    modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp, start = 11.dp),
-                )
-                Text(
-                    text = pet?.let { stringResource(R.string.pets_detail_title, it.name) }.orEmpty(),
-                    color = Color.Black,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
-                )
-            }
+            Text(
+                text = pet?.let { stringResource(R.string.pets_detail_title, it.name) }.orEmpty(),
+                color = Color.Black,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
             if (pet != null) {
                 PetDetailContent(pet = pet, recordCounts = recordCounts, onEditClick = onEditClick, onRecordsClick = onRecordsClick)
             }

@@ -34,7 +34,8 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.GrayText
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.petColors
 import com.example.huellitasya.core.model.Reminder
 import com.example.huellitasya.core.model.ReminderKind
@@ -82,28 +83,26 @@ internal fun NotificationsScreen(
 ) {
     Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
         CurvedBackground(modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.25f))
+        HuellitasBackBar(
+            onClick = onBackClick,
+            contentDescription = stringResource(R.string.reminder_detail_back),
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = HuellitasBackBarHeight)
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(start = 22.dp, end = 22.dp, bottom = 24.dp),
         ) {
-            Box(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
-                HuellitasBackButton(
-                    onClick = onBackClick,
-                    contentDescription = stringResource(R.string.reminder_detail_back),
-                    modifier = Modifier.align(Alignment.TopStart),
-                )
-                Text(
-                    text = stringResource(R.string.notifications_title),
-                    color = Color.Black,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-                )
-            }
+            Text(
+                text = stringResource(R.string.notifications_title),
+                color = Color.Black,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
             Text(
                 text = stringResource(R.string.notifications_subtitle),
                 color = GrayText,

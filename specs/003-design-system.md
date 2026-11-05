@@ -45,7 +45,7 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | Componente | Descripción |
 |------------|-------------|
 | `HuellitasButton` | Botón principal redondeado. Soporta `containerColor`, `enabled` e `isLoading`. |
-| `HuellitasOptionButton` | Botón de 319×46 con ícono a la izquierda y texto alineado a 87 dp ("Continuar con correo", "Regístrate"). |
+| `HuellitasOptionButton` | Botón de 319×46 con ícono en una columna fija a la izquierda y texto centrado en el botón ("Continuar con correo", "Regístrate"). |
 | `GoogleOptionButton` | Variante blanca con borde verde y logo de Google. |
 | `HuellitasTextButton` | Enlace de texto. |
 | `HuellitasTextField` | Etiqueta arriba + caja de 48 dp + `FieldStatus` (`Default`/`Warning`/`Error`) + mensaje opcional. |
@@ -59,7 +59,7 @@ Centralizar tokens visuales y componentes reutilizables para que las pantallas g
 | `AppTitle` | Logo + "Huellitas YA!" con el "YA!" en verde (Bienvenido y Presentación). |
 | `HuellitasDatePickerDialog` | Selector de fecha en UTC, entre `minDate` y `maxDate` (hoy por defecto; una fecha futura en los recordatorios), con "Borrar" opcional. |
 | `HuellitasTimePickerDialog` | Selector de hora de 12 horas con AM/PM (recordatorios, spec 007). |
-| `HuellitasBackButton` | Flecha "<" de 16×14 dp de los formularios y de Datos Personales. |
+| `HuellitasBackBar` | Barra fija de 48 dp con la flecha de volver (`ic_back_arrow`), siempre en el mismo lugar. Va fuera del contenido con scroll, que deja `HuellitasBackBarHeight` arriba. Es la única forma de poner una flecha. |
 | `PasswordConfirmDialog` | Diálogo "Confirma tu contraseña" antes de una operación sensible (cambiar el correo, eliminar la cuenta). |
 | `PasswordRequirementRow` | Fila de la checklist de contraseña (✗ naranja / ✓ verde), en "Crear nueva contraseña" y Seguridad. |
 | `DeleteConfirmDialog` | "¿Seguro deseas eliminarlo?" con el cachorro (Figma 3050:1515): eliminar una mascota o la cuenta. Recibe los textos y el del botón. |

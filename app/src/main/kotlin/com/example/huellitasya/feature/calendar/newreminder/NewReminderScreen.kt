@@ -67,7 +67,8 @@ import com.example.huellitasya.core.designsystem.GreenPrimary
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.FieldStatus
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.designsystem.components.HuellitasDatePickerDialog
 import com.example.huellitasya.core.designsystem.components.HuellitasTimePickerDialog
@@ -149,18 +150,18 @@ internal fun NewReminderScreen(
     ProgressOverlay(isVisible = state.isSaving, text = stringResource(R.string.new_reminder_saving)) {
         Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
             CurvedBackground(modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.55f))
+            HuellitasBackBar(
+                onClick = onBackClick,
+                contentDescription = stringResource(R.string.new_reminder_back),
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(top = HuellitasBackBarHeight)
                     .navigationBarsPadding()
                     .verticalScroll(rememberScrollState())
                     .padding(start = 22.dp, end = 22.dp, bottom = 24.dp),
             ) {
-                HuellitasBackButton(
-                    onClick = onBackClick,
-                    contentDescription = stringResource(R.string.new_reminder_back),
-                    modifier = Modifier.padding(top = 8.dp),
-                )
                 Text(
                     text = stringResource(state.kind.labelRes),
                     color = Color.Black,
