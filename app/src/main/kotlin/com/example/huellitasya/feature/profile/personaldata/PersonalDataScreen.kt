@@ -57,7 +57,8 @@ import com.example.huellitasya.core.designsystem.components.HuellitasDatePickerD
 import com.example.huellitasya.core.designsystem.components.CurvedBackground
 import com.example.huellitasya.core.designsystem.components.FieldMessage
 import com.example.huellitasya.core.designsystem.components.FieldStatus
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.designsystem.components.PasswordConfirmDialog
 import com.example.huellitasya.core.model.AuthProvider
@@ -123,9 +124,14 @@ internal fun PersonalDataScreen(
             modifier = Modifier.align(Alignment.BottomCenter).fillMaxHeight(0.58f)
         )
 
+        HuellitasBackBar(
+            onClick = onBackClick,
+            contentDescription = stringResource(R.string.personal_data_back),
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = HuellitasBackBarHeight)
                 // Edge-to-edge: el botón no debe quedar debajo de la barra de navegación ni del teclado.
                 .navigationBarsPadding()
                 .imePadding()
@@ -133,13 +139,7 @@ internal fun PersonalDataScreen(
                 .padding(horizontal = 22.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
-            HuellitasBackButton(
-                onClick = onBackClick,
-                contentDescription = stringResource(R.string.personal_data_back),
-                modifier = Modifier.align(Alignment.Start),
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Text(
                 text = stringResource(R.string.personal_data_title),
                 color = Color.Black,

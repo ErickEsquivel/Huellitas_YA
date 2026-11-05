@@ -165,7 +165,6 @@ internal fun AuthChooserScreen(
                     text = stringResource(R.string.auth_chooser_email),
                     icon = painterResource(R.drawable.ic_auth_mail),
                     iconSize = DpSize(29.dp, 20.dp),
-                    iconColumnStart = 42.dp,
                     containerColor = GreenAction,
                     enabled = !isLoading,
                     onClick = onEmailClick
@@ -192,7 +191,6 @@ internal fun AuthChooserScreen(
                     text = stringResource(R.string.auth_chooser_register),
                     icon = painterResource(R.drawable.ic_register_person),
                     iconSize = DpSize(23.75.dp, 23.75.dp),
-                    iconColumnStart = 44.6.dp,
                     containerColor = MintSurface.copy(alpha = 0.5f),
                     border = BorderStroke(1.dp, GreenPrimary.copy(alpha = 0.5f)),
                     contentColor = Color.Black,

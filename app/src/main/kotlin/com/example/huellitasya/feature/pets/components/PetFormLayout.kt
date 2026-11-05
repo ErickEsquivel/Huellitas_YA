@@ -32,7 +32,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.huellitasya.R
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.components.greenWave
 import com.example.huellitasya.feature.pets.form.PetFormAction
 import com.example.huellitasya.feature.pets.form.PetFormState
@@ -64,9 +65,14 @@ internal fun PetFormLayout(
                 .height(446.dp)
                 .alpha(0.3f),
         )
+        HuellitasBackBar(
+            onClick = onBackClick,
+            contentDescription = stringResource(R.string.pets_register_back),
+        )
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = HuellitasBackBarHeight)
                 // Edge-to-edge: los botones no deben quedar debajo de la barra de navegación ni del teclado.
                 .navigationBarsPadding()
                 .imePadding()
@@ -75,11 +81,6 @@ internal fun PetFormLayout(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            HuellitasBackButton(
-                onClick = onBackClick,
-                contentDescription = stringResource(R.string.pets_register_back),
-                modifier = Modifier.align(Alignment.Start).offset(x = 6.dp),
-            )
             Text(
                 text = title,
                 color = Color.Black,

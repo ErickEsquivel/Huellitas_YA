@@ -50,6 +50,8 @@ import com.example.huellitasya.core.designsystem.DestructiveRed
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.RecordCardSurface
 import com.example.huellitasya.core.designsystem.components.DeleteConfirmDialog
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.designsystem.components.ProgressOverlay
 import com.example.huellitasya.core.model.MedicalRecord
@@ -108,15 +110,20 @@ internal fun RecordDetailScreen(
 ) {
     ProgressOverlay(isVisible = state.isDeleting, text = stringResource(R.string.records_deleting)) {
         Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+            HuellitasBackBar(
+                onClick = onBackClick,
+                contentDescription = stringResource(R.string.records_back),
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(top = HuellitasBackBarHeight)
                     .navigationBarsPadding()
                     .verticalScroll(rememberScrollState())
                     .padding(start = 24.dp, end = 24.dp, bottom = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                RecordsHeader(pet = state.pet, category = state.record?.category, onBackClick = onBackClick)
+                RecordsHeader(pet = state.pet, category = state.record?.category)
                 state.record?.let { record ->
                     RecordPreviewCard(record = record, onDownloadClick = { onAction(RecordDetailAction.Download) })
                     Spacer(modifier = Modifier.height(8.dp))

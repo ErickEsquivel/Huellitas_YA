@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.GreenBackground
-import com.example.huellitasya.core.designsystem.components.HuellitasBackButton
 import com.example.huellitasya.core.designsystem.components.greenWave
 import com.example.huellitasya.core.model.Pet
 import com.example.huellitasya.core.model.RecordCategory
@@ -48,26 +47,17 @@ import com.example.huellitasya.core.ui.breedAndAge
 internal fun RecordsHeader(
     pet: Pet?,
     category: RecordCategory?,
-    onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Spacer(modifier = Modifier.height(16.dp))
-        Box(modifier = Modifier.fillMaxWidth()) {
-            HuellitasBackButton(
-                onClick = onBackClick,
-                contentDescription = stringResource(R.string.records_back),
-                modifier = Modifier.align(Alignment.TopStart).padding(top = 8.dp),
-            )
-            Text(
-                text = pet?.let { stringResource(R.string.records_pet_title, it.name) }.orEmpty(),
-                color = Color.Black,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 36.dp),
-            )
-        }
+        Text(
+            text = pet?.let { stringResource(R.string.records_pet_title, it.name) }.orEmpty(),
+            color = Color.Black,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.ExtraBold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(),
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Box(modifier = Modifier.fillMaxWidth()) {
             // La ola empieza a media altura de la foto, como en Figma.

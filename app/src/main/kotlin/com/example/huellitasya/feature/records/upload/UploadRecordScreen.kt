@@ -71,6 +71,8 @@ import com.example.huellitasya.core.designsystem.UploadProgressEnd
 import com.example.huellitasya.core.designsystem.UploadProgressStart
 import com.example.huellitasya.core.designsystem.UploadProgressText
 import com.example.huellitasya.core.designsystem.components.FieldStatus
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBar
+import com.example.huellitasya.core.designsystem.components.HuellitasBackBarHeight
 import com.example.huellitasya.core.designsystem.components.HuellitasButton
 import com.example.huellitasya.core.designsystem.components.HuellitasDatePickerDialog
 import com.example.huellitasya.core.designsystem.components.IconCardClickableField
@@ -154,9 +156,14 @@ internal fun UploadRecordScreen(
                 .fillMaxSize()
                 .then(if (state.isUploading && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Modifier.blur(5.dp) else Modifier),
         ) {
+            HuellitasBackBar(
+                onClick = onBackClick,
+                contentDescription = stringResource(R.string.records_back),
+            )
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(top = HuellitasBackBarHeight)
                     .navigationBarsPadding()
                     .imePadding()
                     .verticalScroll(rememberScrollState())
@@ -164,7 +171,7 @@ internal fun UploadRecordScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                RecordsHeader(pet = state.pet, category = category, onBackClick = onBackClick)
+                RecordsHeader(pet = state.pet, category = category)
                 val file = state.file
                 if (file == null) {
                     UploadCard(onClick = onPickFile)

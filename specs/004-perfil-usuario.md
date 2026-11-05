@@ -308,7 +308,7 @@ Callables en `functions/src/index.ts`, con las `setGlobalOptions` existentes (re
 - `feature/profile/verifyemail`: `VerifyEmailChange*` ("Verifica tu correo"), con la cuenta regresiva para reenviar.
 - `feature/settings/security`: `Security*` (cambio de contraseña).
 - `feature/settings`: `SettingsViewModel` pasa al patrón `UiState`/`Action`/`Event` y agrega eliminar la cuenta (confirmación, reautenticación y `LaunchGoogleReauth`). Las filas de "Mi cuenta" se rehacen según 3452:1018; el diálogo es `DeleteConfirmDialog` (`core.designsystem`, desde la spec 005), con la tarjeta de Figma como imagen (`img_delete_dialog`).
-- `core.designsystem`: `HuellitasBackButton` (antes `AuthBackButton`), `PasswordConfirmDialog` y `PasswordRequirementRow` (antes en `feature.auth.components`), compartidos por Auth, Perfil y Configuración. El estado del diálogo vive en `core.ui.PasswordPromptState`.
+- `core.designsystem`: `HuellitasBackBar` (antes `AuthBackButton`), `PasswordConfirmDialog` y `PasswordRequirementRow` (antes en `feature.auth.components`), compartidos por Auth, Perfil y Configuración. El estado del diálogo vive en `core.ui.PasswordPromptState`.
 - `GoogleIdTokenRequester` sale de `feature.auth.google` y pasa a `core.ui.google`, porque Configuración también lo necesita para reautenticar y una feature no importa otra.
 - Strings en `res/values/strings_profile.xml` y `strings_settings.xml`; los errores nuevos, en `strings_errors.xml`. Recursos con prefijo `img_profile_*` / `ic_profile_*` e `ic_settings_*`.
 
@@ -333,7 +333,7 @@ Hechos en el PR de implementación:
 - **001 — Firebase setup:** paso 9 "Storage", `firebase-storage` en Contratos y criterio de las reglas de Storage.
 - **002 — Autenticación:** enlaces a esta spec en `users/{uid}`, `AuthRepository`, `UserRepository` y Google Sign-In.
 - **002 — Autenticación:** `PasswordRequirementRow` pasa al design system y restablecer la contraseña envía el aviso "Tu contraseña cambió".
-- **003 — Design system:** `HuellitasBackButton`, `PasswordConfirmDialog` y `PasswordRequirementRow` en el catálogo.
+- **003 — Design system:** `HuellitasBackBar`, `PasswordConfirmDialog` y `PasswordRequirementRow` en el catálogo.
 - **CLAUDE.md:** sección "Perfil (spec 004)", nueva ubicación de `GoogleIdTokenRequester` y `firebase deploy --only storage`.
 
 ## Riesgos
