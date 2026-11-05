@@ -8,11 +8,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,8 +24,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,11 +37,13 @@ import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.MintSurface
 
 private val OptionShape = RoundedCornerShape(50)
+private val IconColumnStart = 16.dp
+private val IconColumnWidth = 40.dp
 
 /**
  * Botón de opción con ícono a la izquierda (Figma "BIENVENIDO": "Continuar con correo",
  * "Continuar con Google", "Regístrate"). Mide 319x46 dp por defecto.
- * El ícono ocupa una columna fija para que los textos de varios botones queden alineados.
+ * El ícono ocupa una columna fija a la izquierda y el texto va centrado en el botón.
  */
 @Composable
 fun HuellitasOptionButton(
@@ -54,8 +57,6 @@ fun HuellitasOptionButton(
     contentColor: Color = Color.White,
     fontWeight: FontWeight = FontWeight.ExtraBold,
     enabled: Boolean = true,
-    iconColumnStart: Dp = 38.dp,
-    textStart: Dp = 87.dp,
 ) {
     Box(
         modifier = modifier
@@ -69,9 +70,9 @@ fun HuellitasOptionButton(
     ) {
         Box(
             modifier = Modifier
-                .padding(start = iconColumnStart)
-                .width(textStart - iconColumnStart),
-            contentAlignment = Alignment.CenterStart,
+                .padding(start = IconColumnStart)
+                .width(IconColumnWidth),
+            contentAlignment = Alignment.Center,
         ) {
             Image(
                 painter = icon,
@@ -81,12 +82,18 @@ fun HuellitasOptionButton(
                     .height(iconSize.height),
             )
         }
-        Row(
-            modifier = Modifier.padding(start = textStart, end = 16.dp),
-            horizontalArrangement = Arrangement.Start,
-        ) {
-            Text(text = text, color = contentColor, fontSize = 16.sp, fontWeight = fontWeight)
-        }
+        // Mismo margen a ambos lados para que el texto quede centrado en el botón y no pise el ícono.
+        Text(
+            text = text,
+            color = contentColor,
+            fontWeight = fontWeight,
+            maxLines = 1,
+            autoSize = TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = 16.sp),
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = IconColumnStart + IconColumnWidth + 4.dp),
+        )
     }
 }
 
@@ -109,7 +116,6 @@ fun GoogleOptionButton(
         contentColor = Color.Black,
         fontWeight = FontWeight.Bold,
         enabled = enabled,
-        iconColumnStart = 39.dp,
     )
 }
 

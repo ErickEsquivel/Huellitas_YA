@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -75,6 +76,8 @@ fun HuellitasButton(
                 fontWeight = fontWeight,
                 maxLines = 1,
                 autoSize = TextAutoSize.StepBased(minFontSize = 12.sp, maxFontSize = fontSize),
+                // Con `autoSize` el texto puede ocupar todo el ancho: sin esto queda a la izquierda.
+                textAlign = TextAlign.Center,
             )
         }
     }
