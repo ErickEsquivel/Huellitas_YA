@@ -7,6 +7,57 @@ App Android para organizar las vacunas, el historial médico y los eventos de tu
 - **Registros médicos:** subir PDF o imágenes, verlos y descargarlos.
 - **Calendario:** recordatorios con aviso en el teléfono.
 
+## Integrantes
+
+- Julian Camilo Gonzalez Morales
+- Mateo Sarmiento Cortes
+- Erick Santiago Esquivel Cruz
+
+## Versión funcional
+
+La última versión funcional está en la rama **`master`** de este repositorio.
+
+## Capturas
+
+| Bienvenido | Iniciar sesión | Inicio |
+|---|---|---|
+| <img src="docs/capturas/1-bienvenido.jpg" width="220" alt="Pantalla de bienvenida"> | <img src="docs/capturas/2-login.jpg" width="220" alt="Pantalla de inicio de sesión"> | <img src="docs/capturas/3-inicio.jpg" width="220" alt="Inicio con la lista de mascotas"> |
+
+| Perfil de la mascota | Registros médicos | Calendario |
+|---|---|---|
+| <img src="docs/capturas/4-mascota.jpg" width="220" alt="Perfil de una mascota"> | <img src="docs/capturas/5-registros.jpg" width="220" alt="Lista de registros médicos"> | <img src="docs/capturas/6-calendario.jpg" width="220" alt="Calendario con recordatorios"> |
+
+## Cómo instalar la app
+
+Hay dos caminos. El más rápido no requiere compilar.
+
+```mermaid
+flowchart TD
+    A[Quiero probar la app] --> B{¿Necesito compilar?}
+    B -- No --> C[Descargar el APK en el teléfono]
+    C --> D[Permitir la instalación y abrir el APK]
+    B -- Sí --> E[Clonar la rama master]
+    E --> F[Copiar google-services.json en app/]
+    F --> G[Abrir en Android Studio y pulsar Run]
+    D --> H[Crear una cuenta en la app]
+    G --> H
+```
+
+### Opción rápida: instalar el APK
+
+Necesitas un teléfono con Android 7.0 o superior y conexión a internet.
+
+1. En el teléfono, abre este enlace: [descargar HuellitasYA-1.0.apk](https://github.com/ErickEsquivel/Huellitas_YA/releases/latest/download/HuellitasYA-1.0.apk).
+2. Abre el archivo descargado. Si Android lo pide, permite instalar apps de esa fuente.
+3. Si Google Play Protect muestra un aviso, elige instalar de todos modos. Aparece porque la app no viene de Play Store.
+4. Abre **Huellitas YA!** y sigue la [comprobación del paso 7](#7-comprobar-que-funciona).
+
+Con este APK también funciona "Continuar con Google", porque está firmado con la clave registrada en Firebase.
+
+### Opción completa: compilar el proyecto
+
+Sigue la guía de la siguiente sección.
+
 ## Compilar y ejecutar en otro equipo
 
 Esta guía parte de un equipo que nunca ha abierto el proyecto. Se completa en unos 30 minutos; la primera compilación es la que más tarda, porque descarga las dependencias.
