@@ -47,10 +47,25 @@ flowchart TD
 
 Necesitas un teléfono con Android 7.0 o superior y conexión a internet.
 
-1. En el teléfono, abre este enlace: [descargar HuellitasYA-1.0.apk](https://github.com/ErickEsquivel/Huellitas_YA/releases/latest/download/HuellitasYA-1.0.apk).
-2. Abre el archivo descargado. Si Android lo pide, permite instalar apps de esa fuente.
-3. Si Google Play Protect muestra un aviso, elige instalar de todos modos. Aparece porque la app no viene de Play Store.
-4. Abre **Huellitas YA!** y sigue la [comprobación del paso 7](#7-comprobar-que-funciona).
+**1. Descarga el APK.** En el teléfono, abre este enlace: [descargar HuellitasYA-1.0.apk](https://github.com/ErickEsquivel/Huellitas_YA/releases/latest/download/HuellitasYA-1.0.apk). Chrome avisa porque es un archivo APK; elige **Descargar de todos modos**.
+
+<img src="docs/capturas/instalacion-1-descargar.jpg" width="320" alt="Chrome pregunta si se descarga el archivo; se elige Descargar de todos modos">
+
+**2. Abre el archivo.** Toca **Abrir** en el aviso de descarga. Si el aviso ya se cerró, entra al menú **⋮ → Descargas** de Chrome y toca `HuellitasYA-1.0.apk`.
+
+<img src="docs/capturas/instalacion-2-abrir.jpg" width="320" alt="Aviso de archivo descargado con la opción Abrir">
+
+**3. Confirma la instalación.** Toca **Instalar**. Si Android pide permiso, permite instalar apps desde Chrome.
+
+<img src="docs/capturas/instalacion-3-instalar.jpg" width="320" alt="Android pregunta si se desea instalar Huellitas YA">
+
+**4. Pasa la revisión de Google Play Protect.** Aparece porque la app no viene de Play Store. Toca **Analizar app** y, cuando diga que parece segura, toca **Instalar**.
+
+<img src="docs/capturas/instalacion-4-analizar.jpg" width="240" alt="Play Protect recomienda analizar la app"> <img src="docs/capturas/instalacion-5-segura.jpg" width="240" alt="Play Protect indica que la app parece segura">
+
+**5. Abre la app.** Toca **Abrir** y sigue la [comprobación del paso 7](#7-comprobar-que-funciona).
+
+<img src="docs/capturas/instalacion-6-lista.jpg" width="320" alt="Android confirma que se instaló la app">
 
 Con este APK también funciona "Continuar con Google", porque está firmado con la clave registrada en Firebase.
 
