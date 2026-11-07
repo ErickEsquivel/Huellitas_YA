@@ -27,108 +27,133 @@ La última versión funcional está en la rama **`master`** de este repositorio.
 |---|---|---|
 | <img src="docs/capturas/4-mascota.jpg" width="220" alt="Perfil de una mascota"> | <img src="docs/capturas/5-registros.jpg" width="220" alt="Lista de registros médicos"> | <img src="docs/capturas/6-calendario.jpg" width="220" alt="Calendario con recordatorios"> |
 
-## Cómo instalar la app
+## Cómo compilar e instalar la app
 
-Hay dos caminos. El más rápido no requiere compilar.
+Esta guía parte de un equipo que nunca ha abierto el proyecto y lleva la app desde GitHub hasta un teléfono con Android Studio. Se completa en unos 30 minutos; la primera sincronización y la primera compilación son las que más tardan, porque descargan las dependencias.
+
+Las capturas son de Android Studio 2026.2.1 en inglés, sobre un clon limpio de `master`.
 
 ```mermaid
-flowchart TD
-    A[Quiero probar la app] --> B{¿Necesito compilar?}
-    B -- No --> C[Descargar el APK en el teléfono]
-    C --> D[Permitir la instalación y abrir el APK]
-    B -- Sí --> E[Clonar la rama master]
-    E --> F[Copiar google-services.json en app/]
-    F --> G[Abrir en Android Studio y pulsar Run]
-    D --> H[Crear una cuenta en la app]
-    G --> H
+flowchart LR
+    A[Clonar master] --> B[Confiar y esperar Gradle Sync]
+    B --> C[Copiar google-services.json en app/]
+    C --> D[Assemble Project]
+    D --> E[Elegir dispositivo y pulsar Run]
+    E --> F[Crear una cuenta en la app]
 ```
-
-### Opción rápida: instalar el APK
-
-Necesitas un teléfono con Android 7.0 o superior y conexión a internet.
-
-**1. Descarga el APK.** En el teléfono, abre este enlace: [descargar HuellitasYA-1.0.apk](https://github.com/ErickEsquivel/Huellitas_YA/releases/latest/download/HuellitasYA-1.0.apk). Chrome avisa porque es un archivo APK; elige **Descargar de todos modos**.
-
-<img src="docs/capturas/instalacion-1-descargar.jpg" width="320" alt="Chrome pregunta si se descarga el archivo; se elige Descargar de todos modos">
-
-**2. Abre el archivo.** Toca **Abrir** en el aviso de descarga. Si el aviso ya se cerró, entra al menú **⋮ → Descargas** de Chrome y toca `HuellitasYA-1.0.apk`.
-
-<img src="docs/capturas/instalacion-2-abrir.jpg" width="320" alt="Aviso de archivo descargado con la opción Abrir">
-
-**3. Confirma la instalación.** Toca **Instalar**. Si Android pide permiso, permite instalar apps desde Chrome.
-
-<img src="docs/capturas/instalacion-3-instalar.jpg" width="320" alt="Android pregunta si se desea instalar Huellitas YA">
-
-**4. Pasa la revisión de Google Play Protect.** Aparece porque la app no viene de Play Store. Toca **Analizar app** y, cuando diga que parece segura, toca **Instalar**.
-
-<img src="docs/capturas/instalacion-4-analizar.jpg" width="240" alt="Play Protect recomienda analizar la app"> <img src="docs/capturas/instalacion-5-segura.jpg" width="240" alt="Play Protect indica que la app parece segura">
-
-**5. Abre la app.** Toca **Abrir** y sigue la [comprobación del paso 7](#7-comprobar-que-funciona).
-
-<img src="docs/capturas/instalacion-6-lista.jpg" width="320" alt="Android confirma que se instaló la app">
-
-Con este APK también funciona "Continuar con Google", porque está firmado con la clave registrada en Firebase.
-
-### Opción completa: compilar el proyecto
-
-Sigue la guía de la siguiente sección.
-
-## Compilar y ejecutar en otro equipo
-
-Esta guía parte de un equipo que nunca ha abierto el proyecto. Se completa en unos 30 minutos; la primera compilación es la que más tarda, porque descarga las dependencias.
 
 ### 1. Instalar lo necesario
 
 | Herramienta | Versión | Notas |
 |---|---|---|
-| [Android Studio](https://developer.android.com/studio) | 2026.1.4 o superior | Trae el Android SDK. |
-| [Git](https://git-scm.com/downloads) | Cualquiera reciente | Para clonar el proyecto. |
-| Android SDK Platform | 37 | Android Studio ofrece instalarlo al abrir el proyecto (paso 4). |
+| [Android Studio](https://developer.android.com/studio) | 2026.1.4 o superior | Trae el Android SDK y Java. |
+| [Git](https://git-scm.com/downloads) | Cualquiera reciente | Android Studio lo usa para clonar. |
+| Android SDK Platform | 37 | Android Studio ofrece instalarlo al abrir el proyecto (paso 3). |
 | Teléfono o emulador | Android 7.0 (API 24) o superior | Con internet. Ver el paso 6. |
 
-No hace falta instalar Gradle: el proyecto trae Gradle Wrapper 9.6.0, que además descarga por su cuenta el JDK 25 con el que compila. Android Studio ya incluye Java, así que tampoco hay que instalarlo. Solo para compilar **desde una terminal externa** hace falta un Java (17 o superior) para arrancar Gradle; ver el paso 5.
+Pide también al equipo el archivo `google-services.json`; se usa en el paso 4.
+
+No hace falta instalar Gradle: el proyecto trae Gradle Wrapper 9.6.0, que además descarga por su cuenta el JDK 25 con el que compila. Solo para compilar **desde una terminal externa** hace falta un Java (17 o superior) para arrancar Gradle; ver [Compilar desde una terminal](#compilar-desde-una-terminal).
 
 ### 2. Clonar el proyecto
 
-```bash
-git clone https://github.com/ErickEsquivel/Huellitas_YA.git
-cd Huellitas_YA
-git checkout master
-```
+1. Abre Android Studio y, en la pantalla de bienvenida, elige **Clone Repository**. Si se abre otro proyecto, usa **File → New → Project from Version Control**.
 
-### 3. Agregar `google-services.json`
+   <img src="docs/capturas/android-1-clonar.jpg" width="560" alt="Pantalla de bienvenida de Android Studio con Clone Repository resaltado">
 
-Este archivo conecta la app con Firebase. **Sin él, el proyecto no compila.** Tiene las credenciales del proyecto, por eso no está en el repositorio y el equipo lo entrega por un canal privado.
+2. En **URL** escribe `https://github.com/ErickEsquivel/Huellitas_YA.git`.
+3. En **Directory** elige la carpeta de destino, de preferencia una ruta corta como `C:\Proyectos\Huellitas_YA`.
+4. Pulsa **Clone**. El proyecto queda en la rama `master`.
 
-1. Pide el archivo al equipo.
-2. Cópialo en la carpeta `app/`, no en la raíz del proyecto. Debe llamarse exactamente `google-services.json`:
+   <img src="docs/capturas/android-2-url.jpg" width="560" alt="Diálogo Clone Repository con la URL y la carpeta llenas">
 
-   ```text
-   Huellitas_YA/
-   ├── app/
-   │   ├── google-services.json   ← aquí
-   │   ├── build.gradle.kts
-   │   └── src/
-   ├── gradle/
-   └── README.md
-   ```
+Si prefieres la terminal, clona con `git clone https://github.com/ErickEsquivel/Huellitas_YA.git` y abre la carpeta `Huellitas_YA` (la raíz, no `app/`) con **Open**.
 
-3. No lo subas al repositorio. Ya está en `.gitignore`, así que `git status` no debe mostrarlo.
+### 3. Confiar en el proyecto y esperar Gradle Sync
 
-### 4. Abrir el proyecto en Android Studio
+1. Cuando Android Studio pregunte, elige **Trust Project**.
 
-1. Abre Android Studio y elige **Open**.
-2. Selecciona la carpeta `Huellitas_YA` (la raíz, no `app/`).
-3. Espera a que termine **Gradle Sync**. El avance se ve en la barra inferior.
+   <img src="docs/capturas/android-3-confiar.jpg" width="560" alt="Diálogo Trust and Open Project con Trust Project resaltado">
+
+2. Si aparece **Sign in to Android Studio**, elige **Skip for now**. No hace falta una cuenta.
+3. Espera a que termine **Gradle Sync**. El avance se ve en la barra inferior; la primera vez tarda unos 4 minutos.
 4. Si aparece un aviso de que falta el SDK 37, haz clic en **Install** o instálalo en **Settings → Languages & Frameworks → Android SDK → SDK Platforms → Android API 37**, y sincroniza otra vez con **File → Sync Project with Gradle Files**.
 
 Android Studio crea solo el archivo `local.properties`, con la ruta del SDK.
 
+### 4. Agregar `google-services.json`
+
+Este archivo conecta la app con Firebase. **Gradle Sync termina sin él, pero sin él el proyecto no compila.** Tiene las credenciales del proyecto, por eso no está en el repositorio y el equipo lo entrega por un canal privado.
+
+1. Cópialo con el Explorador de archivos en la carpeta `app/`, no en la raíz del proyecto. Debe llamarse exactamente `google-services.json`.
+2. En Android Studio, cambia la vista del panel izquierdo de **Android** a **Project**, porque la vista Android no muestra este archivo.
+3. Si no aparece dentro de `app`, usa **File → Reload All from Disk**.
+
+   <img src="docs/capturas/android-4-json.jpg" width="420" alt="Vista Project con google-services.json dentro de la carpeta app">
+
+No lo subas al repositorio. Ya está en `.gitignore`, así que `git status` no debe mostrarlo.
+
 ### 5. Compilar
 
-**Desde Android Studio:** menú **Build → Assemble Project**.
+1. Abre el menú **Build → Assemble Project**.
 
-**O desde una terminal,** en la raíz del proyecto:
+   <img src="docs/capturas/android-5-compilar.jpg" width="560" alt="Menú Build con Assemble Project resaltado">
+
+2. Espera a que termine; la primera vez tarda unos 4 minutos. Para ver el resultado, abre el panel **Build** (ícono del martillo, abajo a la izquierda). Debe decir `BUILD SUCCESSFUL`.
+
+   <img src="docs/capturas/android-6-build-ok.jpg" width="680" alt="Panel Build con el mensaje BUILD SUCCESSFUL">
+
+El APK queda en `app/build/outputs/apk/debug/app-debug.apk`.
+
+### 6. Ejecutar
+
+Prepara un dispositivo. Elige una opción:
+
+- **Teléfono físico:**
+  1. Activa las **Opciones de desarrollador** (toca 7 veces **Número de compilación** en Ajustes → Acerca del teléfono).
+  2. Activa **Depuración USB**.
+  3. Conecta el teléfono y acepta el permiso que aparece.
+- **Emulador:** en **Device Manager → Add a new device**, elige un equipo con el ícono de **Google Play** y una imagen de Android reciente.
+
+Después selecciona el dispositivo en la barra superior de Android Studio, con la configuración `app`, y pulsa **Run ▶**. Android Studio instala la app en el dispositivo y la abre.
+
+<img src="docs/capturas/android-7-run.jpg" width="620" alt="Barra superior con el dispositivo, la configuración app y el botón Run resaltados">
+
+La app abre en la pantalla **Bienvenido**:
+
+<img src="docs/capturas/android-8-app.jpg" width="260" alt="La app abierta en la pantalla Bienvenido">
+
+### 7. Comprobar que funciona
+
+1. Toca **Regístrate** y crea una cuenta con tu correo.
+2. Registra una mascota con su foto: la app te lleva a **Home** y la mascota aparece ahí.
+3. En **Calendario**, crea un recordatorio. Acepta el permiso de notificaciones para recibir el aviso.
+
+No hay que desplegar nada: la base de datos, las reglas de seguridad y las Cloud Functions ya están publicadas en el proyecto de Firebase `huellitasya-3fd78`.
+
+### 8. Inicio de sesión con Google (opcional)
+
+El inicio con correo y contraseña funciona sin más pasos. **"Continuar con Google" falla en un equipo nuevo** hasta registrar su huella digital, porque cada computador firma la app con su propia clave de depuración.
+
+1. Ejecuta en la raíz del proyecto:
+
+   ```bash
+   # Windows
+   gradlew.bat signingReport
+
+   # macOS o Linux
+   ./gradlew signingReport
+   ```
+
+2. En la salida, busca `Variant: debug` y copia los valores `SHA1` y `SHA-256`.
+3. Envíalos al equipo, que los registra en la consola de Firebase.
+4. Espera unos minutos y vuelve a probar. Si sigue fallando, pide al equipo un `google-services.json` actualizado y repite desde el paso 4.
+
+El dispositivo necesita Google Play y una cuenta de Google iniciada.
+
+### Compilar desde una terminal
+
+Es opcional y reemplaza el paso 5. En la raíz del proyecto:
 
 ```bash
 # Windows
@@ -159,60 +184,20 @@ sdk.dir=C\:\\Users\\TU_USUARIO\\AppData\\Local\\Android\\Sdk
 # sdk.dir=/home/TU_USUARIO/Android/Sdk
 ```
 
-Al terminar debe decir `BUILD SUCCESSFUL`. El APK queda en `app/build/outputs/apk/debug/app-debug.apk`.
-
-### 6. Ejecutar
-
-Elige una opción:
-
-- **Teléfono físico:**
-  1. Activa las **Opciones de desarrollador** (toca 7 veces **Número de compilación** en Ajustes → Acerca del teléfono).
-  2. Activa **Depuración USB**.
-  3. Conecta el teléfono y acepta el permiso que aparece.
-- **Emulador:** en **Device Manager → Add a new device**, elige un equipo con el ícono de **Google Play** y una imagen de Android reciente.
-
-Después selecciona el dispositivo en la barra superior de Android Studio y pulsa **Run ▶** (configuración `app`).
-
-### 7. Comprobar que funciona
-
-1. La app abre en la pantalla **Bienvenido**.
-2. Toca **Regístrate** y crea una cuenta con tu correo.
-3. Registra una mascota con su foto: la app te lleva a **Home** y la mascota aparece ahí.
-4. En **Calendario**, crea un recordatorio. Acepta el permiso de notificaciones para recibir el aviso.
-
-No hay que desplegar nada: la base de datos, las reglas de seguridad y las Cloud Functions ya están publicadas en el proyecto de Firebase `huellitasya-3fd78`.
-
-### 8. Inicio de sesión con Google (opcional)
-
-El inicio con correo y contraseña funciona sin más pasos. **"Continuar con Google" falla en un equipo nuevo** hasta registrar su huella digital, porque cada computador firma la app con su propia clave de depuración.
-
-1. Ejecuta en la raíz del proyecto:
-
-   ```bash
-   # Windows
-   gradlew.bat signingReport
-
-   # macOS o Linux
-   ./gradlew signingReport
-   ```
-
-2. En la salida, busca `Variant: debug` y copia los valores `SHA1` y `SHA-256`.
-3. Envíalos al equipo, que los registra en la consola de Firebase.
-4. Espera unos minutos y vuelve a probar. Si sigue fallando, pide al equipo un `google-services.json` actualizado y repite desde el paso 3.
-
-El dispositivo necesita Google Play y una cuenta de Google iniciada.
+Al terminar debe decir `BUILD SUCCESSFUL`.
 
 ### Problemas comunes
 
 | Qué aparece | Causa | Solución |
 |---|---|---|
-| `File google-services.json is missing` | Falta el archivo o está en la raíz | Cópialo en `app/` (paso 3). |
+| `File google-services.json is missing` | Falta el archivo o está en la raíz | Cópialo en `app/` (paso 4). |
 | `No matching client found for package name` | El archivo es de otra app de Firebase | Pide al equipo el archivo correcto: el paquete debe ser `com.example.huellitasya`. |
-| `JAVA_HOME is not set` o `java` no se reconoce | La terminal no encuentra Java | Usa la terminal de Android Studio o define `JAVA_HOME` (paso 5). |
-| `SDK location not found` | Falta la ruta del SDK | Abre el proyecto en Android Studio o crea `local.properties` (paso 5). |
-| `Failed to find target with hash string 'android-37'` | Falta el SDK 37 | Instálalo (paso 4). |
+| `JAVA_HOME is not set` o `java` no se reconoce | La terminal no encuentra Java | Usa la terminal de Android Studio o define `JAVA_HOME` ([Compilar desde una terminal](#compilar-desde-una-terminal)). |
+| `SDK location not found` | Falta la ruta del SDK | Abre el proyecto en Android Studio o crea `local.properties` ([Compilar desde una terminal](#compilar-desde-una-terminal)). |
+| `Failed to find target with hash string 'android-37'` | Falta el SDK 37 | Instálalo (paso 3). |
 | Falla la descarga de dependencias o del JDK | Sin internet o con un proxy | Revisa la conexión y repite con **Sync Project**. |
 | `Unable to delete directory` (Windows) | Android Studio u otro programa tiene bloqueada `app/build` | Cierra el programa y compila otra vez. |
+| `INSTALL_FAILED_UPDATE_INCOMPATIBLE` | El dispositivo ya tiene la app firmada con otra clave | Desinstala la app del dispositivo y pulsa **Run ▶** otra vez. |
 | "Continuar con Google" muestra un error | Falta registrar la huella del equipo | Sigue el paso 8. |
 | "Sin conexión" en la app | El dispositivo no tiene internet | Conéctalo a una red con internet. La app la necesita para entrar y guardar. |
 
