@@ -22,6 +22,7 @@ Las specs son la fuente de verdad de **qué** debe hacer cada feature antes de e
 | [005 — Mascotas](005-mascotas.md) | Implemented |
 | [006 — Registros médicos](006-registros-medicos.md) | Implemented |
 | [007 — Calendario y recordatorios](007-calendario.md) | Implemented |
+| [008 — Modo sin facturación](008-modo-sin-facturacion.md) | Approved |
 
 ## Plantilla
 
