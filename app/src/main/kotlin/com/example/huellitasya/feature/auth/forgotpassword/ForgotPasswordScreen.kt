@@ -3,6 +3,7 @@ package com.example.huellitasya.feature.auth.forgotpassword
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
@@ -166,7 +167,11 @@ internal fun ForgotPasswordScreen(
 /** "¿No te llegó? Reenviar enlace" con cuenta regresiva (modo gratuito, spec 008). */
 @Composable
 private fun ResendLinkRow(secondsLeft: Int, enabled: Boolean, onResend: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
         Text(
             text = stringResource(R.string.auth_forgot_link_not_received),
             color = GrayText,
