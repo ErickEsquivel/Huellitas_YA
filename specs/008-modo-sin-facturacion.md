@@ -1,6 +1,8 @@
 # 008 — Modo sin facturación
 
 - **Estado:** Approved
+  - Implementado: el interruptor y el modo gratuito de la cuenta (recuperar contraseña, cambio de correo, Seguridad y eliminar cuenta).
+  - Pendiente: el modo gratuito de los archivos y el script de migración.
 - **Paquetes:** `core.domain`, `core.data`, `feature.auth`, `feature.profile`, `feature.settings`, `feature.pets`, `feature.records`; `firebase/firestore.rules`
 - **Figma:** sin frames nuevos. Las pantallas nuevas reutilizan los componentes de la spec 003.
 - **Relacionadas:** 001 (Firebase setup), 002 (auth), 004 (perfil), 005 (mascotas), 006 (registros médicos)
@@ -64,6 +66,8 @@ Las pantallas que cambian según el modo (recuperar contraseña y cambio de corr
 Inicio de sesión ─ "¿Se te olvidó la contraseña?" ─► ¿Olvidaste tu contraseña? ─ "Enviar enlace" ─►
 Revisa tu correo ─ "Volver a iniciar sesión" ─► Inicio de sesión
 ```
+
+- "Revisa tu correo" no es un destino nuevo: es la misma pantalla de "¿Olvidaste tu contraseña?" con otro título y otro texto, sin el campo de correo. Atrás vuelve a Inicio de sesión, igual que "Volver a iniciar sesión".
 
 - "Enviar enlace" llama a `sendPasswordResetEmail(email)`, con `setLanguageCode("es")` como ya hace la app.
 - **Revisa tu correo:** "Si hay una cuenta con <correo>, te enviamos un enlace para crear una contraseña nueva. Revisa también la carpeta de spam." Tiene un botón "Reenviar enlace", que se habilita a los 60 s con cuenta regresiva, igual que en la spec 002.

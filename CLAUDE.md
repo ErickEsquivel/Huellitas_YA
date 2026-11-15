@@ -97,6 +97,12 @@ Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tien
 - La foto va a Storage (`users/{uid}/profile.jpg`), comprimida en `FirebaseStorageProfilePhotoRepository`.
 - Eliminar la cuenta lo hace la callable `deleteAccount` (`functions/src/index.ts`, lógica pura en `account.ts`): exige un inicio de sesión de hace ≤ 5 min, así que la app reautentica antes (`PasswordConfirmDialog` o Google) y luego cierra la sesión local.
 
+**Modo sin facturación (spec 008):**
+- El parámetro `blaze_activo` de Remote Config elige el backend: `true` usa Cloud Functions y Storage, y si falta o vale `false` se usa el modo gratuito (solo Auth y Firestore).
+- `BackendModeProvider` (dominio) se implementa en `core.data.config.RemoteConfigBackendModeProvider`. `HuellitasApplication` lo refresca al abrir la app.
+- Hilt registra los `ModeAware*Repository`, que delegan en la versión con Functions o en la gratuita (`AuthLink*Repository`, `ClientAccountRepository`). No borres ninguna de las dos.
+- Las pantallas que cambian según el modo usan `GetBackendModeUseCase`. En los tests, `FakeBackendModeProvider` (por defecto, Blaze).
+
 **Google Sign-In:** `GoogleIdTokenRequester` (Credential Manager, en `core.ui.google`) necesita un Activity. `MainActivity` le pasa `default_web_client_id` a `HuellitasApp`, que lo entrega a `authGraph()` y a `settingsScreen()` (reautenticación antes de eliminar la cuenta).
 
 ## Figma

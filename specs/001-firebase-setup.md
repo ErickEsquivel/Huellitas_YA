@@ -76,6 +76,11 @@ Conectar la app al proyecto de Firebase existente (Auth + Firestore) sin publica
      firebase deploy --only storage
      ```
 
+10. **Remote Config** (interruptor del modo sin facturación, spec 008):
+    - No requiere Blaze. La app lee el parámetro booleano `blaze_activo`.
+    - Si no existe o vale `false`, la app usa el **modo gratuito**: enlaces de Firebase Auth en lugar de códigos y eliminar la cuenta desde la app.
+    - Ponerlo en `true` (consola → Remote Config → `blaze_activo` → Publicar) **solo** cuando el proyecto esté en Blaze y las Cloud Functions desplegadas. Los pasos están en la spec 008, "Volver a Blaze".
+
 ### Por CLI (alternativa a la consola para los pasos 1 y 2)
 
 ```bash

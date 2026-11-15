@@ -7,8 +7,10 @@ import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.ValidationError
+import com.example.huellitasya.core.domain.repository.BackendMode
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.usecase.ChangePasswordUseCase
+import com.example.huellitasya.core.domain.usecase.GetBackendModeUseCase
 import com.example.huellitasya.core.domain.validation.PasswordRequirements
 import com.example.huellitasya.core.domain.validation.ValidatePasswordUseCase
 import com.example.huellitasya.core.ui.FieldFeedback
@@ -64,13 +66,15 @@ sealed interface SecurityEvent {
 
 /**
  * Configuración → Seguridad (spec 004, Figma 3263:1086): cambio de contraseña con la contraseña
- * actual, la nueva y su confirmación. Al terminar, el backend envía el aviso "Tu contraseña cambió".
+ * actual, la nueva y su confirmación. Al terminar, el backend envía el aviso "Tu contraseña cambió"
+ * (solo en modo Blaze, spec 008).
  */
 @HiltViewModel
 class SecurityViewModel @Inject constructor(
     private val changePassword: ChangePasswordUseCase,
     private val validatePassword: ValidatePasswordUseCase,
     private val networkMonitor: NetworkMonitor,
+    private val getBackendMode: GetBackendModeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SecurityUiState())
@@ -155,7 +159,9 @@ class SecurityViewModel @Inject constructor(
             when (val result = changePassword(state.currentPassword, state.newPassword)) {
                 is AppResult.Success -> {
                     _uiState.value = SecurityUiState()
-                    showMessage(UiText.Resource(R.string.security_success))
+                    // Sin Cloud Functions no se envía el aviso por correo (spec 008).
+                    val message = if (getBackendMode() == BackendMode.Blaze) R.string.security_success else R.string.security_success_no_notice
+                    showMessage(UiText.Resource(message))
                 }
                 is AppResult.Failure -> {
                     _uiState.update { it.copy(isLoading = false) }

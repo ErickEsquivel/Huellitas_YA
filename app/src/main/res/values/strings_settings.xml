@@ -44,5 +44,6 @@
     <string name="security_rule_unmet">Pendiente</string>
     <string name="security_button">Actualizar información</string>
     <string name="security_success">Contraseña actualizada. Te enviamos un aviso a tu correo</string>
+    <string name="security_success_no_notice">Contraseña actualizada</string>
     <string name="security_back">Volver</string>
 </resources>

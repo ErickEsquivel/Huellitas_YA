@@ -131,6 +131,8 @@ La app abre en la pantalla **Bienvenido**:
 
 No hay que desplegar nada: la base de datos, las reglas de seguridad y las Cloud Functions ya están publicadas en el proyecto de Firebase `huellitasya-3fd78`.
 
+Si el proyecto no tiene facturación activa, la app funciona en **modo gratuito**: recuperar la contraseña y cambiar el correo se hacen con un **enlace** que llega al correo, en lugar de un código de 4 dígitos. Lo controla el parámetro `blaze_activo` de Remote Config ([spec 008](specs/008-modo-sin-facturacion.md)).
+
 ### 8. Inicio de sesión con Google (opcional)
 
 El inicio con correo y contraseña funciona sin más pasos. **"Continuar con Google" falla en un equipo nuevo** hasta registrar su huella digital, porque cada computador firma la app con su propia clave de depuración.
