@@ -25,8 +25,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +38,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +50,7 @@ import coil3.request.ImageRequest
 import com.example.huellitasya.R
 import com.example.huellitasya.core.designsystem.BorderSubtle
 import com.example.huellitasya.core.designsystem.DestructiveRed
+import com.example.huellitasya.core.designsystem.GrayText
 import com.example.huellitasya.core.designsystem.HuellitasYATheme
 import com.example.huellitasya.core.designsystem.RecordCardSurface
 import com.example.huellitasya.core.designsystem.components.DeleteConfirmDialog
@@ -64,8 +68,8 @@ import com.example.huellitasya.core.ui.ObserveAsEvents
 import com.example.huellitasya.core.ui.pdf.PdfFirstPageDecoder
 import com.example.huellitasya.feature.records.components.RecordFileIcon
 import com.example.huellitasya.feature.records.components.RecordsHeader
-import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun RecordDetailRoute(
@@ -199,10 +203,26 @@ private fun RecordPreviewCard(record: MedicalRecord, onDownloadClick: () -> Unit
     }
 }
 
-/** La imagen, o la primera página del PDF dibujada por [PdfFirstPageDecoder], ajustada a su caja. */
+/**
+ * La imagen, o la primera página del PDF dibujada por [PdfFirstPageDecoder], ajustada a su caja.
+ * Si no se puede cargar (p. ej. un archivo de Storage en el modo gratuito, spec 008), lo dice.
+ */
 @Composable
 private fun RecordPreview(record: MedicalRecord, modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    var failed by remember(record.fileUrl) { mutableStateOf(false) }
+    if (failed) {
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
+            Text(
+                text = stringResource(R.string.error_file_unavailable),
+                color = GrayText,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+            )
+        }
+        return
+    }
     val request = remember(record.fileUrl, record.isPdf) {
         ImageRequest.Builder(context)
             .data(record.fileUrl)
@@ -213,6 +233,7 @@ private fun RecordPreview(record: MedicalRecord, modifier: Modifier = Modifier) 
         model = request,
         contentDescription = stringResource(R.string.records_preview, record.fileName),
         contentScale = ContentScale.Fit,
+        onError = { failed = true },
         modifier = modifier,
     )
 }

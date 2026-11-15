@@ -145,6 +145,6 @@ class DeleteRecordUseCase @Inject constructor(
 class DownloadRecordUseCase @Inject constructor(
     private val downloader: RecordDownloader,
 ) {
-    operator fun invoke(record: MedicalRecord): AppResult<Unit, DataError> =
+    suspend operator fun invoke(record: MedicalRecord): AppResult<Unit, DataError> =
         downloader.download(record.fileUrl, record.fileName, record.contentType)
 }

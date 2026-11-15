@@ -25,5 +25,7 @@ enum class DataError : AppError {
     NotFound,
     /** La foto pesa más de 5 MB aun comprimida (límite de `storage.rules`). */
     FileTooLarge,
+    /** El archivo está en Storage y el proyecto no tiene facturación (spec 008): no se puede leer por ahora. */
+    FileUnavailable,
     Unknown,
 }

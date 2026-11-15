@@ -1,6 +1,7 @@
 package com.example.huellitasya.core.data.repository
 
 import com.example.huellitasya.core.common.AppResult
+import com.example.huellitasya.core.data.media.FirestoreMediaStore
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.repository.AccountRepository
 import com.google.firebase.FirebaseNetworkException
@@ -17,15 +18,16 @@ import javax.inject.Inject
  * Modo gratuito de [AccountRepository] (spec 008): sin la Cloud Function `deleteAccount`, la app
  * borra desde el cliente lo que el usuario tiene en Firestore y después su usuario de Auth.
  *
- * El cliente no puede borrar una subcolección de una vez, así que se recorre: recordatorios,
- * registros de cada mascota, mascotas y al final `users/{uid}`. Es idempotente: al reintentar,
- * lo que ya no existe simplemente no aparece en las consultas.
+ * El cliente no puede borrar una subcolección de una vez, así que se recorre: archivos guardados en
+ * Firestore, recordatorios, registros de cada mascota, mascotas y al final `users/{uid}`. Es
+ * idempotente: al reintentar, lo que ya no existe simplemente no aparece en las consultas.
  *
  * Los archivos de Storage no se tocan: en el plan Spark Storage no responde (spec 008).
  */
 internal class ClientAccountRepository @Inject constructor(
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
+    private val mediaStore: FirestoreMediaStore,
 ) : AccountRepository {
 
     override suspend fun deleteAccount(): AppResult<Unit, AuthError> {
@@ -51,6 +53,7 @@ internal class ClientAccountRepository @Inject constructor(
     override suspend fun notifyPasswordChanged(): AppResult<Unit, AuthError> = AppResult.Success(Unit)
 
     private suspend fun deleteUserData(uid: String) {
+        mediaStore.deleteAll(uid)
         val userDocument = firestore.collection(USERS).document(uid)
         val documents = buildList {
             addAll(userDocument.collection(REMINDERS).get().await().documents.map { it.reference })

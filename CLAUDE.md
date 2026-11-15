@@ -100,7 +100,8 @@ Tests en `app/src/test/kotlin/...` con la misma estructura. `core/testing/` tien
 **Modo sin facturación (spec 008):**
 - El parámetro `blaze_activo` de Remote Config elige el backend: `true` usa Cloud Functions y Storage, y si falta o vale `false` se usa el modo gratuito (solo Auth y Firestore).
 - `BackendModeProvider` (dominio) se implementa en `core.data.config.RemoteConfigBackendModeProvider`. `HuellitasApplication` lo refresca al abrir la app.
-- Hilt registra los `ModeAware*Repository`, que delegan en la versión con Functions o en la gratuita (`AuthLink*Repository`, `ClientAccountRepository`). No borres ninguna de las dos.
+- Hilt registra los `ModeAware*Repository`, que delegan en la versión con Functions o Storage, o en la gratuita (`AuthLink*Repository`, `ClientAccountRepository`, `Firestore*PhotoRepository`, `FirestoreRecordFileRepository`). No borres ninguna de las dos.
+- En el modo gratuito, fotos y archivos van a Firestore en chunks (`core.data.media.FirestoreMediaStore`) con URL `huellitas-media://users/{uid}/media/{mediaId}`. Coil las lee con `MediaFetcher`, registrado en `HuellitasApplication` (`SingletonImageLoader.Factory`).
 - Las pantallas que cambian según el modo usan `GetBackendModeUseCase`. En los tests, `FakeBackendModeProvider` (por defecto, Blaze).
 
 **Google Sign-In:** `GoogleIdTokenRequester` (Credential Manager, en `core.ui.google`) necesita un Activity. `MainActivity` le pasa `default_web_client_id` a `HuellitasApp`, que lo entrega a `authGraph()` y a `settingsScreen()` (reautenticación antes de eliminar la cuenta).

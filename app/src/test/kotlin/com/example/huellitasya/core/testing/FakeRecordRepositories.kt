@@ -115,7 +115,7 @@ class FakeRecordDownloader : RecordDownloader {
     /** (url, fileName) de cada descarga. */
     val downloads = mutableListOf<Pair<String, String>>()
 
-    override fun download(url: String, fileName: String, contentType: String): AppResult<Unit, DataError> {
+    override suspend fun download(url: String, fileName: String, contentType: String): AppResult<Unit, DataError> {
         downloads += url to fileName
         return result
     }
