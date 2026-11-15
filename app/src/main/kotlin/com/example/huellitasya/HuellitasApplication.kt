@@ -1,6 +1,9 @@
 package com.example.huellitasya
 
 import android.app.Application
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
 import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.domain.repository.BackendModeProvider
 import dagger.hilt.android.HiltAndroidApp
@@ -9,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
-class HuellitasApplication : Application() {
+class HuellitasApplication : Application(), SingletonImageLoader.Factory {
 
     @Inject
     lateinit var backendMode: BackendModeProvider
@@ -17,6 +20,12 @@ class HuellitasApplication : Application() {
     @Inject
     @ApplicationScope
     lateinit var appScope: CoroutineScope
+
+    /** Lee también las fotos y archivos guardados en Firestore en el modo gratuito (spec 008). */
+    @Inject
+    lateinit var imageLoaderFactory: SingletonImageLoader.Factory
+
+    override fun newImageLoader(context: PlatformContext): ImageLoader = imageLoaderFactory.newImageLoader(context)
 
     override fun onCreate() {
         super.onCreate()

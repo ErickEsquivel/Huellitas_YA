@@ -26,6 +26,7 @@
     <string name="error_reminder_in_past">Elige una fecha y hora futuras</string>
     <string name="error_profile_not_found">No encontramos tu perfil</string>
     <string name="error_photo_too_large">La imagen es demasiado grande</string>
+    <string name="error_file_unavailable">Este archivo no está disponible por ahora</string>
     <string name="error_new_email_invalid">Ingresa un correo distinto al actual</string>
     <string name="error_current_password_incorrect">La contraseña ingresada no es correcta</string>
     <string name="error_password_same">La nueva contraseña debe ser distinta a la actual</string>

@@ -3,19 +3,20 @@ package com.example.huellitasya.core.data.di
 import com.example.huellitasya.core.common.ApplicationScope
 import com.example.huellitasya.core.data.config.RemoteConfigBackendModeProvider
 import com.example.huellitasya.core.data.download.DownloadManagerRecordDownloader
+import com.example.huellitasya.core.data.media.HuellitasImageLoaderFactory
 import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
 import com.example.huellitasya.core.data.notifications.WorkManagerReminderNotifier
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
-import com.example.huellitasya.core.data.repository.FirebaseStoragePetPhotoRepository
-import com.example.huellitasya.core.data.repository.FirebaseStorageProfilePhotoRepository
 import com.example.huellitasya.core.data.repository.FirestorePetRepository
 import com.example.huellitasya.core.data.repository.FirestoreRecordRepository
 import com.example.huellitasya.core.data.repository.FirestoreReminderRepository
-import com.example.huellitasya.core.data.repository.FirebaseStorageRecordFileRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
 import com.example.huellitasya.core.data.repository.ModeAwareAccountRepository
 import com.example.huellitasya.core.data.repository.ModeAwareEmailChangeRepository
 import com.example.huellitasya.core.data.repository.ModeAwarePasswordResetRepository
+import com.example.huellitasya.core.data.repository.ModeAwarePetPhotoRepository
+import com.example.huellitasya.core.data.repository.ModeAwareProfilePhotoRepository
+import com.example.huellitasya.core.data.repository.ModeAwareRecordFileRepository
 import com.example.huellitasya.core.domain.repository.AccountRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
 import com.example.huellitasya.core.domain.repository.BackendModeProvider
@@ -31,6 +32,7 @@ import com.example.huellitasya.core.domain.repository.ReminderNotifier
 import com.example.huellitasya.core.domain.repository.ReminderRepository
 import com.example.huellitasya.core.domain.repository.ProfilePhotoRepository
 import com.example.huellitasya.core.domain.repository.UserRepository
+import coil3.SingletonImageLoader
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
@@ -108,7 +110,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindProfilePhotoRepository(impl: FirebaseStorageProfilePhotoRepository): ProfilePhotoRepository
+    abstract fun bindProfilePhotoRepository(impl: ModeAwareProfilePhotoRepository): ProfilePhotoRepository
 
     @Binds
     @Singleton
@@ -124,7 +126,7 @@ internal abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindPetPhotoRepository(impl: FirebaseStoragePetPhotoRepository): PetPhotoRepository
+    abstract fun bindPetPhotoRepository(impl: ModeAwarePetPhotoRepository): PetPhotoRepository
 
     @Binds
     @Singleton
@@ -140,11 +142,16 @@ internal abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindRecordFileRepository(impl: FirebaseStorageRecordFileRepository): RecordFileRepository
+    abstract fun bindRecordFileRepository(impl: ModeAwareRecordFileRepository): RecordFileRepository
 
     @Binds
     @Singleton
     abstract fun bindRecordDownloader(impl: DownloadManagerRecordDownloader): RecordDownloader
+
+    /** Coil con el lector de archivos `huellitas-media://` de Firestore (spec 008). */
+    @Binds
+    @Singleton
+    abstract fun bindImageLoaderFactory(impl: HuellitasImageLoaderFactory): SingletonImageLoader.Factory
 }
 
 private const val FUNCTIONS_REGION = "southamerica-east1"

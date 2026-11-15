@@ -1,8 +1,7 @@
 # 008 — Modo sin facturación
 
 - **Estado:** Approved
-  - Implementado: el interruptor y el modo gratuito de la cuenta (recuperar contraseña, cambio de correo, Seguridad y eliminar cuenta).
-  - Pendiente: el modo gratuito de los archivos y el script de migración.
+  - Implementado: el interruptor, el modo gratuito de la cuenta (recuperar contraseña, cambio de correo, Seguridad y eliminar cuenta), el de los archivos y el script de migración.
 - **Paquetes:** `core.domain`, `core.data`, `feature.auth`, `feature.profile`, `feature.settings`, `feature.pets`, `feature.records`; `firebase/firestore.rules`
 - **Figma:** sin frames nuevos. Las pantallas nuevas reutilizan los componentes de la spec 003.
 - **Relacionadas:** 001 (Firebase setup), 002 (auth), 004 (perfil), 005 (mascotas), 006 (registros médicos)
@@ -125,6 +124,8 @@ users/{uid}/media/{mediaId}/chunks/{n}       ← bytes, n = 0, 1, 2…
 | `data` | bytes | ≤ 900 KB |
 
 - **Escritura:** primero los chunks y al final el documento de metadatos. Un archivo sin metadatos está incompleto: no se muestra y se borra en el siguiente intento.
+- **Reemplazar** (otra foto de perfil o de mascota): las reglas no permiten editar, así que se borra el archivo anterior y se crea otro con el mismo `mediaId`.
+- **Borrar** una foto o un registro limpia los dos lugares: en modo Blaze, Storage y Firestore; en el modo gratuito, solo Firestore, porque Storage no responde.
 - **Avance de subida:** se calcula por chunks escritos (`UploadProgress.InProgress`).
 - **URL:** en lugar de la URL de descarga de Storage, `photoUrl` y `fileUrl` guardan `huellitas-media://users/{uid}/media/{mediaId}`. Los modelos y las pantallas no cambian.
 - **IDs:**
@@ -142,15 +143,22 @@ users/{uid}/media/{mediaId}/chunks/{n}       ← bytes, n = 0, 1, 2…
 - Mismos tipos y tamaño que la spec 006 (PDF o imagen, < 10 MB), sin comprimir.
 - **Ver y descargar:**
   - Coil carga las URLs `huellitas-media://` con un `Fetcher` de `core.data` que arma el archivo con los chunks. La miniatura del PDF sigue usando `PdfFirstPageDecoder`.
-  - El `DownloadManager` del sistema no sabe leer esa URL. Para esos archivos, `RecordDownloader` escribe los bytes en Descargas con `MediaStore` y muestra la misma notificación de descarga completa.
+  - El `DownloadManager` del sistema no sabe leer esa URL. Para esos archivos, `RecordDownloader` escribe los bytes en Descargas con `MediaStore` (antes de Android 10, en la carpeta Download de la app, como hoy). No hay notificación del sistema: el aviso es el Snackbar de la spec 006.
+  - Los archivos leídos se guardan en la caché de la app (`cache/huellitas-media/`), así no se vuelven a leer los chunks cada vez.
 
 ### Archivos que ya están en Storage
 
 - En modo gratuito, las URLs de Storage que ya existen no cargan, porque Storage responde 402/403. Las fotos muestran su placeholder. El detalle de un registro muestra "Este archivo no está disponible por ahora", en lugar de la vista previa y el botón de descargar.
-- **Recomendado, antes de quitar la facturación:** correr una sola vez el script `functions/scripts/migrar-storage-a-firestore.ts`. Corre en el computador de quien tenga acceso al proyecto, con credenciales de administrador, y no se despliega. El script:
+- **Recomendado, antes de quitar la facturación:** correr una sola vez el script `functions/scripts/migrar-storage-a-firestore.mjs`. Corre en el computador de quien tenga acceso al proyecto, con credenciales de administrador, y no se despliega. El script:
   - copia cada archivo de Storage a `media`;
   - reemplaza su `photoUrl` o `fileUrl`;
   - es idempotente y no borra nada de Storage.
+
+  ```bash
+  gcloud auth application-default login                            # credenciales de administrador
+  node functions/scripts/migrar-storage-a-firestore.mjs            # simulación: lista lo que copiaría
+  node functions/scripts/migrar-storage-a-firestore.mjs --aplicar  # copia y cambia las URLs
+  ```
 
 ## Reglas de Firestore
 
