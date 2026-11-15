@@ -5,10 +5,13 @@ import com.example.huellitasya.R
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.designsystem.components.FieldStatus
 import com.example.huellitasya.core.domain.error.AuthError
+import com.example.huellitasya.core.domain.repository.BackendMode
 import com.example.huellitasya.core.domain.usecase.ChangePasswordUseCase
+import com.example.huellitasya.core.domain.usecase.GetBackendModeUseCase
 import com.example.huellitasya.core.domain.validation.ValidatePasswordUseCase
 import com.example.huellitasya.core.testing.FakeAccountRepository
 import com.example.huellitasya.core.testing.FakeAuthRepository
+import com.example.huellitasya.core.testing.FakeBackendModeProvider
 import com.example.huellitasya.core.testing.FakeNetworkMonitor
 import com.example.huellitasya.core.testing.MainDispatcherRule
 import com.example.huellitasya.core.ui.MissingFieldsFeedback
@@ -29,11 +32,13 @@ class SecurityViewModelTest {
     private val authRepository = FakeAuthRepository()
     private val accountRepository = FakeAccountRepository()
     private val networkMonitor = FakeNetworkMonitor()
+    private val backendMode = FakeBackendModeProvider()
 
     private fun viewModel() = SecurityViewModel(
         changePassword = ChangePasswordUseCase(authRepository, accountRepository),
         validatePassword = ValidatePasswordUseCase(),
         networkMonitor = networkMonitor,
+        getBackendMode = GetBackendModeUseCase(backendMode),
     )
 
     private fun SecurityViewModel.fill(current: String, new: String, confirmation: String = new) {
@@ -131,5 +136,18 @@ class SecurityViewModelTest {
             assertEquals(SecurityEvent.ShowMessage(AuthError.Network.toUiText()!!), awaitItem())
         }
         assertTrue(authRepository.reauthPasswords.isEmpty())
+    }
+
+    @Test
+    fun `en modo gratuito no promete el aviso por correo`() = runTest {
+        backendMode.mode = BackendMode.Free
+        val viewModel = viewModel()
+        viewModel.fill(current = "Actual1", new = "Nueva2025")
+
+        viewModel.events.test {
+            viewModel.onAction(SecurityAction.Submit)
+            assertEquals(SecurityEvent.ShowMessage(UiText.Resource(R.string.security_success_no_notice)), awaitItem())
+        }
+        assertEquals(listOf("Nueva2025"), authRepository.updatedPasswords)
     }
 }

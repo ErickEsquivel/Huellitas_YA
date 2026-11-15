@@ -24,6 +24,8 @@
     <string name="personal_data_save">Actualizar información</string>
     <string name="personal_data_saved">Datos actualizados</string>
     <string name="personal_data_email_changed">Tu correo ahora es %1$s</string>
+    <!-- Modo gratuito (spec 008): el cambio de correo se confirma con un enlace -->
+    <string name="personal_data_email_link_sent">Te enviamos un enlace a %1$s. El cambio se aplica cuando lo abras.</string>
 
     <!-- Reautenticación antes de cambiar el correo -->
     <string name="personal_data_reauth_title">Confirma tu contraseña</string>

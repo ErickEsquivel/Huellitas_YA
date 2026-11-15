@@ -1,12 +1,11 @@
 package com.example.huellitasya.core.data.di
 
 import com.example.huellitasya.core.common.ApplicationScope
+import com.example.huellitasya.core.data.config.RemoteConfigBackendModeProvider
 import com.example.huellitasya.core.data.download.DownloadManagerRecordDownloader
 import com.example.huellitasya.core.data.network.ConnectivityNetworkMonitor
 import com.example.huellitasya.core.data.notifications.WorkManagerReminderNotifier
 import com.example.huellitasya.core.data.repository.FirebaseAuthRepository
-import com.example.huellitasya.core.data.repository.FunctionsAccountRepository
-import com.example.huellitasya.core.data.repository.FunctionsEmailChangeRepository
 import com.example.huellitasya.core.data.repository.FirebaseStoragePetPhotoRepository
 import com.example.huellitasya.core.data.repository.FirebaseStorageProfilePhotoRepository
 import com.example.huellitasya.core.data.repository.FirestorePetRepository
@@ -14,9 +13,12 @@ import com.example.huellitasya.core.data.repository.FirestoreRecordRepository
 import com.example.huellitasya.core.data.repository.FirestoreReminderRepository
 import com.example.huellitasya.core.data.repository.FirebaseStorageRecordFileRepository
 import com.example.huellitasya.core.data.repository.FirestoreUserRepository
-import com.example.huellitasya.core.data.repository.FunctionsPasswordResetRepository
+import com.example.huellitasya.core.data.repository.ModeAwareAccountRepository
+import com.example.huellitasya.core.data.repository.ModeAwareEmailChangeRepository
+import com.example.huellitasya.core.data.repository.ModeAwarePasswordResetRepository
 import com.example.huellitasya.core.domain.repository.AccountRepository
 import com.example.huellitasya.core.domain.repository.AuthRepository
+import com.example.huellitasya.core.domain.repository.BackendModeProvider
 import com.example.huellitasya.core.domain.repository.EmailChangeRepository
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
 import com.example.huellitasya.core.domain.repository.PasswordResetRepository
@@ -32,6 +34,7 @@ import com.example.huellitasya.core.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.FirebaseStorage
 import dagger.Binds
 import dagger.Module
@@ -68,6 +71,11 @@ internal object FirebaseModule {
     @Singleton
     fun provideFirebaseStorage(): FirebaseStorage = FirebaseStorage.getInstance()
 
+    /** Interruptor `blaze_activo` del modo sin facturación (spec 008). */
+    @Provides
+    @Singleton
+    fun provideFirebaseRemoteConfig(): FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+
     @Provides
     @Singleton
     @ApplicationScope
@@ -88,11 +96,15 @@ internal abstract class RepositoryModule {
 
     @Binds
     @Singleton
+    abstract fun bindBackendModeProvider(impl: RemoteConfigBackendModeProvider): BackendModeProvider
+
+    @Binds
+    @Singleton
     abstract fun bindNetworkMonitor(impl: ConnectivityNetworkMonitor): NetworkMonitor
 
     @Binds
     @Singleton
-    abstract fun bindPasswordResetRepository(impl: FunctionsPasswordResetRepository): PasswordResetRepository
+    abstract fun bindPasswordResetRepository(impl: ModeAwarePasswordResetRepository): PasswordResetRepository
 
     @Binds
     @Singleton
@@ -100,11 +112,11 @@ internal abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindAccountRepository(impl: FunctionsAccountRepository): AccountRepository
+    abstract fun bindAccountRepository(impl: ModeAwareAccountRepository): AccountRepository
 
     @Binds
     @Singleton
-    abstract fun bindEmailChangeRepository(impl: FunctionsEmailChangeRepository): EmailChangeRepository
+    abstract fun bindEmailChangeRepository(impl: ModeAwareEmailChangeRepository): EmailChangeRepository
 
     @Binds
     @Singleton

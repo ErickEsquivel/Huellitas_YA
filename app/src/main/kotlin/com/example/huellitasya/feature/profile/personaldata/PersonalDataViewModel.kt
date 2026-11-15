@@ -7,7 +7,9 @@ import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.error.EmailChangeError
+import com.example.huellitasya.core.domain.repository.BackendMode
 import com.example.huellitasya.core.domain.repository.NetworkMonitor
+import com.example.huellitasya.core.domain.usecase.GetBackendModeUseCase
 import com.example.huellitasya.core.domain.usecase.ObserveUserProfileUseCase
 import com.example.huellitasya.core.domain.usecase.ReauthenticateUseCase
 import com.example.huellitasya.core.domain.usecase.RequestEmailChangeCodeUseCase
@@ -106,6 +108,7 @@ class PersonalDataViewModel @Inject constructor(
     private val validateAddress: ValidateAddressUseCase,
     private val validateBirthDate: ValidateBirthDateUseCase,
     private val validatePassword: ValidatePasswordUseCase,
+    private val getBackendMode: GetBackendModeUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PersonalDataUiState())
@@ -221,10 +224,16 @@ class PersonalDataViewModel @Inject constructor(
     /**
      * Pide el código para el correo nuevo. El correo no cambia hasta validar el código en
      * "Verifica tu correo"; mientras tanto se sale del modo edición con lo ya guardado.
+     *
+     * En el modo gratuito (spec 008) se envía un enlace al correo nuevo y el cambio se aplica
+     * cuando el usuario lo abre: no hay "Verifica tu correo", solo un aviso.
      */
     private suspend fun changeEmail(newEmail: String) {
+        val usesLink = getBackendMode() == BackendMode.Free
         when (val result = requestEmailChangeCode(newEmail)) {
-            is AppResult.Success -> {
+            is AppResult.Success -> if (usesLink) {
+                finishSaving(UiText.Resource(R.string.personal_data_email_link_sent, newEmail))
+            } else {
                 finishSaving(message = null)
                 _events.send(PersonalDataEvent.NavigateToVerifyEmail(newEmail))
             }

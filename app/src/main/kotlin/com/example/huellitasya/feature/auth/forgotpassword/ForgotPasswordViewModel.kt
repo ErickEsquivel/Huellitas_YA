@@ -2,8 +2,11 @@ package com.example.huellitasya.feature.auth.forgotpassword
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.huellitasya.R
 import com.example.huellitasya.core.common.AppResult
 import com.example.huellitasya.core.domain.error.PasswordResetError
+import com.example.huellitasya.core.domain.repository.BackendMode
+import com.example.huellitasya.core.domain.usecase.GetBackendModeUseCase
 import com.example.huellitasya.core.domain.usecase.RequestPasswordResetCodeUseCase
 import com.example.huellitasya.core.domain.validation.ValidateEmailUseCase
 import com.example.huellitasya.core.ui.FieldFeedback
@@ -12,7 +15,9 @@ import com.example.huellitasya.core.ui.formFeedbackFor
 import com.example.huellitasya.core.ui.toFieldFeedback
 import com.example.huellitasya.core.ui.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,13 +32,23 @@ data class ForgotPasswordUiState(
     val emailFeedback: FieldFeedback? = null,
     val formFeedback: FieldFeedback? = null,
     val isLoading: Boolean = false,
+    /** Modo gratuito (spec 008): se envía un enlace en lugar del código. */
+    val usesLink: Boolean = false,
+    /** Correo al que se envió el enlace: la pantalla pasa a "Revisa tu correo". */
+    val linkSentTo: String? = null,
+    /** Segundos que faltan para poder reenviar el enlace (0 = "Reenviar enlace" activo). */
+    val resendSecondsLeft: Int = 0,
 ) {
     val isComplete: Boolean get() = email.isNotBlank()
+    val canResend: Boolean get() = resendSecondsLeft == 0 && !isLoading
 }
 
 sealed interface ForgotPasswordAction {
     data class EmailChanged(val value: String) : ForgotPasswordAction
     data object Submit : ForgotPasswordAction
+
+    /** "Reenviar enlace" en "Revisa tu correo" (modo gratuito). */
+    data object Resend : ForgotPasswordAction
 }
 
 sealed interface ForgotPasswordEvent {
@@ -42,6 +57,9 @@ sealed interface ForgotPasswordEvent {
     /** Se pidió el código: la pantalla pasa a "Verifica tu correo". */
     data class NavigateToVerifyCode(val email: String) : ForgotPasswordEvent
 
+    /** Modo gratuito: "Volver a iniciar sesión" desde "Revisa tu correo". */
+    data object NavigateToLogin : ForgotPasswordEvent
+
     /** Falló por red: la pantalla muestra el overlay "Sin conexión". */
     data object NetworkError : ForgotPasswordEvent
 }
@@ -49,14 +67,18 @@ sealed interface ForgotPasswordEvent {
 /**
  * Pide el código de 4 dígitos por correo (spec 002, "Recuperar contraseña"). Por privacidad el
  * backend responde igual exista o no la cuenta, así que siempre se avanza a "Verifica tu correo".
+ *
+ * En el modo gratuito (spec 008) Firebase Auth envía un enlace y la misma pantalla pasa a
+ * "Revisa tu correo", con "Reenviar enlace" cada 60 s.
  */
 @HiltViewModel
 class ForgotPasswordViewModel @Inject constructor(
     private val requestCode: RequestPasswordResetCodeUseCase,
     private val validateEmail: ValidateEmailUseCase,
+    getBackendMode: GetBackendModeUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(ForgotPasswordUiState())
+    private val _uiState = MutableStateFlow(ForgotPasswordUiState(usesLink = getBackendMode() == BackendMode.Free))
     val uiState: StateFlow<ForgotPasswordUiState> = _uiState.asStateFlow()
 
     private val _events = Channel<ForgotPasswordEvent>(Channel.BUFFERED)
@@ -68,8 +90,11 @@ class ForgotPasswordViewModel @Inject constructor(
                 it.copy(email = action.value, emailFeedback = null, formFeedback = null)
             }
             ForgotPasswordAction.Submit -> submit()
+            ForgotPasswordAction.Resend -> resend()
         }
     }
+
+    private var countdownJob: Job? = null
 
     private fun submit() {
         val state = _uiState.value
@@ -83,10 +108,20 @@ class ForgotPasswordViewModel @Inject constructor(
             return
         }
 
+        // En "Revisa tu correo" el botón principal vuelve a iniciar sesión.
+        if (state.linkSentTo != null) {
+            viewModelScope.launch { _events.send(ForgotPasswordEvent.NavigateToLogin) }
+            return
+        }
+
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             val result = requestCode(state.email)
             _uiState.update { it.copy(isLoading = false) }
+            if (state.usesLink) {
+                onLinkRequested(state.email.trim(), result)
+                return@launch
+            }
             when {
                 // Si ya se envió un código hace poco, ese sigue sirviendo: se avanza igual.
                 result is AppResult.Success ||
@@ -98,5 +133,46 @@ class ForgotPasswordViewModel @Inject constructor(
                     result.error.toUiText()?.let { _events.send(ForgotPasswordEvent.ShowMessage(it)) }
             }
         }
+    }
+
+    private fun resend() {
+        val state = _uiState.value
+        val email = state.linkSentTo ?: return
+        if (!state.canResend) return
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val result = requestCode(email)
+            _uiState.update { it.copy(isLoading = false) }
+            if (result is AppResult.Success) _events.send(ForgotPasswordEvent.ShowMessage(UiText.Resource(R.string.auth_forgot_link_resent)))
+            onLinkRequested(email, result)
+        }
+    }
+
+    /** Igual que con el código: si ya se envió un enlace hace poco, ese sigue sirviendo. */
+    private suspend fun onLinkRequested(email: String, result: AppResult<Unit, PasswordResetError>) {
+        when {
+            result is AppResult.Success -> showLinkSent(email, RESEND_COOLDOWN_SECONDS)
+            result is AppResult.Failure && result.error is PasswordResetError.TooManyRequests ->
+                showLinkSent(email, result.error.retryAfterSeconds)
+            result is AppResult.Failure && result.error == PasswordResetError.Network ->
+                _events.send(ForgotPasswordEvent.NetworkError)
+            result is AppResult.Failure ->
+                result.error.toUiText()?.let { _events.send(ForgotPasswordEvent.ShowMessage(it)) }
+        }
+    }
+
+    private fun showLinkSent(email: String, cooldownSeconds: Int) {
+        _uiState.update { it.copy(linkSentTo = email) }
+        countdownJob?.cancel()
+        countdownJob = viewModelScope.launch {
+            for (left in cooldownSeconds downTo 0) {
+                _uiState.update { it.copy(resendSecondsLeft = left) }
+                if (left > 0) delay(1_000)
+            }
+        }
+    }
+
+    companion object {
+        const val RESEND_COOLDOWN_SECONDS = 60
     }
 }

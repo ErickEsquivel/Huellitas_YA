@@ -8,6 +8,8 @@ import com.example.huellitasya.core.domain.error.DataError
 import com.example.huellitasya.core.domain.error.ValidationError
 import com.example.huellitasya.core.domain.error.AuthError
 import com.example.huellitasya.core.domain.error.EmailChangeError
+import com.example.huellitasya.core.domain.repository.BackendMode
+import com.example.huellitasya.core.domain.usecase.GetBackendModeUseCase
 import com.example.huellitasya.core.domain.usecase.ObserveUserProfileUseCase
 import com.example.huellitasya.core.domain.usecase.ReauthenticateUseCase
 import com.example.huellitasya.core.domain.usecase.RequestEmailChangeCodeUseCase
@@ -22,6 +24,7 @@ import com.example.huellitasya.core.model.AuthProvider
 import com.example.huellitasya.core.model.Field
 import com.example.huellitasya.core.model.ProfileChanges
 import com.example.huellitasya.core.testing.FakeAuthRepository
+import com.example.huellitasya.core.testing.FakeBackendModeProvider
 import com.example.huellitasya.core.testing.FakeEmailChangeRepository
 import com.example.huellitasya.core.testing.FakeNetworkMonitor
 import com.example.huellitasya.core.testing.FakeUserRepository
@@ -53,6 +56,7 @@ class PersonalDataViewModelTest {
     }
     private val networkMonitor = FakeNetworkMonitor()
     private val emailChangeRepository = FakeEmailChangeRepository()
+    private val backendMode = FakeBackendModeProvider()
 
     private fun viewModel() = PersonalDataViewModel(
         observeUserProfile = ObserveUserProfileUseCase(authRepository, userRepository),
@@ -66,6 +70,7 @@ class PersonalDataViewModelTest {
         validateAddress = ValidateAddressUseCase(),
         validateBirthDate = ValidateBirthDateUseCase(),
         validatePassword = ValidatePasswordUseCase(),
+        getBackendMode = GetBackendModeUseCase(backendMode),
     )
 
     private fun PersonalDataViewModel.startEditing() = onAction(PersonalDataAction.ToggleEditing)
@@ -355,5 +360,26 @@ class PersonalDataViewModelTest {
         assertNull(state.reauth)
         assertTrue(state.isEditing)
         assertEquals("nuevo@correo.com", state.email)
+    }
+
+    @Test
+    fun `en modo gratuito cambiar el correo envia un enlace y avisa sin abrir Verifica tu correo`() = runTest {
+        backendMode.mode = BackendMode.Free
+        val viewModel = viewModel()
+        viewModel.startEditing()
+        viewModel.onAction(PersonalDataAction.EmailChanged("nuevo@correo.com"))
+
+        viewModel.events.test {
+            viewModel.onAction(PersonalDataAction.Save)
+            assertEquals(
+                PersonalDataEvent.ShowMessage(UiText.Resource(R.string.personal_data_email_link_sent, "nuevo@correo.com")),
+                awaitItem(),
+            )
+        }
+
+        assertEquals(listOf("nuevo@correo.com"), emailChangeRepository.requestedEmails)
+        val state = viewModel.uiState.value
+        assertEquals(TestProfile.email, state.email)
+        assertFalse(state.isEditing)
     }
 }

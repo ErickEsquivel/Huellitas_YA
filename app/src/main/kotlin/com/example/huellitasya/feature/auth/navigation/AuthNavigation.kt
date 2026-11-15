@@ -51,6 +51,7 @@ private const val PASSWORD_RESET_KEY = "password_reset"
  * Bienvenido → (correo → Login → Recuperar contraseña | Regístrate | Google). Presentación ya no
  * está aquí: se ve después del login si no hay mascotas (spec 005).
  * Recuperar contraseña → Verifica tu correo (código) → Crear nueva contraseña → vuelve a Login.
+ * En el modo gratuito (spec 008), Recuperar contraseña envía un enlace y desde ahí vuelve a Login.
  * Al autenticarse no se navega desde aquí: la app reemplaza este grafo al cambiar la sesión.
  *
  * Todas las pantallas comparten el overlay "Sin conexión" ([ConnectivityAware]).
@@ -104,6 +105,7 @@ fun NavGraphBuilder.authGraph(
                 ForgotPasswordRoute(
                     onBackClick = navController::navigateUp,
                     onCodeSent = { email -> navController.navigate(VerifyResetCodeDestination(email)) },
+                    onBackToLogin = { navController.popBackStack<LoginDestination>(inclusive = false) },
                     onNetworkError = connectivity::onNetworkError,
                 )
             }
